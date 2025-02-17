@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_bg_rounded_sheet"
+    android:padding="@dimen/_12sdp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/drag_handle"
+        android:layout_width="@dimen/_48sdp"
+        android:layout_height="@dimen/_4sdp"
+        android:layout_gravity="center_horizontal"
+        android:alpha="0.25"
+        app:cardBackgroundColor="@color/colorIconOpacity"
+        app:cardElevation="@dimen/_0sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="@dimen/_0sdp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_map_location_area"
+        style="@style/TextSemiBold"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:gravity="start|center_vertical"
+        android:text=""
+        android:textSize="@dimen/_11ssp"
+        app:layout_constraintEnd_toStartOf="@+id/action_share"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drag_handle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_map_location_details"
+        style="@style/TextRegular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:alpha="0.7"
+        android:gravity="start|center_vertical"
+        android:text=""
+        android:textSize="@dimen/_8ssp"
+        app:layout_constraintStart_toStartOf="@+id/text_map_location_area"
+        app:layout_constraintTop_toBottomOf="@+id/text_map_location_area" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_map_direction_time"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:alpha="0.7"
+        android:gravity="start|center_vertical"
+        android:text=""
+        android:textSize="@dimen/_8ssp"
+        app:layout_constraintEnd_toEndOf="@+id/text_map_location_area"
+        app:layout_constraintStart_toEndOf="@+id/text_map_location_details"
+        app:layout_constraintTop_toTopOf="@+id/text_map_location_details" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_share"
+        style="@style/MaterialButtonTransparent"
+        android:layout_width="@dimen/_24sdp"
+        android:layout_height="@dimen/_24sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:backgroundTint="@color/colorCardBackground"
+        app:icon="@drawable/ic_menu_share"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/_0sdp"
+        app:layout_constraintEnd_toStartOf="@+id/action_close"
+        app:layout_constraintTop_toTopOf="@+id/action_close" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_close"
+        style="@style/MaterialButtonTransparent"
+        android:layout_width="@dimen/_24sdp"
+        android:layout_height="@dimen/_24sdp"
+        app:backgroundTint="@color/colorCardBackground"
+        app:icon="@drawable/ic_menu_close"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/_0sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drag_handle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_navigation"
+        style="@style/MaterialButtonAccent"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:text="@string/action_direction"
+        android:textSize="@dimen/_11ssp"
+        app:fontFamily="@font/medium"
+        app:icon="@drawable/ic_menu_navigation"
+        app:iconGravity="textStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_map_location_details" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

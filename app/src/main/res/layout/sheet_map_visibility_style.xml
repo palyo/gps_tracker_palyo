@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sheet_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_bg_rounded_sheet"
+    android:padding="@dimen/_12sdp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/drag_handle"
+        android:layout_width="@dimen/_48sdp"
+        android:layout_height="@dimen/_4sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:alpha="0.25"
+        app:cardBackgroundColor="@color/colorIconOpacity"
+        app:cardElevation="@dimen/_0sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="@dimen/_0sdp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_administrative"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drag_handle">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_administrative"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_administrative"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_administrative_country"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_country"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_administrative_province"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_administrative" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_administrative_province"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_province"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_administrative_country"
+            app:layout_constraintEnd_toStartOf="@+id/map_administrative_locality"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_administrative_country"
+            app:layout_constraintTop_toTopOf="@+id/map_administrative_country" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_administrative_locality"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_locality"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_administrative_country"
+            app:layout_constraintEnd_toStartOf="@+id/map_administrative_neighborhood"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_administrative_province"
+            app:layout_constraintTop_toTopOf="@+id/map_administrative_country" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_administrative_neighborhood"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_neighborhood"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_administrative_country"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.35"
+            app:layout_constraintStart_toEndOf="@+id/map_administrative_locality"
+            app:layout_constraintTop_toTopOf="@+id/map_administrative_country" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_administrative_land_parcel"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_land_parcel"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_administrative_space"
+            app:layout_constraintHorizontal_weight="0.35"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map_administrative_country" />
+
+        <View
+            android:id="@+id/map_administrative_space"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_administrative_land_parcel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.65"
+            app:layout_constraintStart_toEndOf="@+id/map_administrative_land_parcel"
+            app:layout_constraintTop_toTopOf="@+id/map_administrative_land_parcel" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_landscape"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_administrative">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_landscape"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_landscape"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_landscape_man_made"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_human_made"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_landscape_natural"
+            app:layout_constraintHorizontal_weight="0.35"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_landscape" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_landscape_natural"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_natural"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_landscape_man_made"
+            app:layout_constraintEnd_toStartOf="@+id/map_landscape_natural_landcover"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_landscape_man_made"
+            app:layout_constraintTop_toTopOf="@+id/map_landscape_man_made" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_landscape_natural_landcover"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_landcover"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_landscape_man_made"
+            app:layout_constraintEnd_toStartOf="@+id/map_landscape_natural_terrain"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_landscape_natural"
+            app:layout_constraintTop_toTopOf="@+id/map_landscape_man_made" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_landscape_natural_terrain"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_terrain"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_landscape_man_made"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_landscape_natural_landcover"
+            app:layout_constraintTop_toTopOf="@+id/map_landscape_man_made" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_point_of_interest"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_landscape">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_poi"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_point_of_interest"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_attraction"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_attraction"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_business"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_poi" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_business"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_business"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_attraction"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_government"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_attraction"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_attraction" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_government"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_government"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_attraction"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_medical"
+            app:layout_constraintHorizontal_weight="0.30"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_business"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_attraction" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_medical"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_medical"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_attraction"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_government"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_attraction" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_park"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_park"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_place_of_worship"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map_poi_attraction" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_place_of_worship"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_worship"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_park"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_school"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_park"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_park" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_school"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_school"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_park"
+            app:layout_constraintEnd_toStartOf="@+id/map_poi_sports_complex"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_place_of_worship"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_park" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_poi_sports_complex"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_sports"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_poi_park"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_poi_school"
+            app:layout_constraintTop_toTopOf="@+id/map_poi_park" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_road"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_point_of_interest">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_road"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_road"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_road_arterial"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_arterial"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_road_highway"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_road" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_road_highway"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_highway"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_road_arterial"
+            app:layout_constraintEnd_toStartOf="@+id/map_road_highway_controlled_access"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_road_arterial"
+            app:layout_constraintTop_toTopOf="@+id/map_road_arterial" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_road_highway_controlled_access"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_controlled_access"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_road_arterial"
+            app:layout_constraintEnd_toStartOf="@+id/map_road_local"
+            app:layout_constraintHorizontal_weight="0.35"
+            app:layout_constraintStart_toEndOf="@+id/map_road_highway"
+            app:layout_constraintTop_toTopOf="@+id/map_road_arterial" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_road_local"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_local"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_road_arterial"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.20"
+            app:layout_constraintStart_toEndOf="@+id/map_road_highway_controlled_access"
+            app:layout_constraintTop_toTopOf="@+id/map_road_arterial" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_transit"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_road">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_transit"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_transit"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_transit_line"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_line"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_transit_station"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_transit" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_transit_station"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_station"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_transit_line"
+            app:layout_constraintEnd_toStartOf="@+id/map_transit_station_airport"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_transit_line"
+            app:layout_constraintTop_toTopOf="@+id/map_transit_line" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_transit_station_airport"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_airport"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_transit_line"
+            app:layout_constraintEnd_toStartOf="@+id/map_transit_station_bus"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_transit_station"
+            app:layout_constraintTop_toTopOf="@+id/map_transit_line" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_transit_station_bus"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_bus"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_transit_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toEndOf="@+id/map_transit_station_airport"
+            app:layout_constraintTop_toTopOf="@+id/map_transit_line" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_transit_station_rail"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_rail"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_transit_space"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map_transit_line" />
+
+        <View
+            android:id="@+id/map_transit_space"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_transit_station_rail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.75"
+            app:layout_constraintStart_toEndOf="@+id/map_transit_station_rail"
+            app:layout_constraintTop_toTopOf="@+id/map_transit_station_rail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_water_toggle"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_transit">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_map_water"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/map_visibility_label_water"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_water"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:singleLine="true"
+            android:text="@string/map_visibility_water"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toStartOf="@+id/map_water_space"
+            app:layout_constraintHorizontal_weight="0.25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_map_water" />
+
+        <View
+            android:id="@+id/map_water_space"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/map_water"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="0.75"
+            app:layout_constraintStart_toEndOf="@+id/map_water"
+            app:layout_constraintTop_toTopOf="@+id/map_water" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

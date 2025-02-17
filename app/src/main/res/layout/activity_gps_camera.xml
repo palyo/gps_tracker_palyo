@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".ui.GPSCameraActivity">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/control_bar"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_close"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_margin="@dimen/_12sdp"
+            app:backgroundTint="@color/colorBlack34"
+            app:icon="@drawable/ic_menu_close"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_18sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_flash"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_margin="@dimen/_12sdp"
+            app:backgroundTint="@color/colorBlack34"
+            app:icon="@drawable/ic_acion_flash_off"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/button_collection"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            app:cardCornerRadius="@dimen/_12sdp"
+            app:cardBackgroundColor="@color/colorTransparent"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/button_capture"
+            app:layout_constraintEnd_toStartOf="@+id/button_capture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/button_capture">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/image_last_captured"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:scaleType="centerCrop"
+                android:background="@color/colorBlack34" />
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_capture"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_60sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:icon="@drawable/ic_action_capture"
+            app:iconPadding="@dimen/_0sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_change_camera"
+            app:layout_constraintStart_toEndOf="@+id/button_collection" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/colorAccentTool"
+            app:indicatorSize="@dimen/_60sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/button_capture"
+            app:layout_constraintEnd_toEndOf="@+id/button_capture"
+            app:layout_constraintStart_toStartOf="@+id/button_capture"
+            app:layout_constraintTop_toTopOf="@+id/button_capture"
+            app:trackColor="@color/colorTransparent"
+            app:trackThickness="@dimen/_2sdp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_change_camera"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            app:backgroundTint="@color/colorBlack34"
+            app:icon="@drawable/ic_action_change_camera"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@+id/button_capture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button_capture"
+            app:layout_constraintTop_toTopOf="@+id/button_capture" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layout_map_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:cardBackgroundColor="@color/colorBlack34"
+            app:cardCornerRadius="@dimen/_12sdp"
+            app:cardElevation="0dp"
+            app:contentPadding="@dimen/_8sdp"
+            app:layout_constraintBottom_toTopOf="@+id/button_capture">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_icon_map"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    app:cardCornerRadius="@dimen/_12sdp"
+                    app:cardBackgroundColor="@color/colorTransparent"
+                    app:cardElevation="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/icon_map"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:adjustViewBounds="true"
+                        android:background="@color/colorTransparent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_map_icon" />
+                </androidx.cardview.widget.CardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_address"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:gravity="center_vertical"
+                    android:text=""
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_10sdp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latlong"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/card_icon_map"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_latlong"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text=""
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_address" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/permission_layout"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:background="@color/colorBlack80"
+        android:padding="@dimen/_24sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/permission_title"
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_camera_nd_location"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_14ssp"
+            app:layout_constraintBottom_toTopOf="@+id/permission_body"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/permission_body"
+            style="@style/TextRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:text="@string/body_camera_nd_location"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintBottom_toTopOf="@+id/button_allow_access"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/permission_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_allow_access"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:text="Allow Access"
+            android:textAllCaps="true"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_11ssp"
+            app:backgroundTint="@color/colorBlack34"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/permission_body" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0F0F0F</color>
+    <color name="colorPrimaryDark">#0F0F0F</color>
+    <color name="colorBackground">#0F0F0F</color>
+    <color name="colorSecondaryBackground">#181818</color>
+    <color name="colorBackgroundStart">#CC0F0F0F</color>
+    <color name="colorBackgroundEnd">#880F0F0F</color>
+
+    <color name="colorAccent">#1B9ECC</color>
+    <color name="colorAccent80">#CC1B9ECC</color>
+    <color name="colorAccent64">#A31B9ECC</color>
+    <color name="colorAccent50">#801B9ECC</color>
+    <color name="colorAccent34">#571B9ECC</color>
+    <color name="colorAccent12">#1F1B9ECC</color>
+    <color name="colorAccent8">#141B9ECC</color>
+    <color name="colorAccentTool">#FFFFFF</color>
+
+    <color name="colorInverseText">#212121</color>
+    <color name="colorInverseCardBackground">#E5E6EB</color>
+    <color name="colorCardBackground">#1D1D1D</color>
+    <color name="colorCardBackground50">#801D1D1D</color>
+    <color name="colorCardBackground34">#571D1D1D</color>
+
+    <color name="colorIcon">#FFFFFF</color>
+    <color name="colorIconOpacity">#CECECE</color>
+    <color name="colorIconOpacity24">#3DFFFFFF</color>
+    <color name="colorIconOpacity12">#1FFFFFFF</color>
+
+    <color name="colorText">#FFFFFF</color>
+    <color name="colorTextOpacity">#CECECE</color>
+    <color name="colorTextOpacity24">#3DFFFFFF</color>
+    <color name="colorRedShade">#1B1616</color>
+    <color name="colorGreenShade">#141A16</color>
+</resources>

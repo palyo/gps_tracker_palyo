@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "337479705164",
+    "project_id": "gps-map-track-gps-maps-ab",
+    "storage_bucket": "gps-map-track-gps-maps-ab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337479705164:android:708b946be18045f37d0ae9",
+        "android_client_info": {
+          "package_name": "aani.gps.map.trackgps.gpsmapcamera.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx3uiBEMEuP-GpZSU6yFWZi25v5BoIfao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

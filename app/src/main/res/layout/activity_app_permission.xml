@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".ui.AppPermissionActivity">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:adjustViewBounds="true"
+        app:contentPadding="@dimen/_24sdp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_root"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_vector_ui_permission" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_root"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/_24sdp"
+        android:paddingVertical="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_permission"
+            style="@style/TextBold"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:text="@string/title_permission_required"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_note"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:gravity="start|center_vertical"
+            android:text="@string/body_permission_required"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_permission" />
+
+        <View
+            android:id="@+id/view_divider_1"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_12sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_note" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_phone_state"
+            style="@style/TextBold"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:gravity="start|center_vertical"
+            android:text="@string/title_phone_state"
+            android:textSize="@dimen/_14ssp"
+            app:layout_constraintEnd_toStartOf="@+id/is_phone_state"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_divider_1" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/is_phone_state"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:button="@drawable/ic_button_selector"
+            android:clickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            app:buttonTint="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_phone_state"
+            app:useMaterialThemeColors="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/body_phone_state"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:gravity="start|center_vertical"
+            android:text="@string/body_phone_state"
+            android:textSize="@dimen/_9ssp"
+            app:layout_constraintEnd_toStartOf="@+id/is_phone_state"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_phone_state" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_overlay"
+            style="@style/TextBold"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:gravity="start|center_vertical"
+            android:text="@string/title_display_over_other_apps"
+            android:textSize="@dimen/_14ssp"
+            app:layout_constraintEnd_toStartOf="@+id/is_overlay"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/body_phone_state" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/is_overlay"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:button="@drawable/ic_button_selector"
+            android:clickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            app:buttonTint="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_overlay"
+            app:useMaterialThemeColors="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/body_overlay"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:gravity="start|center_vertical"
+            android:text="@string/body_display_over_other_apps"
+            android:textSize="@dimen/_9ssp"
+            app:layout_constraintEnd_toStartOf="@+id/is_overlay"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_overlay" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_continue"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:text="@string/button_allow_and_continue"
+            app:cornerRadius="@dimen/_8sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/body_overlay" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

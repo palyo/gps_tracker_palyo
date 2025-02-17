@@ -1,0 +1,137 @@
+<resources>
+    <string name="app_name" translatable="false">GPS Map - Track GPS &amp; Maps</string>
+    <string name="app_name_splash" translatable="false">GPS Map\nTrack GPS &amp; Maps</string>
+    <string name="app_name_manifest" translatable="false">#GPS Map - Track GPS &amp; Maps</string>
+    <string name="message_policy" translatable="false">By clicking \'Agree &amp; Continue\' you accept and approve the <a href="https://privacy-and-policy-online.blogspot.com/2021/10/privacy-policy.html">Privacy Policy</a></string>
+
+
+    <string name="text_hint_search">Search</string>
+    <string name="text_hint_source">Source</string>
+    <string name="text_hint_destination">Destination</string>
+    <string name="title_speedometer">Speedometer</string>
+    <string name="title_compass">Compass</string>
+    <string name="action_direction">Direction</string>
+    <string name="label_map_style">Map style</string>
+    <string name="map_standard">Standard</string>
+    <string name="map_satellite">Satellite</string>
+    <string name="map_terrain">Terrain</string>
+    <string name="map_silver">Silver</string>
+    <string name="map_retro">Retro</string>
+    <string name="map_dark">Dark</string>
+    <string name="map_night">Night</string>
+    <string name="map_aubergine">Aubergine</string>
+    <string name="label_map_details">Map details</string>
+    <string name="map_feature_traffic">Traffic</string>
+    <string name="map_feature_3d">3D</string>
+    <string name="map_visibility_label_administrative">Administrative</string>
+    <string name="map_visibility_label_landscape">Landscape</string>
+    <string name="map_visibility_label_point_of_interest">Point of interest</string>
+    <string name="map_visibility_label_road">Road</string>
+    <string name="map_visibility_label_transit">Transit</string>
+    <string name="map_visibility_label_water">Water</string>
+    <string name="map_visibility_country">Country</string>
+    <string name="map_visibility_province">Province</string>
+    <string name="map_visibility_locality">Locality</string>
+    <string name="map_visibility_neighborhood">Neighborhood</string>
+    <string name="map_visibility_land_parcel">Land parcel</string>
+    <string name="map_visibility_human_made">Human made</string>
+    <string name="map_visibility_natural">Natural</string>
+    <string name="map_visibility_landcover">Landcover</string>
+    <string name="map_visibility_terrain">Terrain</string>
+    <string name="map_visibility_attraction">Attraction</string>
+    <string name="map_visibility_business">Business</string>
+    <string name="map_visibility_government">Government</string>
+    <string name="map_visibility_medical">Medical</string>
+    <string name="map_visibility_park">Park</string>
+    <string name="map_visibility_worship">Worship</string>
+    <string name="map_visibility_school">School</string>
+    <string name="map_visibility_sports">Sports</string>
+    <string name="map_visibility_arterial">Arterial</string>
+    <string name="map_visibility_highway">Highway</string>
+    <string name="map_visibility_controlled_access">Controlled access</string>
+    <string name="map_visibility_local">Local</string>
+    <string name="map_visibility_line">Line</string>
+    <string name="map_visibility_station">Station</string>
+    <string name="map_visibility_airport">Airport</string>
+    <string name="map_visibility_bus">Bus</string>
+    <string name="map_visibility_rail">Rail</string>
+    <string name="map_visibility_water">Water</string>
+    <string name="menu_app_language">App Language</string>
+
+    <string name="tool_settings">Settings</string>
+    <string name="label_theme">Theme mode</string>
+    <string name="theme_system_default">System default</string>
+    <string name="theme_light_mode">Light mode</string>
+    <string name="theme_dark_mode">Dark mode</string>
+    <string name="label_other">Other</string>
+    <string name="menu_share_app">Share app</string>
+    <string name="menu_privacy_policy">Privacy policy</string>
+    <string name="menu_manage_consent">Manage consent</string>
+    <string name="menu_about_caller_id">About caller ID</string>
+    <string name="title_caller_theme">Caller theme</string>
+    <string name="action_apply_theme">Apply theme</string>
+
+    <string name="button_next">Next</string>
+    <string name="button_allow_and_continue">Allow &amp; Continue</string>
+
+    <string name="text_intro_page_1">Quickly access important tools after every call with our new post-call feature!</string>
+    <string name="text_intro_page_2">Explore your map with customizable styles, real-time speed tracking, and smart navigation tools.</string>
+
+    <string name="title_permission_required">Permission Required</string>
+    <string name="body_permission_required">Please grant the following permissions to ensure uninterrupted use of the app.</string>
+    <string name="title_phone_state">Phone State</string>
+    <string name="body_phone_state">Helps to identify incoming and outgoing call states.</string>
+    <string name="title_display_over_other_apps">Display Over Other Apps</string>
+    <string name="body_display_over_other_apps">Used in order for the aftercall feature to function properly.</string>
+
+    <string name="notification_permission_title">Stay Updated with Important Notifications</string>
+    <string name="notification_permission_body">Enable notifications to receive important updates and reminders related to your budget and financial tracking.</string>
+
+    <string name="button_enable">Enable</string>
+    <string name="message_please_add_mark_on_map">Please add mark on map</string>
+    <string name="message_map_not_initialized_yet">Map not initialized yet.</string>
+    <string name="measurement_area_in_km">"Area in Km: "</string>
+    <string name="measurement_area_in_meters">"Area in meters: "</string>
+    <string name="dashboard_banner_body">• Multiple Map Styles\n• Visibility Controls\n• Custom Overlays &amp; Markers</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_map_body">Stay on the right path with precise location updates.</string>
+    <string name="menu_voice_navigation">Voice navigation</string>
+    <string name="menu_voice_navigation_body">Get clear spoken directions while driving or walking.</string>
+    <string name="menu_route_finder">Route finder</string>
+    <string name="menu_route_finder_body">Get the shortest and quickest path.</string>
+    <string name="menu_speedometer">Speedometer</string>
+    <string name="menu_speedometer_body">Get real-time speed updates.</string>
+    <string name="menu_compass">Compass</string>
+    <string name="menu_compass_body">Needle points to Earth\'s magnetic field, helping you find your way</string>
+    <string name="menu_near_by_location">Near by location</string>
+    <string name="menu_near_by_location_body">See how far places are and get directions instantly.</string>
+    <string name="menu_area_calculator">Area Calculator</string>
+    <string name="menu_area_calculator_body">Measure and calculate area effortlessly on the map with precision and ease</string>
+
+    <string name="camera_unavailable" translatable="false">Camera unavailable</string>
+    <string name="camera_open_error" translatable="false">An error occurred accessing the camera</string>
+    <string name="video_creating_error" translatable="false">An error occurred creating the video file</string>
+    <string name="video_mode_error" translatable="false">Switching to video mode failed</string>
+    <string name="save_error_internal_storage" translatable="false">An error occurred, save folder changed to internal storage</string>
+    <string name="camera_switch_error" translatable="false">Switching camera failed</string>
+    <string name="click_to_resume_preview" translatable="false">Click on the image to resume preview</string>
+    <string name="photo_not_saved" translatable="false">The photo could not be saved</string>
+    <string name="setting_resolution_failed" translatable="false">Setting proper resolution failed</string>
+    <string name="video_recording_failed" translatable="false">Video recording failed, try using a different resolution</string>
+    <string name="camera_in_use_error" translatable="false">Camera is in use by another app, please close the app and try again</string>
+    <string name="camera_configure_error" translatable="false">An error occurred while configuring the camera</string>
+    <string name="camera_disabled_by_admin_error" translatable="false">Camera is disabled by the admin</string>
+    <string name="camera_dnd_error" translatable="false">"Do Not Disturb" mode is enabled. Please disable and try again</string>
+    <string name="photo_capture_failed" translatable="false">Photo capture failed</string>
+    <string name="video_capture_insufficient_storage_error" translatable="false">Video recording failed due to insufficient storage</string>
+
+    <string name="menu_gps_camera">GPS camera</string>
+    <string name="menu_gps_camera_body">Capture &amp; Track Locations with Every Photo!</string>
+    <string name="title_camera_nd_location">Camera &amp; Location Access Required></string>
+    <string name="body_camera_nd_location">To capture photos with embedded GPS data, this app needs access to your camera and location. Please grant these permissions to enable you to take pictures that automatically include your current location.</string>
+    <string name="sheet_title_delete_permanently">❌ Permanently Delete?</string>
+    <string name="sheet_body_delete_permanently">Are you sure you want to permanently delete this file? This action cannot be undone.</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+
+</resources>

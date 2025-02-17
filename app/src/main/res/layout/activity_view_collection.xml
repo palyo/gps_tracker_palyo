@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorBlack"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.ViewCollectionActivity">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:transitionName="image_media"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_toolbar"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_gradient_background_flipped"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:theme="@style/Theme.Space.AppBarOverlay"
+            android:translationZ="0.1dp"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@null"
+                app:navigationIcon="@drawable/ic_navigation_back"
+                app:navigationIconTint="@color/colorWhite"
+                app:popupTheme="@style/Theme.Space.PopupMenu"
+                app:titleTextAppearance="@style/TextAppearance.Space.TitleSmall"
+                app:titleTextColor="@color/colorWhite" />
+        </com.google.android.material.appbar.AppBarLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/button_action_bar"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_gradient_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_share"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_48sdp"
+            app:icon="@drawable/ic_menu_share"
+            app:iconSize="@dimen/_24sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintEnd_toStartOf="@+id/button_delete"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_48sdp"
+            app:iconSize="@dimen/_18sdp"
+            app:icon="@drawable/ic_menu_trash"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button_share"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

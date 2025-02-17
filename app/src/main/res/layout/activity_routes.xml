@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.RouteActivity">
+
+    <FrameLayout
+        android:id="@+id/map_fragment"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_controller"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_search_source"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="@dimen/_24sdp"
+            app:cardElevation="@dimen/_0sdp"
+            app:layout_constraintEnd_toStartOf="@+id/map_navigate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_search_source"
+                style="@style/Theme.Tracker.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/_4sdp"
+                android:paddingHorizontal="@dimen/_4sdp"
+                app:boxBackgroundColor="@color/colorTransparent"
+                app:boxBackgroundMode="none"
+                app:elevation="@dimen/_4sdp"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_search_source"
+                    style="@style/TextMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_icon_search"
+                    android:drawablePadding="@dimen/_8sdp"
+                    android:gravity="start|center_vertical"
+                    android:hint="@string/text_hint_source"
+                    android:imeOptions="actionSearch"
+                    android:inputType="textPostalAddress"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:singleLine="true"
+                    android:textColor="@color/colorTextOpacity"
+                    android:textSize="@dimen/_12ssp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_search_destination"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="@dimen/_24sdp"
+            app:cardElevation="@dimen/_0sdp"
+            app:layout_constraintEnd_toStartOf="@+id/map_navigate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_search_source"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_search_destination"
+                style="@style/Theme.Tracker.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/_4sdp"
+                android:paddingHorizontal="@dimen/_4sdp"
+                app:boxBackgroundColor="@color/colorTransparent"
+                app:boxBackgroundMode="none"
+                app:elevation="@dimen/_4sdp"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_search_destination"
+                    style="@style/TextMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_icon_search"
+                    android:drawablePadding="@dimen/_8sdp"
+                    android:gravity="start|center_vertical"
+                    android:hint="@string/text_hint_destination"
+                    android:imeOptions="actionSearch"
+                    android:inputType="textPostalAddress"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:singleLine="true"
+                    android:textColor="@color/colorTextOpacity"
+                    android:textSize="@dimen/_12ssp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_suggested_result"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:maxHeight="@dimen/_100sdp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/card_search_destination"
+            app:layout_constraintStart_toStartOf="@+id/card_search_destination"
+            app:layout_constraintTop_toBottomOf="@+id/card_search_destination"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/layout_row_item_suggestion" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_navigate"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginEnd="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_navigation"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/card_search_source"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_progress"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginEnd="@dimen/_12sdp"
+            android:clickable="true"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="@dimen/_18sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/card_search_source"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_bar_find"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                app:indicatorColor="@color/colorAccent"
+                app:indicatorSize="@dimen/_16sdp"
+                app:trackColor="@color/colorCardBackground"
+                app:trackCornerRadius="@dimen/_2sdp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_style"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_margin="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_map_layers"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_search_source"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_visibility"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_map_visibility"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:layout_constraintEnd_toEndOf="@+id/map_style"
+            app:layout_constraintTop_toBottomOf="@+id/map_style"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_zoom_in"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_zoom_in"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:iconTint="@color/colorIcon"
+            app:layout_constraintBottom_toTopOf="@+id/map_zoom_out"
+            app:layout_constraintEnd_toEndOf="@+id/map_current_location"
+            app:layout_constraintStart_toStartOf="@+id/map_current_location"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_zoom_out"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_36sdp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_zoom_out"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:iconTint="@color/colorIcon"
+            app:layout_constraintBottom_toTopOf="@+id/map_current_location"
+            app:layout_constraintEnd_toEndOf="@+id/map_current_location"
+            app:layout_constraintStart_toStartOf="@+id/map_current_location"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/map_current_location"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_margin="@dimen/_12sdp"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_menu_current_location"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:strokeColor="@color/colorIconOpacity24"
+            app:strokeWidth="1dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="@dimen/_36sdp"
+        android:layout_height="@dimen/_36sdp"
+        android:indeterminate="true"
+        app:indicatorColor="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackColor="@color/colorCardBackground"
+        app:trackCornerRadius="@dimen/_4sdp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
