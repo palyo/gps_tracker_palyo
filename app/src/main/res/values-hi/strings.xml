@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">अनुमति दें और जारी रखें</string>
     <string name="text_intro_page_2">अपनी आय और व्यय को आसानी से ट्रैक करें, बजट प्रबंधित करें और अपने वित्त पर नियंत्रण बनाए रखने के लिए व्यावहारिक रिपोर्ट तैयार करें।</string>
     <string name="text_intro_page_1">अनुकूलित शैलियों, वास्तविक समय की गति ट्रैकिंग और स्मार्ट नेविगेशन टूल के साथ अपने मानचित्र का अन्वेषण करें।</string>
-    <string name="title_permission_required">अनुमति आवश्यक</string>
-    <string name="body_permission_required">कृपया ऐप के निर्बाध उपयोग को सुनिश्चित करने के लिए निम्नलिखित अनुमतियाँ प्रदान करें।</string>
+    <string name="body_permission_required">सर्वोत्तम अनुभव प्रदान करने के लिए, कृपया निम्नलिखित की अनुमति दें:</string>
     <string name="title_phone_state">फ़ोन स्थिति</string>
     <string name="body_phone_state">इनकमिंग और आउटगोइंग कॉल की स्थिति की पहचान करने में मदद करता है।</string>
     <string name="title_display_over_other_apps">अन्य ऐप्स पर प्रदर्शित करें</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">कैमरा और लोकेशन एक्सेस आवश्यक</string>
     <string name="body_camera_nd_location">एम्बेडेड GPS डेटा के साथ फ़ोटो कैप्चर करने के लिए, इस ऐप को आपके कैमरे और लोकेशन तक पहुँच की आवश्यकता है। कृपया ये अनुमतियाँ दें ताकि आप ऐसी तस्वीरें ले सकें जिनमें आपका वर्तमान स्थान अपने आप शामिल हो।</string>
     <string name="sheet_title_delete_permanently">❌ स्थायी रूप से हटाएं?</string>
+    <string name="sheet_body_delete_permanently">क्या आप वाकई इस फ़ाइल को स्थायी रूप से हटाना चाहते हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।</string>
     <string name="action_delete">हटाएँ</string>
     <string name="action_cancel">रद्द करें</string>
+    <string name="title_permission_required">हमें आपकी अनुमति चाहिए!</string>
+    <string name="title_premium">प्रीमियम प्राप्त करें</string>
+    <string name="body_premium">इस मोबाइल टूल की सारी शक्ति अनलॉक करें और पहले कभी न देखे गए डिजिटल अनुभव का आनंद लें!</string>
+    <string name="plan_annual">वार्षिक</string>
+    <string name="label_best_value">सर्वोत्तम मूल्य</string>
+    <string name="plan_monthly">मासिक</string>
+    <string name="plan_weekly">साप्ताहिक</string>
+    <string name="button_buy_now">अभी खरीदें</string>
+    <string name="button_restore">पुनर्स्थापित करें</string>
 
 </resources>

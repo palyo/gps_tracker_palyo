@@ -3,6 +3,11 @@ package aanibrothers.tracker.io.ui
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.isPremium
+import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewNativeBanner
+import android.Manifest
 import android.animation.*
 import android.annotation.*
 import android.graphics.*
@@ -48,46 +53,6 @@ class SpeedViewActivity : BaseActivity<ActivitySpeedViewBinding>(ActivitySpeedVi
         }
     }
 
-    /*private fun ActivitySpeedViewBinding.updateSpeedUI(location: Location?) {
-        location?.let {
-            // ✅ Ignore updates if location hasn't changed significantly
-            if (lastLocation != null && it.distanceTo(lastLocation!!) < 2.5f) {
-                return
-            }
-            lastLocation = it
-
-            // ✅ Ignore inaccurate locations (low accuracy)
-            if (it.accuracy > 10) return
-
-            val newSpeed = it.speed * 3.6f // Convert m/s to km/h
-
-            // ✅ Ignore speeds below 1 km/h unless 3 seconds have passed
-            if (newSpeed < 1.0f) {
-                if (System.currentTimeMillis() - lastMovingTime > 3000) {
-                    speedometer.setSpeedAt(0f)
-                    speedWindow.clear()
-                    speedSum = 0f
-                    return
-                }
-            } else {
-                lastMovingTime = System.currentTimeMillis()
-            }
-
-            // ✅ Smooth out speed fluctuations using a rolling average
-            if (speedWindow.size >= 5) {
-                speedSum -= speedWindow.removeAt(0)
-            }
-            speedWindow.add(newSpeed)
-            speedSum += newSpeed
-            val averageSpeed = speedSum / speedWindow.size
-
-            // ✅ Only update speed if it significantly changes
-            if (Math.abs(averageSpeed - speedometer.speed) > 0.3f) {
-                speedometer.setSpeedAt(averageSpeed)
-            }
-        }
-    }*/
-
     private fun ActivitySpeedViewBinding.updateSpeedUI(location: Location?) {
         location?.let {
             if (lastLocation != null && it.distanceTo(lastLocation!!) < 2.5f) {
@@ -122,6 +87,8 @@ class SpeedViewActivity : BaseActivity<ActivitySpeedViewBinding>(ActivitySpeedVi
                 animateBackgroundColor(getSpeedRiskColor(averageSpeed))
             }
         }
+
+        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
     }
 
     private fun animateBackgroundColor(newColor: Int) {
@@ -178,15 +145,14 @@ class SpeedViewActivity : BaseActivity<ActivitySpeedViewBinding>(ActivitySpeedVi
 
     override fun ActivitySpeedViewBinding.initView() {
         toolbar.title = getString(R.string.title_speedometer)
-        layoutTopBar.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
-            v.setPadding(0,  statusBarHeight, 0,  navigationBarHeight)
-            insets
-        }
         toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+
         onBackPressedDispatcher.addCallback {
-            finish()
+            viewInterAdWithLogic {
+                finish()
+            }
         }
     }
 

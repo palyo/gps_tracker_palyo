@@ -11,7 +11,7 @@
         android:id="@+id/preview_view"
         android:layout_width="@dimen/_0sdp"
         android:layout_height="@dimen/_0sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ad_native"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,7 +20,7 @@
         android:id="@+id/control_bar"
         android:layout_width="@dimen/_0sdp"
         android:layout_height="@dimen/_0sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ad_native"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -187,6 +187,15 @@
 
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <aanibrothers.tracker.io.module.AdsView
+        android:id="@+id/ad_native"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/native_56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shimmer_preview_layout="@layout/ad_unified_banner_loading" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/permission_layout"

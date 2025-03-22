@@ -70,8 +70,7 @@
     <string name="button_allow_and_continue">収入と支出を簡単に追跡し、予算を管理し、洞察力のあるレポートを生成して、財務を管理します。</string>
     <string name="text_intro_page_2">カスタマイズ可能なスタイル、リアルタイムの速度追跡、スマートなナビゲーション ツールを使用して、マップを探索します。</string>
     <string name="text_intro_page_1">必要な権限</string>
-    <string name="title_permission_required">アプリを中断せずに使用できるように、次の権限を付与してください。</string>
-    <string name="body_permission_required">電話の状態</string>
+    <string name="body_permission_required">最高の体験を提供するために、次のことを許可してください:</string>
     <string name="title_phone_state">着信と発信の状態を識別するのに役立ちます。</string>
     <string name="body_phone_state">他のアプリの上に表示</string>
     <string name="title_display_over_other_apps">アフターコール機能が正しく機能するために使用します。</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">カメラと位置情報へのアクセスが必要です</string>
     <string name="body_camera_nd_location">GPS データが埋め込まれた写真をキャプチャするには、このアプリがカメラと位置情報にアクセスする必要があります。現在の位置情報を自動的に含む写真を撮影できるようにするには、これらの権限を付与してください。</string>
     <string name="sheet_title_delete_permanently">❌ 完全に削除しますか?</string>
+    <string name="sheet_body_delete_permanently">このファイルを完全に削除してもよろしいですか? この操作は元に戻せません。</string>
     <string name="action_delete">削除</string>
     <string name="action_cancel">キャンセル</string>
+    <string name="title_permission_required">あなたの許可が必要です!</string>
+    <string name="title_premium">プレミアムをゲット</string>
+    <string name="body_premium">このモバイルツールのパワーをすべて引き出して、これまでにないデジタル体験をお楽しみください!</string>
+    <string name="plan_annual">年間</string>
+    <string name="label_best_value">ベストバリュー</string>
+    <string name="plan_monthly">月間</string>
+    <string name="plan_weekly">週間</string>
+    <string name="button_buy_now">今すぐ購入</string>
+    <string name="button_restore">復元</string>
 
 </resources>

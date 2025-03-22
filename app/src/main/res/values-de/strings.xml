@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">Zulassen und fortfahren</string>
     <string name="text_intro_page_2">Verfolgen Sie mühelos Ihre Einnahmen und Ausgaben, verwalten Sie Budgets und erstellen Sie aufschlussreiche Berichte, um die Kontrolle über Ihre Finanzen zu behalten.</string>
     <string name="text_intro_page_1">Erkunden Sie Ihre Karte mit anpassbaren Stilen, Echtzeit-Geschwindigkeitsverfolgung und intelligenten Navigationstools.</string>
-    <string name="title_permission_required">Berechtigung erforderlich</string>
-    <string name="body_permission_required">Bitte erteilen Sie die folgenden Berechtigungen, um eine unterbrechungsfreie Nutzung der App sicherzustellen.</string>
+    <string name="body_permission_required">Für ein optimales Erlebnis erlauben Sie bitte Folgendes:</string>
     <string name="title_phone_state">Telefonstatus</string>
     <string name="body_phone_state">Hilft bei der Identifizierung eingehender und ausgehender Anrufstatus.</string>
     <string name="title_display_over_other_apps">Über anderen Apps anzeigen</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">Kamera- und Standortzugriff erforderlich</string>
     <string name="body_camera_nd_location">Um Fotos mit eingebetteten GPS-Daten aufzunehmen, benötigt diese App Zugriff auf Ihre Kamera und Ihren Standort. Bitte erteilen Sie diese Berechtigungen, damit Sie Bilder aufnehmen können, die automatisch Ihren aktuellen Standort enthalten.</string>
     <string name="sheet_title_delete_permanently">❌ Dauerhaft löschen?</string>
+    <string name="sheet_body_delete_permanently">Möchten Sie diese Datei wirklich dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="action_delete">Löschen</string>
     <string name="action_cancel">Abbrechen</string>
+    <string name="title_permission_required">Wir brauchen Ihre Zustimmung!</string>
+    <string name="title_premium">Premium sichern</string>
+    <string name="body_premium">Entfesseln Sie die volle Leistung dieses mobilen Tools und erleben Sie digitale Erlebnisse wie nie zuvor!</string>
+    <string name="plan_annual">Jährlich</string>
+    <string name="label_best_value">Bestes Preis-Leistungs-Verhältnis</string>
+    <string name="plan_monthly">Monatlich</string>
+    <string name="plan_weekly">Wöchentlich</string>
+    <string name="button_buy_now">Jetzt kaufen</string>
+    <string name="button_restore">Wiederherstellen</string>
 
 </resources>

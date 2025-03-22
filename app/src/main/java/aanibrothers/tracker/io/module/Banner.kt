@@ -1,19 +1,14 @@
 package aanibrothers.tracker.io.module
 
-import aanibrothers.tracker.io.*
+import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.module.*
-import android.app.Activity
-import android.util.DisplayMetrics
-import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
-
+import aanibrothers.tracker.io.extension.*
+import android.Manifest
+import android.app.*
+import android.util.*
+import android.view.*
+import coder.apps.space.library.extension.hasPermissions
+import com.google.android.gms.ads.*
 
 fun Activity.viewBanner(container: ViewGroup) {
     if (container.childCount > 0) container.removeAllViews()
@@ -28,7 +23,8 @@ fun Activity.viewBanner(container: ViewGroup) {
     container.addView(view.root)
     val adView = AdView(this)
     adView.setAdSize(adSize)
-    adView.adUnitId = BANNER_ID
+    if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) adView.adUnitId = BANNER_NON_CDO_ID
+    else adView.adUnitId = BANNER_ID
     adView.adListener = object : AdListener() {
         override fun onAdFailedToLoad(loadAdError: LoadAdError) {
             super.onAdFailedToLoad(loadAdError)

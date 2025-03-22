@@ -1,21 +1,155 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-dontwarn com.fasterxml.jackson.annotation.JsonFormat
+-dontwarn com.fasterxml.jackson.databind.JsonDeserializer
+-dontwarn com.fasterxml.jackson.databind.module.SimpleModule
+-dontwarn com.fasterxml.jackson.databind.ser.ContextualSerializer
+-dontwarn com.fasterxml.jackson.databind.ser.std.StdSerializer
+-dontwarn com.oracle.svm.core.annotate.Delete
+-dontwarn com.oracle.svm.core.annotate.TargetClass
+-dontwarn com.sun.org.apache.xml.internal.utils.PrefixResolver
+-dontwarn com.sun.org.apache.xpath.internal.XPath
+-dontwarn com.sun.org.apache.xpath.internal.XPathContext
+-dontwarn com.sun.org.apache.xpath.internal.objects.XBoolean
+-dontwarn com.sun.org.apache.xpath.internal.objects.XNodeSet
+-dontwarn com.sun.org.apache.xpath.internal.objects.XNull
+-dontwarn com.sun.org.apache.xpath.internal.objects.XNumber
+-dontwarn com.sun.org.apache.xpath.internal.objects.XObject
+-dontwarn com.sun.org.apache.xpath.internal.objects.XString
+-dontwarn java.beans.BeanInfo
+-dontwarn java.beans.IndexedPropertyDescriptor
+-dontwarn java.beans.IntrospectionException
+-dontwarn java.beans.Introspector
+-dontwarn java.beans.MethodDescriptor
+-dontwarn java.beans.PropertyDescriptor
+-dontwarn java.rmi.Remote
+-dontwarn java.rmi.RemoteException
+-dontwarn java.rmi.UnexpectedException
+-dontwarn java.rmi.server.RemoteObject
+-dontwarn java.rmi.server.RemoteRef
+-dontwarn java.rmi.server.RemoteStub
+-dontwarn java.rmi.server.UnicastRemoteObject
+-dontwarn java.rmi.server.Unreferenced
+-dontwarn javax.el.ELContext
+-dontwarn javax.el.ExpressionFactory
+-dontwarn javax.el.VariableMapper
+-dontwarn javax.servlet.GenericServlet
+-dontwarn javax.servlet.RequestDispatcher
+-dontwarn javax.servlet.ServletContext
+-dontwarn javax.servlet.ServletContextAttributeListener
+-dontwarn javax.servlet.ServletContextListener
+-dontwarn javax.servlet.ServletException
+-dontwarn javax.servlet.ServletRequest
+-dontwarn javax.servlet.ServletResponse
+-dontwarn javax.servlet.http.HttpServlet
+-dontwarn javax.servlet.http.HttpServletRequest
+-dontwarn javax.servlet.http.HttpServletRequestWrapper
+-dontwarn javax.servlet.http.HttpServletResponse
+-dontwarn javax.servlet.http.HttpServletResponseWrapper
+-dontwarn javax.servlet.http.HttpSession
+-dontwarn javax.servlet.http.HttpSessionAttributeListener
+-dontwarn javax.servlet.http.HttpSessionListener
+-dontwarn javax.servlet.jsp.JspApplicationContext
+-dontwarn javax.servlet.jsp.JspContext
+-dontwarn javax.servlet.jsp.JspEngineInfo
+-dontwarn javax.servlet.jsp.JspException
+-dontwarn javax.servlet.jsp.JspFactory
+-dontwarn javax.servlet.jsp.JspWriter
+-dontwarn javax.servlet.jsp.PageContext
+-dontwarn javax.servlet.jsp.el.VariableResolver
+-dontwarn javax.servlet.jsp.tagext.BodyContent
+-dontwarn javax.servlet.jsp.tagext.BodyTag
+-dontwarn javax.servlet.jsp.tagext.IterationTag
+-dontwarn javax.servlet.jsp.tagext.JspFragment
+-dontwarn javax.servlet.jsp.tagext.JspTag
+-dontwarn javax.servlet.jsp.tagext.SimpleTag
+-dontwarn javax.servlet.jsp.tagext.Tag
+-dontwarn javax.servlet.jsp.tagext.TryCatchFinally
+-dontwarn javax.swing.JTree
+-dontwarn org.apache.log.Hierarchy
+-dontwarn org.apache.log.Logger
+-dontwarn org.apache.log4j.Level
+-dontwarn org.apache.log4j.Logger
+-dontwarn org.apache.log4j.Priority
+-dontwarn org.apache.tools.ant.Task
+-dontwarn org.apache.tools.ant.taskdefs.MatchingTask
+-dontwarn org.apache.xml.utils.PrefixResolver
+-dontwarn org.apache.xpath.XPath
+-dontwarn org.apache.xpath.XPathContext
+-dontwarn org.apache.xpath.objects.XBoolean
+-dontwarn org.apache.xpath.objects.XNodeSet
+-dontwarn org.apache.xpath.objects.XNull
+-dontwarn org.apache.xpath.objects.XNumber
+-dontwarn org.apache.xpath.objects.XObject
+-dontwarn org.apache.xpath.objects.XString
+-dontwarn org.dom4j.Attribute
+-dontwarn org.dom4j.Branch
+-dontwarn org.dom4j.Document
+-dontwarn org.dom4j.DocumentFactory
+-dontwarn org.dom4j.DocumentType
+-dontwarn org.dom4j.Element
+-dontwarn org.dom4j.Node
+-dontwarn org.dom4j.ProcessingInstruction
+-dontwarn org.dom4j.QName
+-dontwarn org.dom4j.tree.DefaultAttribute
+-dontwarn org.jaxen.BaseXPath
+-dontwarn org.jaxen.Context
+-dontwarn org.jaxen.ContextSupport
+-dontwarn org.jaxen.FunctionContext
+-dontwarn org.jaxen.JaxenException
+-dontwarn org.jaxen.NamespaceContext
+-dontwarn org.jaxen.Navigator
+-dontwarn org.jaxen.VariableContext
+-dontwarn org.jaxen.XPathFunctionContext
+-dontwarn org.jaxen.dom.DOMXPath
+-dontwarn org.jaxen.dom.DocumentNavigator
+-dontwarn org.jaxen.dom4j.Dom4jXPath
+-dontwarn org.jaxen.jdom.JDOMXPath
+-dontwarn org.jdom.Attribute
+-dontwarn org.jdom.CDATA
+-dontwarn org.jdom.Comment
+-dontwarn org.jdom.DocType
+-dontwarn org.jdom.Document
+-dontwarn org.jdom.Element
+-dontwarn org.jdom.EntityRef
+-dontwarn org.jdom.Namespace
+-dontwarn org.jdom.ProcessingInstruction
+-dontwarn org.jdom.Text
+-dontwarn org.jdom.output.XMLOutputter
+-dontwarn org.jspecify.nullness.Nullable
+-dontwarn org.mozilla.javascript.Context
+-dontwarn org.mozilla.javascript.EvaluatorException
+-dontwarn org.mozilla.javascript.Function
+-dontwarn org.mozilla.javascript.NativeJavaObject
+-dontwarn org.mozilla.javascript.Scriptable
+-dontwarn org.mozilla.javascript.ScriptableObject
+-dontwarn org.mozilla.javascript.Undefined
+-dontwarn org.mozilla.javascript.UniqueTag
+-dontwarn org.mozilla.javascript.Wrapper
+-dontwarn org.python.core.Py
+-dontwarn org.python.core.PyClass
+-dontwarn org.python.core.PyDictionary
+-dontwarn org.python.core.PyException
+-dontwarn org.python.core.PyFloat
+-dontwarn org.python.core.PyInstance
+-dontwarn org.python.core.PyInteger
+-dontwarn org.python.core.PyJavaInstance
+-dontwarn org.python.core.PyLong
+-dontwarn org.python.core.PyNone
+-dontwarn org.python.core.PyObject
+-dontwarn org.python.core.PySequence
+-dontwarn org.python.core.PyString
+-dontwarn org.python.core.PyStringMap
+-dontwarn org.python.core.PySystemState
+-dontwarn org.python.core.PyType
+-dontwarn org.python.util.PythonInterpreter
+-dontwarn org.slf4j.Logger
+-dontwarn org.slf4j.LoggerFactory
+-dontwarn org.slf4j.Marker
+-dontwarn org.slf4j.spi.LocationAwareLogger
+-dontwarn org.w3c.dom.traversal.NodeIterator
+-dontwarn org.zeroturnaround.javarebel.ClassEventListener
+-dontwarn org.zeroturnaround.javarebel.Reloader
+-dontwarn org.zeroturnaround.javarebel.ReloaderFactory
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-dontwarn com.google.errorprone.annotations.InlineMe
+-dontwarn com.google.errorprone.annotations.MustBeClosed

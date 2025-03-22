@@ -4,15 +4,22 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.isPremium
+import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewNativeBanner
 import android.Manifest
 import android.annotation.*
 import android.content.*
 import android.content.res.*
 import android.graphics.*
+import android.net.Uri
+import android.provider.Settings
 import android.speech.*
 import android.text.*
 import android.view.*
 import android.widget.*
+import androidx.activity.addCallback
 import androidx.activity.result.contract.*
 import androidx.core.content.*
 import androidx.core.view.*
@@ -30,7 +37,7 @@ import com.google.maps.android.ktx.utils.collection.*
 import kotlinx.coroutines.*
 import org.json.*
 
-class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = true), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "MapActivity"
     private var markerManager: MarkerManager? = null
@@ -63,6 +70,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             startVoiceInput()
         }
     }
+    private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
     private val speakLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
         matches?.firstOrNull()?.let { placeName ->
@@ -89,6 +97,8 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         cardColor = tinyDb.getString("cardColor", cardColor) ?: cardColor
         textColor = tinyDb.getString("textColor", textColor) ?: textColor
         mapFragment.alpha = 0f
+
+        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
     }
 
     private fun ActivityMapBinding.setupSuggestionAdapter() {
@@ -170,11 +180,26 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
     }
 
     private fun startVoiceInput() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the place name...")
+        if (hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the place name...")
+            }
+            speakLauncher.launch(intent)
+        } else {
+            if (getPermissionsDeniedCount("MICROPHONE") < 2 && !hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
+                microphonePermissionLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
+                return
+            } else {
+                Toast.makeText(this@MapActivity, "Need Microphone permission enable manually..", Toast.LENGTH_SHORT).show()
+                viewPermissions {
+                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
+                    }
+                    appSettingsLauncher.launch(appSettingsIntent)
+                }
+            }
         }
-        speakLauncher.launch(intent)
     }
 
     private fun ActivityMapBinding.filterQuery(query: String) {
@@ -262,6 +287,12 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets
         }
+
+        onBackPressedDispatcher.addCallback {
+            viewInterAdWithLogic {
+                finish()
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -270,7 +301,18 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             googleMap?.isMyLocationEnabled = true
             binding?.moveToCurrentLocation()
         } else {
-            locationPermissionLauncher.launch(LOCATION_PERMISSION)
+            if (getPermissionsDeniedCount("PERMISSION_LOCATION") < 2 && !hasPermissions(LOCATION_PERMISSION)) {
+                locationPermissionLauncher.launch(LOCATION_PERMISSION)
+                return
+            } else {
+                Toast.makeText(this@MapActivity, "Need location permission enable manually..", Toast.LENGTH_SHORT).show()
+                viewPermissions {
+                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
+                    }
+                    appSettingsLauncher.launch(appSettingsIntent)
+                }
+            }
         }
     }
 

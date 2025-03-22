@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">Laat &amp; Gaan voort</string>
     <string name="text_intro_page_2">Volg jou inkomste en uitgawes moeiteloos, bestuur begrotings en genereer insiggewende verslae om in beheer van jou finansies te bly.</string>
     <string name="text_intro_page_1">Verken jou kaart met aanpasbare style, intydse spoednasporing en slim navigasienutsgoed.</string>
-    <string name="title_permission_required">Toestemming vereis</string>
-    <string name="body_permission_required">Gee asseblief die volgende toestemmings om ononderbroke gebruik van die toepassing te verseker.</string>
+    <string name="body_permission_required">Om die beste ervaring te bied, laat asseblief die volgende toe:</string>
     <string name="title_phone_state">Telefoonstaat</string>
     <string name="body_phone_state">Help om inkomende en uitgaande oproeptoestande te identifiseer.</string>
     <string name="title_display_over_other_apps">Vertoon oor ander toepassings</string>
@@ -103,7 +102,18 @@
     <string name="title_camera_nd_location">Kamera &amp; Plektoegang vereis</string>
     <string name="body_camera_nd_location">Om foto\'s met ingeboude GPS-data te neem, benodig hierdie toepassing toegang tot jou kamera en ligging. Gee asseblief hierdie toestemmings om jou in staat te stel om foto\'s te neem wat outomaties jou huidige ligging insluit.</string>
     <string name="sheet_title_delete_permanently">❌ Vee permanent uit?</string>
+    <string name="sheet_body_delete_permanently">Is jy seker jy wil hierdie lêer permanent uitvee? Hierdie handeling kan nie ontdoen word nie.</string>
     <string name="action_delete">Vee uit</string>
     <string name="action_cancel">Kanselleer</string>
+    <string name="title_permission_required">Ons het jou toestemming nodig!</string>
+    <string name="title_premium">Ontsluit Premium\nKenmerke &amp; Verken Soos\nNooit Tevore Nie!</string>
+    <string name="body_premium">Ontsluit al die krag van hierdie mobiele hulpmiddel en geniet \'n digitale ervaring soos nooit tevore nie!</string>
+
+    <string name="plan_annual">Jaarliks</string>
+    <string name="label_best_value">Beste waarde</string>
+    <string name="plan_monthly">Maandeliks</string>
+    <string name="plan_weekly">Weekliks</string>
+    <string name="button_buy_now">Koop nou</string>
+    <string name="button_restore">Herstel</string>
 
 </resources>

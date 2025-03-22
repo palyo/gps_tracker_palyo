@@ -7,6 +7,33 @@
     android:background="@color/colorPrimary"
     tools:context=".ui.AppPermissionActivity">
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_permission"
+        style="@style/TextBold"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:layout_marginHorizontal="@dimen/_24sdp"
+        android:text="@string/title_permission_required"
+        android:textSize="@dimen/_18ssp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/text_note"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_note"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:gravity="start|center_vertical"
+        android:text="@string/body_permission_required"
+        android:textSize="@dimen/_10ssp"
+        android:layout_marginEnd="@dimen/_24sdp"
+        app:layout_constraintStart_toStartOf="@+id/text_permission"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_permission" />
+
     <com.google.android.material.imageview.ShapeableImageView
         android:layout_width="@dimen/_0sdp"
         android:layout_height="@dimen/_0sdp"
@@ -15,7 +42,8 @@
         app:layout_constraintBottom_toTopOf="@+id/layout_root"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/image_vector"
+        app:layout_constraintTop_toBottomOf="@+id/text_note"
         app:srcCompat="@drawable/ic_vector_ui_permission" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,47 +56,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text_permission"
-            style="@style/TextBold"
-            android:layout_width="@dimen/_0sdp"
-            android:layout_height="wrap_content"
-            android:text="@string/title_permission_required"
-            android:textSize="@dimen/_16ssp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text_note"
-            style="@style/TextRegular"
-            android:layout_width="@dimen/_0sdp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:gravity="start|center_vertical"
-            android:text="@string/body_permission_required"
-            android:textSize="@dimen/_10ssp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_permission" />
-
         <View
             android:id="@+id/view_divider_1"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="@dimen/_12sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_note" />
+            app:layout_constraintBottom_toTopOf="@id/text_phone_state"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_phone_state"
-            style="@style/TextBold"
+            style="@style/TextSemiBold"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_8sdp"
             android:gravity="start|center_vertical"
+            android:layout_marginStart="@dimen/_8sdp"
             android:text="@string/title_phone_state"
             android:textSize="@dimen/_14ssp"
-            app:layout_constraintEnd_toStartOf="@+id/is_phone_state"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/is_phone_state"
+            app:layout_constraintBottom_toTopOf="@id/body_phone_state"
             app:layout_constraintTop_toBottomOf="@+id/view_divider_1" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -81,7 +89,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             app:buttonTint="@null"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_phone_state"
             app:useMaterialThemeColors="false" />
 
@@ -94,21 +102,22 @@
             android:gravity="start|center_vertical"
             android:text="@string/body_phone_state"
             android:textSize="@dimen/_9ssp"
-            app:layout_constraintEnd_toStartOf="@+id/is_phone_state"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_overlay"
+            app:layout_constraintStart_toStartOf="@+id/text_phone_state"
             app:layout_constraintTop_toBottomOf="@+id/text_phone_state" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_overlay"
-            style="@style/TextBold"
+            style="@style/TextSemiBold"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_12sdp"
             android:gravity="start|center_vertical"
             android:text="@string/title_display_over_other_apps"
+            android:layout_marginStart="@dimen/_8sdp"
             android:textSize="@dimen/_14ssp"
-            app:layout_constraintEnd_toStartOf="@+id/is_overlay"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/is_overlay"
+            app:layout_constraintBottom_toTopOf="@id/body_overlay"
             app:layout_constraintTop_toBottomOf="@+id/body_phone_state" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -121,7 +130,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             app:buttonTint="@null"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_overlay"
             app:useMaterialThemeColors="false" />
 
@@ -131,12 +140,52 @@
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_2sdp"
+            android:layout_marginBottom="@dimen/_24sdp"
             android:gravity="start|center_vertical"
             android:text="@string/body_display_over_other_apps"
             android:textSize="@dimen/_9ssp"
-            app:layout_constraintEnd_toStartOf="@+id/is_overlay"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_terms_agree"
+            app:layout_constraintStart_toStartOf="@+id/text_overlay"
             app:layout_constraintTop_toBottomOf="@+id/text_overlay" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/is_terms_agree"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:checked="true"
+            android:gravity="start|center_vertical"
+            android:linksClickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="@dimen/_4sdp"
+            android:textColorLink="@color/colorAccent"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="@id/text_terms_agree"
+            app:layout_constraintTop_toTopOf="@id/text_terms_agree"
+            app:layout_constraintStart_toStartOf="parent"
+            app:useMaterialThemeColors="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_terms_agree"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:checked="false"
+            android:gravity="start|center_vertical"
+            android:linksClickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="@dimen/_4sdp"
+            android:text="@string/message_policy"
+            android:textColorLink="@color/colorAccent"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintBottom_toTopOf="@id/button_continue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/is_terms_agree"
+            app:useMaterialThemeColors="false" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_continue"
@@ -148,7 +197,7 @@
             app:cornerRadius="@dimen/_8sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/body_overlay" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

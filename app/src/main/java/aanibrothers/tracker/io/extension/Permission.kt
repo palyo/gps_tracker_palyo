@@ -12,12 +12,6 @@ import androidx.core.app.*
 
 val LOCATION_PERMISSION = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-fun Activity.hasPermissions(permissions: Array<String>): Boolean = permissions.all { ActivityCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED }
-
-fun Activity.hasOverlayPermission(): Boolean {
-    return Settings.canDrawOverlays(this)
-}
-
 fun Context.isLocationEnabled(): Boolean {
     try {
         return Settings.Secure.getInt(contentResolver, "location_mode") != 0

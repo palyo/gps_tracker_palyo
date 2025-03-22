@@ -58,4 +58,13 @@
         app:spanCount="2"
         tools:listitem="@layout/layout_row_item_near" />
 
+    <aanibrothers.tracker.io.module.AdsView
+        android:id="@+id/ad_native"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/native_255dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shimmer_preview_layout="@layout/ad_unified_medium_loading" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,21 +1,27 @@
 package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.databinding.*
-import android.content.*
+import aanibrothers.tracker.io.extension.*
+import android.*
+import android.app.*
 import android.view.*
 import android.widget.*
+import coder.apps.space.library.extension.hasPermissions
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.*
 
 private const val TAG = "Native"
 
-fun Context.viewNativeBanner(container: ViewGroup) {
+fun Activity.viewNativeBanner(container: ViewGroup) {
     container.removeAllViews()
     val view = AdUnifiedBannerLoadingBinding.inflate(LayoutInflater.from(applicationContext), null, false)
     view.root.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     container.removeAllViews()
     container.addView(view.root)
-    val adLoader = AdLoader.Builder(this, NATIVE_ID)
+    val adLoader = AdLoader.Builder(
+        this, if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) NATIVE_NON_CDO_ID
+        else NATIVE_ID
+    )
         .forNativeAd { nativeAd: NativeAd ->
             val layoutInflater: LayoutInflater = LayoutInflater.from(this@viewNativeBanner)
             val binding = AdUnifiedBannerBinding.inflate(layoutInflater)
@@ -67,13 +73,16 @@ fun populateAdViewBanner(unifiedNativeAd: NativeAd?, binding: AdUnifiedBannerBin
     }
 }
 
-fun Context.viewNativeMedium(container: ViewGroup) {
+fun Activity.viewNativeMedium(container: ViewGroup) {
     container.removeAllViews()
     val view = AdUnifiedMediumLoadingBinding.inflate(LayoutInflater.from(applicationContext), null, false)
     view.root.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     container.removeAllViews()
     container.addView(view.root)
-    val adLoader = AdLoader.Builder(this, NATIVE_ID)
+    val adLoader = AdLoader.Builder(
+        this, if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) NATIVE_NON_CDO_ID
+        else NATIVE_ID
+    )
         .forNativeAd { nativeAd: NativeAd ->
             val layoutInflater: LayoutInflater = LayoutInflater.from(this@viewNativeMedium)
             val binding = AdUnifiedMediumBinding.inflate(layoutInflater)

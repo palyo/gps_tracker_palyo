@@ -3,12 +3,14 @@ package aanibrothers.tracker.io.ui
 import aanibrothers.tracker.io.cdo.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.*
 import android.*
 import android.annotation.*
 import android.content.*
 import android.net.*
 import android.os.*
 import android.provider.*
+import android.widget.*
 import androidx.activity.result.*
 import androidx.activity.result.contract.*
 import coder.apps.space.library.base.*
@@ -23,56 +25,49 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
     private val permissions = arrayOf(Manifest.permission.READ_PHONE_STATE)
     private var displayOverLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         binding?.updateUI()
-        if (!isContinues) {
-            checkNGo()
-            return@registerForActivityResult
-        }
         if (hasOverlayPermission()) {
             settingOverLay?.cancelPollingImeSettings()
             initPermissions()
         } else {
             settingOverLay?.cancelPollingImeSettings()
+            reinitCall()
         }
     }
     private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         binding?.updateUI()
-        if (!isContinues) {
-            checkNGo()
-            return@registerForActivityResult
-        }
         settingOverLay?.cancelPollingImeSettings()
-        initPermissions()
+        reinitCall()
     }
     private val phoneStateLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         binding?.updateUI()
         if (permissions.containsValue(false)) {
             incrementPermissionsDeniedCount("phone_state")
-            if (isContinues) {
-                if (!hasPermissions(this.permissions)) {
-                    viewPermissions {
-                        val phoneDeniedCount = getPermissionsDeniedCount("phone_state")
-                        if (phoneDeniedCount < maxDeniedCount && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
-                            requestPhoneState()
-                            return@viewPermissions
-                        }
-                        val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", packageName, null)
-                        }
-                        appSettingsLauncher.launch(appSettingsIntent)
-                    }
-                    return@registerForActivityResult
-                } else {
+            reinitCall()
+        } else {
+            reinitCall()
+        }
+    }
+
+    private fun reinitCall() {
+        if (!hasPermissions(this.permissions)) {
+            if ((hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && hasOverlayPermission()) && !isPremium) {
+                eulaAccepted()
+            }
+
+            if (hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && !hasOverlayPermission()) {
+                viewPermissions {
                     initPermissions()
                 }
+            } else if (tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true) {
+                go(AppLanguageActivity::class.java, finish = true)
+            } else if (!hasOverlayPermission() || !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
+                go(PremiumActivity::class.java, finish = true)
+            } else {
+                go(DashboardActivity::class.java, finish = true)
             }
+            return
         } else {
-            if (!isContinues) {
-                checkNGo()
-                return@registerForActivityResult
-            }
-            if (hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
-                initPermissions()
-            }
+            initPermissions()
         }
     }
 
@@ -99,6 +94,10 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
 
     override fun ActivityAppPermissionBinding.initListeners() {
         buttonContinue.setOnClickListener {
+            if (!isTermsAgree.isChecked) {
+                Toast.makeText(this@AppPermissionActivity, "By continuing, you agree to our Terms of Service.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             isContinues = true
             initPermissions()
         }
@@ -128,7 +127,19 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
             }
 
             if (!hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
-                viewPermissions {
+                viewPermissions(onDismiss = {
+                    if ((hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && hasOverlayPermission()) && !isPremium) {
+                        eulaAccepted()
+                    }
+
+                    if (tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true) {
+                        go(AppLanguageActivity::class.java, finish = true)
+                    } else if (!hasOverlayPermission() || !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
+                        go(PremiumActivity::class.java, finish = true)
+                    } else {
+                        go(DashboardActivity::class.java, finish = true)
+                    }
+                }) {
                     appSettingsLauncher.launch(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.fromParts("package", packageName, null)
                     })
@@ -156,12 +167,17 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
                 return@setOnClickListener
             }
         }
-
     }
 
     override fun ActivityAppPermissionBinding.initExtra() {}
 
     private fun initPermissions() {
+        binding?.apply {
+            if (!isTermsAgree.isChecked) {
+                Toast.makeText(this@AppPermissionActivity, "Please agree with our terms and privacy", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
         val phoneDeniedCount = getPermissionsDeniedCount("phone_state")
         if (phoneDeniedCount < maxDeniedCount && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
             requestPhoneState()
@@ -169,7 +185,19 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
         }
 
         if (!hasPermissions(permissions)) {
-            viewPermissions {
+            viewPermissions(onDismiss = {
+                if ((hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && hasOverlayPermission()) && !isPremium) {
+                    eulaAccepted()
+                }
+
+                if (tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true) {
+                    go(AppLanguageActivity::class.java, finish = true)
+                } else if (!hasOverlayPermission() || !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) {
+                    go(PremiumActivity::class.java, finish = true)
+                } else {
+                    go(DashboardActivity::class.java, finish = true)
+                }
+            }) {
                 val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", packageName, null)
                 }
@@ -191,7 +219,9 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
             return
         }
 
-        eulaAccepted()
+        if ((hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && hasOverlayPermission()) && !isPremium) {
+            eulaAccepted()
+        }
         if (tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true) {
             go(AppLanguageActivity::class.java, finish = true)
         } else {
@@ -208,6 +238,11 @@ class AppPermissionActivity : BaseActivity<ActivityAppPermissionBinding>(Activit
                 go(DashboardActivity::class.java, finish = true)
             }
         }
+    }
+
+    override fun onDestroy() {
+        settingOverLay?.cancelPollingImeSettings()
+        super.onDestroy()
     }
 
     @SuppressLint("WrongConstant")

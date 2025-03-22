@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">Autoriser et continuer</string>
     <string name="text_intro_page_2">Suivez vos revenus et vos dépenses sans effort, gérez vos budgets et générez des rapports perspicaces pour garder le contrôle de vos finances.</string>
     <string name="text_intro_page_1">Explorez votre carte avec des styles personnalisables, un suivi de la vitesse en temps réel et des outils de navigation intelligents.</string>
-    <string name="title_permission_required">Autorisation requise</string>
-    <string name="body_permission_required">Veuillez accorder les autorisations suivantes pour garantir une utilisation ininterrompue de l\'application.</string>
+    <string name="body_permission_required">Pour une expérience optimale, veuillez autoriser les éléments suivants :</string>
     <string name="title_phone_state">État du téléphone</string>
     <string name="body_phone_state">Aide à identifier les états des appels entrants et sortants.</string>
     <string name="title_display_over_other_apps">Afficher sur d\'autres applications</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">Accès à l\'appareil photo et à l\'emplacement requis</string>
     <string name="body_camera_nd_location">Pour prendre des photos avec des données GPS intégrées, cette application doit accéder à votre appareil photo et à votre emplacement. Veuillez accorder ces autorisations pour vous permettre de prendre des photos qui incluent automatiquement votre emplacement actuel.</string>
     <string name="sheet_title_delete_permanently">❌ Supprimer définitivement ?</string>
+    <string name="sheet_body_delete_permanently">Êtes-vous sûr de vouloir supprimer définitivement ce fichier ? Cette action est irréversible.</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_cancel">Annuler</string>
+    <string name="title_permission_required">Nous avons besoin de votre permission !</string>
+    <string name="title_premium">Obtenez Premium</string>
+    <string name="body_premium">Exploitez toute la puissance de cet outil mobile et vivez une expérience numérique inédite !</string>
+    <string name="plan_annual">Annuel</string>
+    <string name="label_best_value">Meilleur rapport qualité-prix</string>
+    <string name="plan_monthly">Mensuel</string>
+    <string name="plan_weekly">Hebdomadaire</string>
+    <string name="button_buy_now">Acheter maintenant</string>
+    <string name="button_restore">Restaurer</string>
 
 </resources>

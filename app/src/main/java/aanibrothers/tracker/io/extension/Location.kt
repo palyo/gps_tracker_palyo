@@ -7,6 +7,7 @@ import android.os.*
 import android.widget.*
 import coder.apps.space.library.extension.*
 import com.google.android.gms.maps.model.*
+import com.simplemobiletools.commons.extensions.isPackageInstalled
 import kotlinx.coroutines.*
 import java.io.*
 import java.util.*
@@ -74,20 +75,41 @@ fun Context.shareLocation(latLong: LatLng) {
 
 fun Context.navigateLocation(currentLatLng: LatLng?, markerLatLng: LatLng?) {
     val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${currentLatLng?.latitude},${currentLatLng?.longitude}&destination=${markerLatLng?.latitude},${markerLatLng?.longitude}")
-    Intent(
-        Intent.ACTION_VIEW,
-        uri
-    ).apply {
-        setPackage("com.google.android.apps.maps")
-        startActivity(this)
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+
+    // Check if Google Maps is installed
+    val packageName = "com.google.android.apps.maps"
+    if (isPackageInstalled(packageName)) {
+        intent.setPackage(packageName)
+    }
+
+    try {
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        }
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, "No app found to handle maps", Toast.LENGTH_SHORT).show()
     }
 }
 
 fun Context.navigateLocationByPlace(origin: String?, destination: String?) {
     val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${Uri.encode(origin)}&destination=${Uri.encode(destination)}")
-    Intent(Intent.ACTION_VIEW, uri).apply {
-        setPackage("com.google.android.apps.maps")
-        startActivity(this)
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    val packageName = "com.google.android.apps.maps"
+    if (isPackageInstalled(packageName)) {
+        intent.setPackage(packageName)
+    }
+
+    try {
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        }
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, "No app found to handle maps", Toast.LENGTH_SHORT).show()
     }
 }
 

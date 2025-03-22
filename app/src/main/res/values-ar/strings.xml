@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">السماح والمتابعة</string>
     <string name="text_intro_page_2">تتبع دخلك ونفقاتك بسهولة، وإدارة الميزانيات، وإنشاء تقارير مفيدة للبقاء متحكمًا في أموالك.</string>
     <string name="text_intro_page_1">استكشف خريطتك باستخدام الأنماط القابلة للتخصيص، وتتبع السرعة في الوقت الفعلي، وأدوات التنقل الذكية.</string>
-    <string name="title_permission_required">مطلوب إذن</string>
-    <string name="body_permission_required">يرجى منح الأذونات التالية لضمان الاستخدام المتواصل للتطبيق.</string>
+    <string name="body_permission_required">لتوفير أفضل تجربة، يرجى السماح بما يلي:</string>
     <string name="title_phone_state">حالة الهاتف</string>
     <string name="body_phone_state">يساعد في تحديد حالات المكالمات الواردة والصادرة.</string>
     <string name="title_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">مطلوب الوصول إلى الكاميرا والموقع></string>
     <string name="body_camera_nd_location">لالتقاط الصور باستخدام بيانات GPS المضمنة، يحتاج هذا التطبيق إلى الوصول إلى الكاميرا والموقع. يرجى منح هذه الأذونات لتمكينك من التقاط الصور التي تتضمن موقعك الحالي تلقائيًا.</string>
     <string name="sheet_title_delete_permanently">❌حذف نهائيًا؟</string>
+    <string name="sheet_body_delete_permanently">هل أنت متأكد أنك تريد حذف هذا الملف نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.</string>
     <string name="action_delete">حذف</string>
     <string name="action_cancel">إلغاء</string>
+    <string name="title_permission_required">نحن بحاجة إلى إذنك!</string>
+    <string name="title_premium">احصل على النسخة المميزة</string>
+    <string name="body_premium">اكتشف قوة هذه الأداة المحمولة واستمتع بتجربة رقمية لا مثيل لها!</string>
+    <string name="plan_annual">سنوي</string>
+    <string name="label_best_value">أفضل قيمة</string>
+    <string name="plan_monthly">شهري</string>
+    <string name="plan_weekly">أسبوعي</string>
+    <string name="button_buy_now">اشترِ الآن</string>
+    <string name="button_restore">استعد</string>
 
 </resources>

@@ -70,13 +70,18 @@
     <string name="button_allow_and_continue">Realice un seguimiento de sus ingresos y gastos sin esfuerzo, administre presupuestos y genere informes detallados para mantener el control de sus finanzas.</string>
     <string name="text_intro_page_2">Explore su mapa con estilos personalizables, seguimiento de velocidad en tiempo real y herramientas de navegación inteligente.</string>
     <string name="text_intro_page_1">Permiso requerido</string>
-    <string name="title_permission_required">Conceda los siguientes permisos para garantizar un uso ininterrumpido de la aplicación.</string>
-    <string name="body_permission_required">Estado del teléfono</string>
-    <string name="title_phone_state">Ayuda a identificar los estados de las llamadas entrantes y salientes.</string>
-    <string name="body_phone_state">Mostrar sobre otras aplicaciones</string>
-    <string name="title_display_over_other_apps">Se utiliza para que la función de posllamada funcione correctamente.</string>
-    <string name="body_display_over_other_apps">Manténgase actualizado con notificaciones importantes</string>
-    <string name="notification_permission_title">Habilite las notificaciones para recibir actualizaciones y recordatorios importantes relacionados con su presupuesto y seguimiento financiero.</string>
+
+    <string name="title_permission_required">¡Necesitamos tu permiso!</string>
+    <string name="body_permission_required">Para brindarte la mejor experiencia, permite lo siguiente:</string>
+    <string name="title_phone_state">Estado del Teléfono</string>
+    <string name="body_phone_state">Ayuda a identificar los estados de llamadas entrantes y salientes.</string>
+    <string name="title_display_over_other_apps">Mostrar sobre otras aplicaciones</string>
+    <string name="body_display_over_other_apps">Se usa para que la función posterior a la llamada funcione correctamente.</string>
+
+    <string name="notification_permission_title">Mantente actualizado con notificaciones importantes</string>
+    <string name="notification_permission_body">Habilita las notificaciones para recibir actualizaciones y recordatorios importantes sobre tu presupuesto y seguimiento financiero.</string>
+
+
     <string name="dashboard_banner_body">• Múltiples estilos de mapas\n• Controles de visibilidad\n• Superposiciones y marcadores personalizados</string>
     <string name="menu_map">Mapa</string>
     <string name="menu_map_body">Manténgase en el camino correcto con actualizaciones de ubicación precisas.</string>
@@ -92,7 +97,6 @@
     <string name="menu_near_by_location_body">Vea qué tan lejos están los lugares y obtenga direcciones al instante.</string>
     <string name="menu_area_calculator">Calculadora de área</string>
     <string name="menu_area_calculator_body">Mida y calcule el área sin esfuerzo en el mapa con precisión y facilidad</string>
-    <string name="notification_permission_body">Habilite las notificaciones para recibir actualizaciones y recordatorios importantes relacionados con su presupuesto y seguimiento financiero.</string>
     <string name="button_enable">Habilitar</string>
     <string name="message_please_add_mark_on_map">Agregue una marca en el mapa</string>
     <string name="message_map_not_initialized_yet">El mapa aún no se ha inicializado.</string>
@@ -103,7 +107,16 @@
     <string name="title_camera_nd_location">Se requiere acceso a la cámara y a la ubicación</string>
     <string name="body_camera_nd_location">Para capturar fotos con datos GPS integrados, esta aplicación necesita acceso a tu cámara y ubicación. Concédele estos permisos para poder tomar fotos que incluyan automáticamente tu ubicación actual.</string>
     <string name="sheet_title_delete_permanently">❌ ¿Eliminar permanentemente?</string>
+    <string name="sheet_body_delete_permanently">¿Seguro que desea eliminar este archivo permanentemente? Esta acción no se puede deshacer.</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="title_premium">Obtén Premium</string>
+    <string name="body_premium">¡Desbloquea todo el poder de esta herramienta móvil y disfruta de una experiencia digital como nunca antes!</string>
+    <string name="plan_annual">Anual</string>
+    <string name="label_best_value">Mejor valor</string>
+    <string name="plan_monthly">Mensual</string>
+    <string name="plan_weekly">Semanal</string>
+    <string name="button_buy_now">Comprar ahora</string>
+    <string name="button_restore">Restaurar</string>
 
 </resources>

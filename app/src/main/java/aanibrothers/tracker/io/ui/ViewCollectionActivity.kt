@@ -102,7 +102,15 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
         }
         buttonDelete.setOnClickListener {
             actionTrashFile(mutableListOf<File>().apply {
-                filesList?.get(currentPos)?.let { media -> add(media) }
+                filesList?.let { list ->
+                    if (currentPos in list.indices) {
+                        actionTrashFile(mutableListOf<File>().apply {
+                            add(list[currentPos])
+                        })
+                    } else {
+                        "actionTrashFile".log("Invalid index: $currentPos, size: ${list.size}")
+                    }
+                } ?: "actionTrashFile".log("filesList is null")
             })
         }
     }

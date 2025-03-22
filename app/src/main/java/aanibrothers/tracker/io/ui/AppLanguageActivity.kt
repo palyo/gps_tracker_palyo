@@ -4,19 +4,21 @@ import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
+import android.*
 import androidx.activity.*
 import androidx.recyclerview.widget.*
 import coder.apps.space.library.R
 import coder.apps.space.library.base.*
 import coder.apps.space.library.extension.*
 import coder.apps.space.library.helper.*
+import java.util.*
 
 class AppLanguageActivity : BaseActivity<ActivityAppLanguageBinding>(ActivityAppLanguageBinding::inflate) {
-    private var language: String = "en"
+    private var language: String = Locale.getDefault().language
     private var isChangeLanguage: Boolean = false
     override fun ActivityAppLanguageBinding.initExtra() {
         updateNavigationBarColor(R.color.colorTransparent)
-        language = currentLanguage ?: "en"
+        language = currentLanguage ?: Locale.getDefault().language
         initAdapter()
         viewNativeMedium(adNative)
     }
@@ -39,7 +41,12 @@ class AppLanguageActivity : BaseActivity<ActivityAppLanguageBinding>(ActivityApp
                 go(AppSettingsActivity::class.java, finish = true)
             } else {
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
-                go(DashboardActivity::class.java, finish = true)
+                val isMoreNeeded = !hasOverlayPermission() || !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))
+                if (isMoreNeeded && !isPremium) {
+                    go(PremiumActivity::class.java, finish = true)
+                } else {
+                    go(DashboardActivity::class.java, finish = true)
+                }
             }
         }
     }

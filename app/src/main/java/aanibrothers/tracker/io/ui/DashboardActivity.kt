@@ -2,6 +2,7 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.*
 import android.*
 import android.content.*
 import android.os.*
@@ -40,6 +41,8 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
                 notificationLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
             }
         }
+
+        if (!isPremium) viewBanner(adNative) else adNative.beGone()
     }
 
     override fun ActivityDashboardBinding.initListeners() {
@@ -130,7 +133,7 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
             if (exception is ResolvableApiException) {
                 try {
                     exception.startResolutionForResult(this@DashboardActivity, 4634)
-                } catch (sendEx: IntentSender.SendIntentException) {
+                } catch (_: IntentSender.SendIntentException) {
                 }
             } else {
             }

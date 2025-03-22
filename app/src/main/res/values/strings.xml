@@ -77,8 +77,8 @@
     <string name="text_intro_page_1">Quickly access important tools after every call with our new post-call feature!</string>
     <string name="text_intro_page_2">Explore your map with customizable styles, real-time speed tracking, and smart navigation tools.</string>
 
-    <string name="title_permission_required">Permission Required</string>
-    <string name="body_permission_required">Please grant the following permissions to ensure uninterrupted use of the app.</string>
+    <string name="title_permission_required">We Need Your Permission!</string>
+    <string name="body_permission_required">To provide the best experience, please allow the following:</string>
     <string name="title_phone_state">Phone State</string>
     <string name="body_phone_state">Helps to identify incoming and outgoing call states.</string>
     <string name="title_display_over_other_apps">Display Over Other Apps</string>
@@ -133,5 +133,14 @@
     <string name="sheet_body_delete_permanently">Are you sure you want to permanently delete this file? This action cannot be undone.</string>
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
+
+    <string name="title_premium">Unlock Premium\nFeatures &amp; Explore Like\nNever Before!</string>
+    <string name="body_premium">Unlock all the power of this mobile tool and enjoy digital experience like never before!</string>
+    <string name="plan_annual">Annual</string>
+    <string name="label_best_value">Best Value</string>
+    <string name="plan_monthly">Monthly</string>
+    <string name="plan_weekly">Weekly</string>
+    <string name="button_buy_now">Buy now</string>
+    <string name="button_restore">Restore</string>
 
 </resources>

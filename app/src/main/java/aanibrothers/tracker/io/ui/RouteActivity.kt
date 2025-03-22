@@ -4,6 +4,11 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.isPremium
+import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewNativeBanner
+import android.Manifest
 import android.annotation.*
 import android.content.*
 import android.content.res.*
@@ -11,6 +16,7 @@ import android.graphics.*
 import android.text.*
 import android.view.*
 import android.widget.*
+import androidx.activity.addCallback
 import androidx.activity.result.contract.*
 import androidx.core.content.*
 import androidx.core.view.*
@@ -28,7 +34,7 @@ import com.google.maps.android.ktx.utils.collection.*
 import kotlinx.coroutines.*
 import org.json.*
 
-class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = true), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
     private var isSource: Boolean = false
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "VoiceNavigationActivity"
@@ -66,6 +72,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@RouteActivity)
         setupSuggestionAdapter()
 
+        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
         backgroundColor = tinyDb.getString("backgroundColor", backgroundColor) ?: backgroundColor
         cardColor = tinyDb.getString("cardColor", cardColor) ?: cardColor
         textColor = tinyDb.getString("textColor", textColor) ?: textColor
@@ -242,6 +249,11 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
         layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets
+        }
+        onBackPressedDispatcher.addCallback {
+            viewInterAdWithLogic {
+                finish()
+            }
         }
     }
 

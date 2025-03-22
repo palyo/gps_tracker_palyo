@@ -85,8 +85,7 @@
     <string name="button_allow_and_continue">Izinkan &amp; Lanjutkan</string>
     <string name="text_intro_page_2">Lacak pendapatan dan pengeluaran Anda dengan mudah, kelola anggaran, dan buat laporan yang mendalam untuk tetap mengendalikan keuangan Anda.</string>
     <string name="text_intro_page_1">Jelajahi peta Anda dengan gaya yang dapat disesuaikan, pelacakan kecepatan waktu nyata, dan alat navigasi pintar.</string>
-    <string name="title_permission_required">Izin Diperlukan</string>
-    <string name="body_permission_required">Harap berikan izin berikut untuk memastikan penggunaan aplikasi tanpa gangguan.</string>
+    <string name="body_permission_required">Untuk memberikan pengalaman terbaik, mohon izinkan hal-hal berikut:</string>
     <string name="title_phone_state">Status Telepon</string>
     <string name="body_phone_state">Membantu mengidentifikasi status panggilan masuk dan keluar.</string>
     <string name="title_display_over_other_apps">Tampilan di Atas Aplikasi Lain</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">Akses Kamera &amp; Lokasi Diperlukan ></string>
     <string name="body_camera_nd_location">Untuk mengambil foto dengan data GPS tertanam, aplikasi ini memerlukan akses ke kamera dan lokasi Anda. Berikan izin ini agar Anda dapat mengambil gambar yang secara otomatis menyertakan lokasi Anda saat ini.</string>
     <string name="sheet_title_delete_permanently">❌ Hapus Permanen?</string>
+    <string name="sheet_body_delete_permanently">Apakah Anda yakin ingin menghapus berkas ini secara permanen? Tindakan ini tidak dapat dibatalkan.</string>
     <string name="action_delete">Hapus</string>
     <string name="action_cancel">Batal</string>
+    <string name="title_permission_required">Kami Memerlukan Izin Anda!</string>
+    <string name="title_premium">Dapatkan Premium</string>
+    <string name="body_premium">Dapatkan semua kekuatan perangkat seluler ini dan nikmati pengalaman digital yang belum pernah ada sebelumnya!</string>
+    <string name="plan_annual">Tahunan</string>
+    <string name="label_best_value">Nilai Terbaik</string>
+    <string name="plan_monthly">Bulanan</string>
+    <string name="plan_weekly">Mingguan</string>
+    <string name="button_buy_now">Beli sekarang</string>
+    <string name="button_restore">Pulihkan</string>
 
 </resources>

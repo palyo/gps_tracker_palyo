@@ -4,6 +4,8 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.*
+import android.Manifest
 import android.annotation.*
 import android.content.*
 import android.content.res.*
@@ -11,6 +13,7 @@ import android.graphics.*
 import android.text.*
 import android.view.*
 import android.widget.*
+import androidx.activity.*
 import androidx.activity.result.contract.*
 import androidx.core.content.*
 import androidx.core.widget.*
@@ -29,7 +32,7 @@ import com.google.maps.android.ui.*
 import kotlinx.coroutines.*
 import org.json.*
 
-class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = true), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "AreaCalcActivity"
     private var markerManager: MarkerManager? = null
@@ -71,6 +74,7 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
         supportFragmentManager.beginTransaction().replace(R.id.map_fragment, fragment).commit()
         fragment.getMapAsync(this@AreaCalcActivity)
 
+        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@AreaCalcActivity)
         setupSuggestionAdapter()
 
@@ -196,6 +200,11 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
         layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets
+        }
+        onBackPressedDispatcher.addCallback {
+            viewInterAdWithLogic {
+                finish()
+            }
         }
     }
 

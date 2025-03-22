@@ -3,6 +3,7 @@ package aanibrothers.tracker.io.ui
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
+import aanibrothers.tracker.io.module.*
 import android.Manifest
 import android.annotation.*
 import android.content.*
@@ -31,7 +32,7 @@ import java.text.*
 import java.util.*
 import java.util.concurrent.*
 
-class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCameraBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = true) {
+class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCameraBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false) {
     private var imageCapture: ImageCapture? = null
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var aspectRatio = AspectRatio.RATIO_DEFAULT
@@ -39,7 +40,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
     private var currentLocation: LatLng? = null
     private var currentCameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var currentFlashMode = ImageCapture.FLASH_MODE_OFF
-    private var lastModified :File? = null
+    private var lastModified: File? = null
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.containsValue(false)) {
             incrementPermissionsDeniedCount("PERMISSION_LOCATION")
@@ -63,7 +64,10 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
     override fun ActivityGpsCameraBinding.initExtra() {
         if (hasPermissions(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))) {
             permissionLayout.beGone()
-            setupLocation()
+            textAddress.text = "Fetching.."
+            delayed(1000L) {
+                setupLocation()
+            }
             setupCamera()
             val filesList = (File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "GPS Camera"
@@ -75,6 +79,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
                     RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)
                 ).into(imageLastCaptured)
             }
+            if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
         } else {
             permissionLayout.beVisible()
             buttonAllowAccess.setOnClickListener {
@@ -364,8 +369,11 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
     override fun ActivityGpsCameraBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
         updateNavigationBarColor(R.color.colorTransparent)
+
         onBackPressedDispatcher.addCallback {
-            finish()
+            viewInterAdWithLogic {
+                finish()
+            }
         }
         controlBar.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)

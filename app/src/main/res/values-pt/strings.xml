@@ -70,8 +70,7 @@
     <string name="button_allow_and_continue">Monitorize as suas receitas e despesas sem esforço, gerencie orçamentos e gere relatórios detalhados para manter o controlo das suas finanças.</string>
     <string name="text_intro_page_2">Explore o seu mapa com estilos personalizáveis, monitorização de velocidade em tempo real e ferramentas de navegação inteligentes.</string>
     <string name="text_intro_page_1">Permissão necessária</string>
-    <string name="title_permission_required">Conceda as seguintes permissões para garantir a utilização ininterrupta da aplicação.</string>
-    <string name="body_permission_required">Estado do telefone</string>
+    <string name="body_permission_required">Para proporcionar a melhor experiência, permita o seguinte:</string>
     <string name="title_phone_state">Ajuda a identificar estados das chamadas recebidas e efetuadas.</string>
     <string name="body_phone_state">Ver sobre outros aplicativos</string>
     <string name="title_display_over_other_apps">Utilizado para que o recurso de pós-chamada funcione corretamente.</string>
@@ -103,7 +102,17 @@
     <string name="title_camera_nd_location">Câmara e Localização Acesso necessário</string>
     <string name="body_camera_nd_location">Para captar fotografias com dados de GPS incorporados, esta aplicação necessita de acesso à sua câmara e localização. Conceda estas permissões para que possa tirar fotografias que incluam automaticamente a sua localização atual.</string>
     <string name="sheet_title_delete_permanently">❌ Apagar permanentemente?</string>
+    <string name="sheet_body_delete_permanently">Tem a certeza de que pretende eliminar este ficheiro permanentemente? Esta ação não pode ser anulada.</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="title_permission_required">Precisamos da sua autorização!</string>
+    <string name="title_premium">Obtenha Premium</string>
+    <string name="body_premium">Desbloqueie todo o poder desta ferramenta móvel e desfrute de uma experiência digital como nunca antes!</string>
+    <string name="plan_annual">Anual</string>
+    <string name="label_best_value">Melhor valor</string>
+    <string name="plan_monthly">Mensal</string>
+    <string name="plan_weekly">Semanalmente</string>
+    <string name="button_buy_now">Comprar agora</string>
+    <string name="button_restore">Restaurar</string>
 
 </resources>

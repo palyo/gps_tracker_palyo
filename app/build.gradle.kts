@@ -15,8 +15,8 @@ android {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.2.1"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -147,4 +147,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.2.0")
     implementation("com.applovin.mediation:google-ad-manager-adapter:23.2.0.0")
     implementation("com.applovin.mediation:google-adapter:23.2.0.0")
+
+    implementation("com.github.akshaaatt:Google-IAP:1.8.0")
 }

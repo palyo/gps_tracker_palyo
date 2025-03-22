@@ -5,6 +5,8 @@ import aanibrothers.tracker.io.databinding.*
 import android.app.*
 import android.content.res.*
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
+import android.view.View
 import androidx.core.content.*
 import coder.apps.space.library.extension.*
 import com.google.android.gms.maps.*
@@ -316,23 +318,46 @@ fun Activity.viewMapMarkerDetailsSheet(currentLocation: LatLng, marker: LatLng, 
     }
 }
 
-fun Activity.viewPermissions(listener: () -> Unit) {
+
+fun Activity.viewPermissions(
+    onDismiss: (() -> Unit)? = null,
+    onContinue: () -> Unit
+) {
     val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val bindDialog: LayoutSheetPermissionOtherBinding = LayoutSheetPermissionOtherBinding.inflate(layoutInflater)
     dialog.setContentView(bindDialog.root)
+
     dialog.window?.apply {
-        applyDialogConfig()
-        setDimAmount(.24f)
+        setDimAmount(.50f)
+        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+    var isContinueClicked = false // Flag to track if "Continue" was clicked
+
+    dialog.setOnShowListener { dialogInterface ->
+        val bottomSheetDialog = dialogInterface as BottomSheetDialog
+        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let { sheet ->
+            val behavior = BottomSheetBehavior.from(sheet)
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
+    dialog.setOnDismissListener {
+        if (!isContinueClicked) { // Only call onDismiss if "Continue" was NOT clicked
+            onDismiss?.invoke()
+        }
     }
 
     with(bindDialog) {
         buttonContinue.setOnClickListener {
-            listener.invoke()
+            isContinueClicked = true // Mark as "Continue" clicked
+            onContinue.invoke()
             dialog.dismiss()
         }
     }
 
-    if (!isFinishing || !isDestroyed) {
+    if (!isFinishing && !isDestroyed) {
         dialog.show()
     }
 }

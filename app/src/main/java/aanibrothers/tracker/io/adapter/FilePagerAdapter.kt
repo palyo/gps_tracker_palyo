@@ -23,8 +23,14 @@ class FilePagerAdapter(val context: Activity?) : RecyclerView.Adapter<FilePagerA
     }
 
     fun removePage(index: Int) {
-        items?.removeAt(index)
-        notifyDataSetChanged()
+        items?.let {
+            if (index in it.indices) {
+                it.removeAt(index)
+                notifyDataSetChanged()
+            } else {
+                "removePage".log("Invalid index: $index, size: ${it.size}")
+            }
+        } ?: "removePage".log("items is null")
     }
 
     override fun getItemCount(): Int {

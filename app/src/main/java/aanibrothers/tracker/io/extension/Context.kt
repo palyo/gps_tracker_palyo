@@ -28,10 +28,3 @@ fun Window.updateStatusBarIcons(isLight: Boolean) {
         decorView.requestApplyInsets()
     }
 }
-
-fun Context.isNetworkAvailable(): Boolean {
-    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-
-    return activeNetwork != null && activeNetwork.isConnectedOrConnecting
-}

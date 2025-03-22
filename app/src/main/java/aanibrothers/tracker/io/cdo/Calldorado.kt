@@ -1,8 +1,11 @@
 package aanibrothers.tracker.io.cdo
 
 import aanibrothers.tracker.io.*
+import aanibrothers.tracker.io.module.isPremium
 import android.content.*
 import com.calldorado.*
+import com.calldorado.Calldorado.SettingsToggle
+import com.calldorado.Calldorado.acceptConditions
 
 fun Context.initCalldorado() {
     Calldorado.start(this)
@@ -25,4 +28,20 @@ fun Context.eulaAccepted() {
     conditionsMap[Calldorado.Condition.EULA] = true
     conditionsMap[Calldorado.Condition.PRIVACY_POLICY] = true
     Calldorado.acceptConditions(this, conditionsMap)
+}
+
+fun Context.setCdoEnable(){
+    val premium = !isPremium
+    val conditionsMap: HashMap<Calldorado.Condition, Boolean> = HashMap()
+    conditionsMap[Calldorado.Condition.EULA] = premium
+    conditionsMap[Calldorado.Condition.PRIVACY_POLICY] = premium
+    acceptConditions(this, conditionsMap)
+
+    val settingsMap = HashMap<SettingsToggle, Boolean>()
+    settingsMap[SettingsToggle.REAL_TIME_CALLER_ID] = premium
+    settingsMap[SettingsToggle.MISSED_CALL] = premium
+    settingsMap[SettingsToggle.COMPLETED_CALL] = premium
+    settingsMap[SettingsToggle.NO_ANSWER_CALL] = premium
+    settingsMap[SettingsToggle.UNKNOWN_CALL] = premium
+    Calldorado.setSettings(this, settingsMap)
 }
