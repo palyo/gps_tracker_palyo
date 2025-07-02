@@ -4,10 +4,7 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.isPremium
-import aanibrothers.tracker.io.module.viewBanner
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
-import aanibrothers.tracker.io.module.viewNativeBanner
+import aanibrothers.tracker.io.module.*
 import android.Manifest
 import android.annotation.*
 import android.content.*
@@ -16,7 +13,7 @@ import android.graphics.*
 import android.text.*
 import android.view.*
 import android.widget.*
-import androidx.activity.addCallback
+import androidx.activity.*
 import androidx.activity.result.contract.*
 import androidx.core.content.*
 import androidx.core.view.*
@@ -35,6 +32,7 @@ import kotlinx.coroutines.*
 import org.json.*
 
 class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+
     private var isSource: Boolean = false
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "VoiceNavigationActivity"
@@ -63,7 +61,9 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
     }
 
     override fun ActivityRoutesBinding.initExtra() {
-        val googleMapOptions = GoogleMapOptions().compassEnabled(true).rotateGesturesEnabled(true).zoomControlsEnabled(false).tiltGesturesEnabled(true).mapToolbarEnabled(false).scrollGesturesEnabled(true)
+        val googleMapOptions = GoogleMapOptions().compassEnabled(true).rotateGesturesEnabled(true).zoomControlsEnabled(false).tiltGesturesEnabled(true).mapToolbarEnabled(false).scrollGesturesEnabled(
+            true
+        )
         val fragment = SupportMapFragment.newInstance(googleMapOptions)
 
         supportFragmentManager.beginTransaction().replace(R.id.map_fragment, fragment).commit()
@@ -72,7 +72,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@RouteActivity)
         setupSuggestionAdapter()
 
-        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
+        viewNativeBanner(adNative)
         backgroundColor = tinyDb.getString("backgroundColor", backgroundColor) ?: backgroundColor
         cardColor = tinyDb.getString("cardColor", cardColor) ?: cardColor
         textColor = tinyDb.getString("textColor", textColor) ?: textColor
@@ -88,11 +88,13 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
                     cardSuggestedResult.beGone()
                     addMarker(LatLng(it.latitude, it.longitude), isSource)
                     moveToLocation(LatLng(it.latitude, it.longitude))
+                    if (it.featureName == "Your location") editSearchSource.setText("Your location")
                 } else {
                     hideKeyboard(editSearchDestination)
                     cardSuggestedResult.beGone()
                     addMarker(LatLng(it.latitude, it.longitude), isSource)
                     moveToLocation(LatLng(it.latitude, it.longitude))
+                    if (it.featureName == "Your location") editSearchDestination.setText("Your location")
                 }
             }
             adapter = suggestionLocationAdapter
@@ -159,6 +161,12 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
 
         editSearchSource.setOnFocusChangeListener { v, hasFocus ->
             isSource = hasFocus
+            cardSuggestedResult.beVisibleIf(hasFocus)
+        }
+        editSearchDestination.setOnFocusChangeListener { v, hasFocus ->
+            if (editSearchSource.text.toString() != "Your location") {
+                cardSuggestedResult.beVisibleIf(hasFocus)
+            }
         }
 
         mapZoomIn.setOnClickListener { zoomMap(true) }
@@ -208,6 +216,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
             fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
                 location?.let {
                     currentLocation = LatLng(it.latitude, it.longitude)
+                    suggestionLocationAdapter?.addCurrentLocation(currentLocation)
                     currentLocation?.let {
                         moveToLocation(it)
                     }
@@ -311,7 +320,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
         }
 
         googleMap?.setOnPoiClickListener { poi ->
-            addMarker(poi.latLng, isSource,poi.name)
+            addMarker(poi.latLng, isSource, poi.name)
         }
 
         binding?.moveToCurrentLocation()
@@ -362,25 +371,24 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
 
             googleMap?.apply {
                 mapCurrentLocation.iconTint = ContextCompat.getColorStateList(
-                    this@RouteActivity,
-                    when (viewMapType) {
-                        "silver" -> R.color.ic_action_accent_silver_selector
-                        "retro" -> R.color.ic_action_accent_retro_selector
-                        "dark" -> R.color.ic_action_accent_dark_selector
-                        "night" -> R.color.ic_action_accent_night_selector
-                        "aubergine" -> R.color.ic_action_accent_aubergine_selector
-                        else -> if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
-                            R.color.ic_action_accent_satellite_selector
-                        } else {
-                            R.color.ic_action_accent_standard_selector
-                        }
+                    this@RouteActivity, when (viewMapType) {
+                    "silver" -> R.color.ic_action_accent_silver_selector
+                    "retro" -> R.color.ic_action_accent_retro_selector
+                    "dark" -> R.color.ic_action_accent_dark_selector
+                    "night" -> R.color.ic_action_accent_night_selector
+                    "aubergine" -> R.color.ic_action_accent_aubergine_selector
+                    else -> if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
+                        R.color.ic_action_accent_satellite_selector
+                    } else {
+                        R.color.ic_action_accent_standard_selector
                     }
+                }
                 )
             }
         }
     }
 
-    private fun addMarker(latLng: LatLng, isSource: Boolean,name:String? = "") {
+    private fun addMarker(latLng: LatLng, isSource: Boolean, name: String? = "") {
         if (markerCollection == null) {
             markerCollection = markerManager?.newCollection()
         }
@@ -412,7 +420,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
             val styleRes: Int,
             val updateIcons: () -> Unit,
             val delayed: Boolean = true,
-            val doubleSetup: Boolean = false
+            val doubleSetup: Boolean = false,
         )
 
         val config = if (viewMapType == "standard") {
@@ -424,56 +432,28 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
                 }
             }
             MapStyleConfig(
-                backgroundColor = "#FFFFFF",
-                cardColor = "#F8F7F7",
-                textColor = "#3C4043",
-                styleRes = R.raw.standard_map_style,
-                updateIcons = iconsUpdate
+                backgroundColor = "#FFFFFF", cardColor = "#F8F7F7", textColor = "#3C4043", styleRes = R.raw.standard_map_style, updateIcons = iconsUpdate
             )
         } else {
             when (viewMapType) {
                 "silver" -> MapStyleConfig(
-                    backgroundColor = "#FFFFFF",
-                    cardColor = "#F5F5F5",
-                    textColor = "#9D9D9D",
-                    styleRes = R.raw.silver_map_style,
-                    updateIcons = { window.updateStatusBarIcons(true) }
-                )
+                    backgroundColor = "#FFFFFF", cardColor = "#F5F5F5", textColor = "#9D9D9D", styleRes = R.raw.silver_map_style, updateIcons = { window.updateStatusBarIcons(true) })
 
                 "retro" -> MapStyleConfig(
-                    backgroundColor = "#FDFCF8",
-                    cardColor = "#EBE3CD",
-                    textColor = "#7E6B63",
-                    styleRes = R.raw.retro_map_style,
-                    updateIcons = { window.updateStatusBarIcons(true) },
-                    delayed = false,
+                    backgroundColor = "#FDFCF8", cardColor = "#EBE3CD", textColor = "#7E6B63", styleRes = R.raw.retro_map_style, updateIcons = { window.updateStatusBarIcons(true) }, delayed = false,
                     doubleSetup = true
                 )
 
                 "dark" -> MapStyleConfig(
-                    backgroundColor = "#000000",
-                    cardColor = "#212121",
-                    textColor = "#FFFFFF",
-                    styleRes = R.raw.dark_map_style,
-                    updateIcons = { window.updateStatusBarIcons(false) }
-                )
+                    backgroundColor = "#000000", cardColor = "#212121", textColor = "#FFFFFF", styleRes = R.raw.dark_map_style, updateIcons = { window.updateStatusBarIcons(false) })
 
                 "night" -> MapStyleConfig(
-                    backgroundColor = "#38414E",
-                    cardColor = "#242F3E",
-                    textColor = "#9BA3B3",
-                    styleRes = R.raw.night_map_style,
-                    updateIcons = { window.updateStatusBarIcons(false) },
+                    backgroundColor = "#38414E", cardColor = "#242F3E", textColor = "#9BA3B3", styleRes = R.raw.night_map_style, updateIcons = { window.updateStatusBarIcons(false) },
                     doubleSetup = true
                 )
 
                 "aubergine" -> MapStyleConfig(
-                    backgroundColor = "#304A7D",
-                    cardColor = "#1D2C4D",
-                    textColor = "#99A5BC",
-                    styleRes = R.raw.aubergine_map_style,
-                    updateIcons = { window.updateStatusBarIcons(false) }
-                )
+                    backgroundColor = "#304A7D", cardColor = "#1D2C4D", textColor = "#99A5BC", styleRes = R.raw.aubergine_map_style, updateIcons = { window.updateStatusBarIcons(false) })
 
                 else -> error("Unsupported map type")
             }

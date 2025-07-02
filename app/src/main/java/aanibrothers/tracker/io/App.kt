@@ -1,22 +1,17 @@
 package aanibrothers.tracker.io
 
-import aanibrothers.tracker.io.cdo.*
-import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
 import aanibrothers.tracker.io.ui.*
 import aanibrothers.tracker.io.ui.LauncherActivity
-import android.Manifest
 import android.app.*
 import android.content.*
 import android.os.*
 import androidx.lifecycle.*
 import androidx.multidex.*
-import coder.apps.space.library.extension.hasOverlayPermission
-import coder.apps.space.library.extension.hasPermissions
-import com.calldorado.ui.aftercall.*
 
 class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
     companion object {
+
         var isOpenInter = false
         private var instance: App? = null
         private var appContext: Context? = null
@@ -33,31 +28,19 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
         appContext = applicationContext
         registerActivityLifecycleCallbacks(this)
         createNotificationChannel()
-        initCalldorado()
 
         setAvoidMultipleClass(
             mutableListOf(
                 LauncherActivity::class.java,
-                AppPermissionActivity::class.java,
-                PromptActivity::class.java,
-                CallerIdActivity::class.java
             )
         )
         registerActivityLifecycleCallbacks(this)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
-                if (!getAppContext().hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE)) && !hasOverlayPermission() && !isPremium) {
-                    if (!isOpenInter) {
-                        if (isShowOpenAdsOnStart(currentActivity?.javaClass?.name ?: "")) {
-                            viewAppOpen(listener = null, isWait = false)
-                        }
-                    }
-                } else {
-                    if (!isOpenInter && (applicationContext?.appOpenCount ?: 0) >= 2) {
-                        if (isShowOpenAdsOnStart(currentActivity?.javaClass?.name ?: "")) {
-                            viewAppOpen(listener = null, isWait = false)
-                        }
+                if (!isOpenInter && (applicationContext?.appOpenCount ?: 0) >= 2) {
+                    if (isShowOpenAdsOnStart(currentActivity?.javaClass?.name ?: "")) {
+                        viewAppOpen(listener = null, isWait = false)
                     }
                 }
 
@@ -102,13 +85,12 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
     override fun onActivityStarted(activity: Activity) {
-       currentActivity = activity
+        currentActivity = activity
     }
 
     override fun onActivityResumed(activity: Activity) {
         currentActivity = activity
     }
-
 
     override fun onActivityPaused(activity: Activity) {}
 

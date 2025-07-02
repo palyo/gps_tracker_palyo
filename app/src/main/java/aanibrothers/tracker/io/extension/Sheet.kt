@@ -401,3 +401,19 @@ fun Activity.viewTrashOrDeleteSheet(listener: () -> Unit) {
     }
     if (!isFinishing) dialog.show()
 }
+
+fun Activity.viewPinGuideSheet(listener: () -> Unit) {
+    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val binding = LayoutSheetPinGuideBinding.inflate(layoutInflater)
+    dialog.setContentView(binding.root)
+    dialog.window?.apply {
+        applyDialogConfig()
+    }
+    binding.apply {
+        buttonRemove.setOnClickListener {
+            dialog.dismiss()
+            listener.invoke()
+        }
+    }
+    if (!isFinishing) dialog.show()
+}

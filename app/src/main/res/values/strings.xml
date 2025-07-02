@@ -6,7 +6,7 @@
 
 
     <string name="text_hint_search">Search</string>
-    <string name="text_hint_source">Source</string>
+    <string name="text_hint_source">Start</string>
     <string name="text_hint_destination">Destination</string>
     <string name="title_speedometer">Speedometer</string>
     <string name="title_compass">Compass</string>
@@ -96,7 +96,7 @@
     <string name="menu_map">Map</string>
     <string name="menu_map_body">Stay on the right path with precise location updates.</string>
     <string name="menu_voice_navigation">Voice navigation</string>
-    <string name="menu_voice_navigation_body">Get clear spoken directions while driving or walking.</string>
+    <string name="menu_voice_navigation_body">Navigate using your voice</string>
     <string name="menu_route_finder">Route finder</string>
     <string name="menu_route_finder_body">Get the shortest and quickest path.</string>
     <string name="menu_speedometer">Speedometer</string>
@@ -142,5 +142,8 @@
     <string name="plan_weekly">Weekly</string>
     <string name="button_buy_now">Buy now</string>
     <string name="button_restore">Restore</string>
+    <string name="sheet_title_pin_guide">📍 Pin Added Successfully!</string>
+    <string name="sheet_body_pin_guide">Tap on the pin to view its location details or get directions from your current position.</string>
+    <string name="action_got_it">GOT IT</string>
 
 </resources>

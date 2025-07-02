@@ -71,7 +71,6 @@
     <string name="menu_map">मानचित्र</string>
     <string name="menu_map_body">सटीक स्थान अपडेट के साथ सही रास्ते पर रहें।</string>
     <string name="menu_voice_navigation">वॉइस नेविगेशन</string>
-    <string name="menu_voice_navigation_body">ड्राइविंग या पैदल चलते समय स्पष्ट बोले गए निर्देश प्राप्त करें।</string>
     <string name="menu_route_finder">रूट फाइंडर</string>
     <string name="menu_route_finder_body">सबसे छोटा और सबसे तेज़ रास्ता प्राप्त करें।</string>
     <string name="menu_speedometer">स्पीडोमीटर</string>

@@ -2,12 +2,10 @@ package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.extension.*
-import android.Manifest
 import android.app.*
 import android.util.*
 import android.view.*
-import coder.apps.space.library.extension.hasPermissions
+import androidx.core.view.*
 import com.google.android.gms.ads.*
 
 fun Activity.viewBanner(container: ViewGroup) {
@@ -23,8 +21,9 @@ fun Activity.viewBanner(container: ViewGroup) {
     container.addView(view.root)
     val adView = AdView(this)
     adView.setAdSize(adSize)
-    if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) adView.adUnitId = BANNER_NON_CDO_ID
-    else adView.adUnitId = BANNER_ID
+    val adId = BANNER_ID
+    adView.adUnitId = adId
+
     adView.adListener = object : AdListener() {
         override fun onAdFailedToLoad(loadAdError: LoadAdError) {
             super.onAdFailedToLoad(loadAdError)
@@ -33,7 +32,7 @@ fun Activity.viewBanner(container: ViewGroup) {
 
         override fun onAdLoaded() {
             super.onAdLoaded()
-            if (container.childCount > 0) container.removeAllViews()
+            if (container.isNotEmpty()) container.removeAllViews()
             container.addView(adView)
         }
     }

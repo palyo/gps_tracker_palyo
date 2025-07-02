@@ -7,11 +7,19 @@ import android.os.*
 import android.widget.*
 import coder.apps.space.library.extension.*
 import com.google.android.gms.maps.model.*
-import com.simplemobiletools.commons.extensions.isPackageInstalled
 import kotlinx.coroutines.*
 import java.io.*
 import java.util.*
 import kotlin.math.*
+
+fun Context.isPackageInstalled(pkgName: String): Boolean {
+    return try {
+        packageManager.getPackageInfo(pkgName, 0)
+        true
+    } catch (e: Exception) {
+        false
+    }
+}
 
 fun Context.findAddressFromLatLng(latLng: LatLng, callback: (Address?) -> Unit) {
     val geocoder = Geocoder(this, Locale.getDefault())

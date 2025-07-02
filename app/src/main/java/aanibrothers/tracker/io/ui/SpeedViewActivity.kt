@@ -3,8 +3,6 @@ package aanibrothers.tracker.io.ui
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.isPremium
-import aanibrothers.tracker.io.module.viewBanner
 import aanibrothers.tracker.io.module.viewInterAdWithLogic
 import aanibrothers.tracker.io.module.viewNativeBanner
 import android.Manifest
@@ -88,7 +86,7 @@ class SpeedViewActivity : BaseActivity<ActivitySpeedViewBinding>(ActivitySpeedVi
             }
         }
 
-        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
+        viewNativeBanner(adNative)
     }
 
     private fun animateBackgroundColor(newColor: Int) {

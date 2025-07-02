@@ -86,7 +86,6 @@
     <string name="menu_map">地図</string>
     <string name="menu_map_body">正確な位置情報の更新で正しい道を進みます。</string>
     <string name="menu_voice_navigation">音声ナビゲーション</string>
-    <string name="menu_voice_navigation_body">運転中や歩行中に、明瞭な音声による道案内が得られます。</string>
     <string name="menu_route_finder">ルートファインダー</string>
     <string name="menu_route_finder_body">最短かつ最速の経路を取得します。</string>
     <string name="menu_speedometer">スピードメーター</string>

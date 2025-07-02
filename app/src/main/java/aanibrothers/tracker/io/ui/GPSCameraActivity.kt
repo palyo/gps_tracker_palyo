@@ -79,7 +79,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
                     RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)
                 ).into(imageLastCaptured)
             }
-            if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
+            viewNativeBanner(adNative)
         } else {
             permissionLayout.beVisible()
             buttonAllowAccess.setOnClickListener {

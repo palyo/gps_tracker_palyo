@@ -71,7 +71,6 @@
     <string name="menu_map">Peta</string>
     <string name="menu_map_body">Tetap di jalur yang benar dengan pembaruan lokasi yang akurat.</string>
     <string name="menu_voice_navigation">Navigasi suara</string>
-    <string name="menu_voice_navigation_body">Dapatkan petunjuk arah lisan yang jelas saat mengemudi atau berjalan kaki.</string>
     <string name="menu_route_finder">Pencari rute</string>
     <string name="menu_route_finder_body">Dapatkan jalur terpendek dan tercepat.</string>
     <string name="menu_speedometer">Speedometer</string>

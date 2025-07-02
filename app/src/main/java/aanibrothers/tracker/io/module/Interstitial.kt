@@ -1,10 +1,8 @@
 package aanibrothers.tracker.io.module
 
-import android.Manifest
 import android.app.*
 import android.content.*
 import android.os.*
-import coder.apps.space.library.extension.hasPermissions
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.*
 
@@ -90,10 +88,6 @@ fun Activity.viewInterAdForce(listener: ((result: Boolean) -> Unit)? = null) {
 }
 
 fun Activity.viewInterAdWithLogic(listener: ((result: Boolean) -> Unit)? = null) {
-    if (isPremium || hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))){
-        listener?.invoke(true)
-        return
-    }
     currentAdLevel++
     if (currentAdLevel % 2 == 0) {
         viewInterAd {

@@ -4,21 +4,16 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.isPremium
-import aanibrothers.tracker.io.module.viewBanner
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
-import aanibrothers.tracker.io.module.viewNativeMedium
-import android.Manifest
+import aanibrothers.tracker.io.module.*
 import androidx.activity.*
 import androidx.recyclerview.widget.*
 import coder.apps.space.library.base.*
-import coder.apps.space.library.extension.beGone
-import coder.apps.space.library.extension.hasPermissions
 
 class NearActivity : BaseActivity<ActivityNearBinding>(ActivityNearBinding::inflate) {
+
     override fun ActivityNearBinding.initExtra() {
         setupAdapter()
-        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeMedium(adNative) else adNative.beGone()
+        viewNativeMedium(adNative)
     }
 
     private fun ActivityNearBinding.setupAdapter() {

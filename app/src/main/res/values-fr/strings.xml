@@ -3,7 +3,7 @@
     <string name="app_name_manifest">#Tracker.io</string>
     <string name="message_policy" translatable="false">By clicking \'Agree &amp; Continue\' you accept and approve the <a href="https://privacy-and-policy-online.blogspot.com/2021/10/privacy-policy.html">Privacy Policy</a></string>
     <string name="text_hint_search">Recherche</string>
-    <string name="text_hint_source">Source</string>
+    <string name="text_hint_source">Start</string>
     <string name="text_hint_destination">Destination</string>
     <string name="title_speedometer">Compteur de vitesse</string>
     <string name="title_compass">Boussole</string>
@@ -71,7 +71,6 @@
     <string name="menu_map">Carte</string>
     <string name="menu_map_body">Restez sur la bonne voie grâce à des mises à jour de localisation précises.</string>
     <string name="menu_voice_navigation">Navigation vocale</string>
-    <string name="menu_voice_navigation_body">Obtenez des instructions vocales claires pendant que vous conduisez ou marchez.</string>
     <string name="menu_route_finder">Recherche d\'itinéraire</string>
     <string name="menu_route_finder_body">Obtenez le chemin le plus court et le plus rapide.</string>
     <string name="menu_speedometer">Compteur de vitesse</string>

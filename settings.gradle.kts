@@ -22,9 +22,6 @@ dependencyResolutionManagement {
         maven(url = "https://maven.aliyun.com/repository/google")
         maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
         maven(url = "https://maven.aliyun.com/repository/apache-snapshots")
-
-        maven(url = "https://maven.calldorado.com/nexus/content/repositories/thirdparty/")
-        maven(url = "https://maven.calldorado.com/nexus/content/repositories/releases")
     }
 }
 

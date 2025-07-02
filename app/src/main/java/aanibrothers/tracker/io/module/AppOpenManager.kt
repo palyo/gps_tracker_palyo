@@ -3,7 +3,6 @@ package aanibrothers.tracker.io.module
 import aanibrothers.tracker.io.*
 import android.app.*
 import android.os.*
-import coder.apps.space.library.extension.*
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.appopen.*
 import java.util.*
@@ -31,7 +30,7 @@ class AppOpenManager {
 
     fun initAd() {
         App.getAppContext().apply {
-            val adId = if (hasOverlayPermission() && hasPermissions(arrayOf(android.Manifest.permission.READ_PHONE_STATE))) OPEN_ID else OPEN_NON_CDO
+            val adId = OPEN_ID
             openIds = mutableListOf(adId)
             loadOpen()
         }
@@ -83,7 +82,9 @@ class AppOpenManager {
             }
             appOpenAd?.fullScreenContentCallback = fullScreenContentCallback
             isLoaded = false
-            App.currentActivity?.let { appOpenAd?.show(it) }
+            App.currentActivity?.let {
+                appOpenAd?.show(it)
+            }
         } else {
             if (!isWait) {
                 if (dialogShow) {

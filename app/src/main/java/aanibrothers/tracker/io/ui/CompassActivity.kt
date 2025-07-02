@@ -4,7 +4,7 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
-import android.Manifest
+import android.*
 import android.animation.*
 import android.hardware.*
 import android.view.animation.*
@@ -42,7 +42,7 @@ class CompassActivity : BaseActivity<ActivityCompassBinding>(
             Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
         } else {
             binding?.apply {
-                if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
+                viewNativeBanner(adNative)
             }
             startUpdates()
         }
@@ -81,15 +81,13 @@ class CompassActivity : BaseActivity<ActivityCompassBinding>(
     override fun ActivityCompassBinding.initExtra() {
         if (hasPermissions(LOCATION_PERMISSION)) {
             startUpdates()
-            if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewBanner(adNative) else adNative.beGone()
+            viewBanner(adNative)
         } else {
             locationPermissionLauncher.launch(LOCATION_PERMISSION)
         }
     }
 
-    override fun ActivityCompassBinding.initListeners() {
-        // Your listeners here if any.
-    }
+    override fun ActivityCompassBinding.initListeners() {}
 
     override fun ActivityCompassBinding.initView() {
         toolbar.title = getString(R.string.title_compass)
@@ -155,7 +153,7 @@ class CompassActivity : BaseActivity<ActivityCompassBinding>(
             interpolator = DecelerateInterpolator()
             addUpdateListener { animation ->
                 val animatedValue = animation.animatedValue as Float
-                imageNeedle.rotation = animatedValue
+                layoutCompassRotate.rotation = animatedValue
             }
         }
         animator.start()

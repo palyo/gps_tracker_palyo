@@ -15,8 +15,8 @@ android {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.2.1"
+        versionCode = 7
+        versionName = "1.3.0"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -63,12 +63,6 @@ android {
         exclude("META-INF/NOTICE.md")
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    configurations {
-        implementation {
-            exclude(group = "com.squareup.okio", module = "okio")
         }
     }
 }
@@ -126,27 +120,12 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.window:window:1.1.0")
 
-    implementation(libs.simple.tools.commons)
-
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.messaging.ktx)
 
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
-    implementation("com.calldorado:calldorado-release:8.1.8.3839@aar") {
-        isTransitive = true
-    }
-    implementation("com.applovin:applovin-sdk:12.6.0")
-    implementation("com.applovin.mediation:vungle-adapter:7.4.0.0")
 
-    implementation("com.facebook.android:audience-network-sdk:6.17.0")
-    implementation("com.applovin.mediation:facebook-adapter:6.17.0.0")
-    implementation("com.google.ads.mediation:facebook:6.17.0.0")
-
-    implementation("com.google.android.gms:play-services-ads:23.2.0")
-    implementation("com.applovin.mediation:google-ad-manager-adapter:23.2.0.0")
-    implementation("com.applovin.mediation:google-adapter:23.2.0.0")
-
-    implementation("com.github.akshaaatt:Google-IAP:1.8.0")
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
 }

@@ -15,14 +15,8 @@ data class ConfigJson(
     val interID: String? = null,
     @field:SerializedName("open")
     val openID: String? = null,
-    @field:SerializedName("open_non_cdo")
-    val openNonCdo: String? = null,
     @field:SerializedName("banner")
     val bannerID: String? = null,
-    @field:SerializedName("banner_non_cdo")
-    val bannerNonCdo: String? = null,
-    @field:SerializedName("native_non_cdo")
-    val nativeNonCdo: String? = null,
     @field:SerializedName("policy_url")
     val policyUrl: String? = null,
 )

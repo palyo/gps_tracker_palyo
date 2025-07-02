@@ -153,3 +153,69 @@
 
 -dontwarn com.google.errorprone.annotations.InlineMe
 -dontwarn com.google.errorprone.annotations.MustBeClosed
+
+
+
+
+
+
+
+
+
+# Please add these rules to your existing keep rules in order to suppress warnings.
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn com.google.api.client.http.GenericUrl
+-dontwarn com.google.api.client.http.HttpHeaders
+-dontwarn com.google.api.client.http.HttpRequest
+-dontwarn com.google.api.client.http.HttpRequestFactory
+-dontwarn com.google.api.client.http.HttpResponse
+-dontwarn com.google.api.client.http.HttpTransport
+-dontwarn com.google.api.client.http.javanet.NetHttpTransport$Builder
+-dontwarn com.google.api.client.http.javanet.NetHttpTransport
+-dontwarn net.bytebuddy.ByteBuddy
+-dontwarn net.bytebuddy.TypeCache$SimpleKey
+-dontwarn net.bytebuddy.TypeCache
+-dontwarn net.bytebuddy.agent.ByteBuddyAgent
+-dontwarn net.bytebuddy.asm.AsmVisitorWrapper$AbstractBase
+-dontwarn net.bytebuddy.description.modifier.ModifierContributor$ForField
+-dontwarn net.bytebuddy.description.modifier.ModifierContributor$ForMethod
+-dontwarn net.bytebuddy.description.modifier.Ownership
+-dontwarn net.bytebuddy.description.modifier.SynchronizationState
+-dontwarn net.bytebuddy.description.modifier.Visibility
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$FieldDefinition$Optional$Valuable
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$FieldDefinition$Optional
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition$ExceptionDefinition
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition$ImplementationDefinition$Optional
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition$ImplementationDefinition
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition$ParameterDefinition$Initial
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition$ReceiverTypeDefinition
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder$MethodDefinition
+-dontwarn net.bytebuddy.dynamic.DynamicType$Builder
+-dontwarn net.bytebuddy.dynamic.DynamicType$Loaded
+-dontwarn net.bytebuddy.dynamic.DynamicType$Unloaded
+-dontwarn net.bytebuddy.dynamic.Transformer$ForMethod
+-dontwarn net.bytebuddy.dynamic.Transformer
+-dontwarn net.bytebuddy.dynamic.loading.ClassLoadingStrategy$Configurable
+-dontwarn net.bytebuddy.dynamic.loading.ClassLoadingStrategy$Default
+-dontwarn net.bytebuddy.dynamic.loading.ClassLoadingStrategy$UsingLookup
+-dontwarn net.bytebuddy.dynamic.loading.ClassLoadingStrategy
+-dontwarn net.bytebuddy.dynamic.loading.MultipleParentClassLoader$Builder
+-dontwarn net.bytebuddy.dynamic.loading.MultipleParentClassLoader
+-dontwarn net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy$Default
+-dontwarn net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy
+-dontwarn net.bytebuddy.implementation.FieldAccessor$OwnerTypeLocatable
+-dontwarn net.bytebuddy.implementation.FieldAccessor
+-dontwarn net.bytebuddy.implementation.Implementation$Composable
+-dontwarn net.bytebuddy.implementation.Implementation
+-dontwarn net.bytebuddy.implementation.MethodCall$WithoutSpecifiedTarget
+-dontwarn net.bytebuddy.implementation.MethodCall
+-dontwarn net.bytebuddy.implementation.StubMethod
+-dontwarn net.bytebuddy.implementation.attribute.MethodAttributeAppender$Factory
+-dontwarn net.bytebuddy.implementation.attribute.MethodAttributeAppender$ForInstrumentedMethod
+-dontwarn net.bytebuddy.implementation.attribute.MethodAttributeAppender$NoOp
+-dontwarn net.bytebuddy.jar.asm.ClassVisitor
+-dontwarn net.bytebuddy.jar.asm.MethodVisitor
+-dontwarn net.bytebuddy.matcher.ElementMatcher$Junction
+-dontwarn net.bytebuddy.matcher.ElementMatcher
+-dontwarn net.bytebuddy.matcher.ElementMatchers
+-dontwarn org.mockito.internal.creation.bytebuddy.inject.MockMethodDispatcher

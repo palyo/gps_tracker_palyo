@@ -18,34 +18,6 @@
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         tools:node="remove" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission
-        android:name="android.permission.USE_FULL_SCREEN_INTENT"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.READ_CALL_LOG"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
-        tools:node="remove" />
-
-    <uses-permission-sdk-23
-        android:name="android.permission.ACCESS_FINE_LOCATION"
-        tools:node="remove" />
-
-    <uses-permission
-        android:name="android.permission.READ_CONTACTS"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.WRITE_CONTACTS"
-        tools:node="remove" />
 
     <application
         android:name=".App"
@@ -59,24 +31,12 @@
         android:theme="@style/Theme.Tracker"
         tools:targetApi="UPSIDE_DOWN_CAKE">
         <activity
-            android:name=".ui.PremiumActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.ViewCollectionActivity"
             android:exported="false" />
         <activity
             android:name=".ui.GPSCameraActivity"
             android:exported="false" />
 
-        <meta-data
-            android:name="com.calldorado.AccountId"
-            android:value="a1-b655df78-e5c9-43c1-be1c-40f0f4af097d" />
-        <meta-data
-            android:name="com.calldorado.AppId"
-            android:value="b0-b4e723af-38af-483d-b9f4-3b83a47736ac" />
-        <meta-data
-            android:name="com.calldorado.wsf"
-            android:value="true" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"
@@ -85,33 +45,6 @@
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="false" />
 
-        <receiver
-            android:name=".cdo.SetupFragmentReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter android:priority="100">
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".cdo.FirebaseEventBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="custom_firebase_event" />
-            </intent-filter>
-        </receiver>
-
-        <activity
-            android:name=".ui.AppPermissionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.NewPermissionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.PromptActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Space.Prompt" />
         <activity
             android:name=".ui.LauncherActivity"
             android:exported="true"

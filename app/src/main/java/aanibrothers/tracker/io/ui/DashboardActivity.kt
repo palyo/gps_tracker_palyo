@@ -23,26 +23,13 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
     }
 
     override fun ActivityDashboardBinding.initExtra() {
-        val mode = intent.getStringExtra("mode")
-        val goto = intent.getStringExtra("goto")
-        if (mode == "aftercall") {
-            when (goto) {
-                "map" -> go(MapActivity::class.java)
-                "compass" -> go(CompassActivity::class.java)
-                "speedometer" -> go(SpeedViewActivity::class.java)
-                "route" -> go(RouteActivity::class.java)
-                "area" -> go(AreaCalcActivity::class.java)
-                "near" -> go(NearActivity::class.java)
-            }
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
                 notificationLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
             }
         }
 
-        if (!isPremium) viewBanner(adNative) else adNative.beGone()
+        viewBanner(adNative)
     }
 
     override fun ActivityDashboardBinding.initListeners() {
@@ -135,7 +122,6 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
                     exception.startResolutionForResult(this@DashboardActivity, 4634)
                 } catch (_: IntentSender.SendIntentException) {
                 }
-            } else {
             }
         }
     }

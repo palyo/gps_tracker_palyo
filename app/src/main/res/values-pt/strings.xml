@@ -80,7 +80,6 @@
     <string name="menu_map">Mapa</string>
     <string name="menu_map_body">Mantenha-se no caminho certo com atualizações de localização precisas.</string>
     <string name="menu_voice_navigation">Navegação por voz</string>
-    <string name="menu_voice_navigation_body">Obtenha instruções claras e verbais enquanto conduz ou caminha.</string>
     <string name="menu_route_finder">Localizador de rotas</string>
     <string name="menu_route_finder_body">Obtenha o caminho mais curto e rápido.</string>
     <string name="menu_speedometer">Velocímetro</string>

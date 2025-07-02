@@ -1,12 +1,10 @@
 package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.extension.*
-import android.*
 import android.app.*
 import android.view.*
 import android.widget.*
-import coder.apps.space.library.extension.hasPermissions
+import coder.apps.space.library.extension.*
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.*
 
@@ -18,10 +16,9 @@ fun Activity.viewNativeBanner(container: ViewGroup) {
     view.root.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     container.removeAllViews()
     container.addView(view.root)
-    val adLoader = AdLoader.Builder(
-        this, if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) NATIVE_NON_CDO_ID
-        else NATIVE_ID
-    )
+    val adId = NATIVE_ID
+
+    val adLoader = AdLoader.Builder(this, adId)
         .forNativeAd { nativeAd: NativeAd ->
             val layoutInflater: LayoutInflater = LayoutInflater.from(this@viewNativeBanner)
             val binding = AdUnifiedBannerBinding.inflate(layoutInflater)
@@ -31,7 +28,7 @@ fun Activity.viewNativeBanner(container: ViewGroup) {
         }
         .withAdListener(object : AdListener() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-
+                TAG.log(adError.responseInfo.toString())
             }
         })
         .withNativeAdOptions(NativeAdOptions.Builder().setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_RIGHT).build()).build()
@@ -79,10 +76,8 @@ fun Activity.viewNativeMedium(container: ViewGroup) {
     view.root.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     container.removeAllViews()
     container.addView(view.root)
-    val adLoader = AdLoader.Builder(
-        this, if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) NATIVE_NON_CDO_ID
-        else NATIVE_ID
-    )
+    val adId = NATIVE_ID
+    val adLoader = AdLoader.Builder(this, adId)
         .forNativeAd { nativeAd: NativeAd ->
             val layoutInflater: LayoutInflater = LayoutInflater.from(this@viewNativeMedium)
             val binding = AdUnifiedMediumBinding.inflate(layoutInflater)
@@ -92,7 +87,7 @@ fun Activity.viewNativeMedium(container: ViewGroup) {
         }
         .withAdListener(object : AdListener() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-
+                TAG.log(adError.responseInfo.toString())
             }
         })
         .withNativeAdOptions(NativeAdOptions.Builder().setMediaAspectRatio(MediaAspectRatio.LANDSCAPE).setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_RIGHT).build()).build()

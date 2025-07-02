@@ -71,7 +71,6 @@
     <string name="menu_map">الخريطة</string>
     <string name="menu_map_body">ابق على المسار الصحيح مع تحديثات دقيقة للموقع.</string>
     <string name="menu_voice_navigation">الملاحة الصوتية</string>
-    <string name="menu_voice_navigation_body">احصل على اتجاهات واضحة منطوقة أثناء القيادة أو المشي.</string>
     <string name="menu_route_finder">محدد الطريق</string>
     <string name="menu_route_finder_body">احصل على أقصر وأسرع مسار.</string>
     <string name="menu_speedometer">عداد السرعة</string>

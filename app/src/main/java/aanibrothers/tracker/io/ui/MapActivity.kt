@@ -4,22 +4,19 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.isPremium
-import aanibrothers.tracker.io.module.viewBanner
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
-import aanibrothers.tracker.io.module.viewNativeBanner
-import android.Manifest
+import aanibrothers.tracker.io.module.*
+import android.*
 import android.annotation.*
 import android.content.*
 import android.content.res.*
 import android.graphics.*
-import android.net.Uri
-import android.provider.Settings
+import android.net.*
+import android.provider.*
 import android.speech.*
 import android.text.*
 import android.view.*
 import android.widget.*
-import androidx.activity.addCallback
+import androidx.activity.*
 import androidx.activity.result.contract.*
 import androidx.core.content.*
 import androidx.core.view.*
@@ -36,8 +33,10 @@ import com.google.maps.android.collections.*
 import com.google.maps.android.ktx.utils.collection.*
 import kotlinx.coroutines.*
 import org.json.*
+import androidx.core.graphics.toColorInt
 
 class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "MapActivity"
     private var markerManager: MarkerManager? = null
@@ -98,7 +97,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         textColor = tinyDb.getString("textColor", textColor) ?: textColor
         mapFragment.alpha = 0f
 
-        if (!isPremium && !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))) viewNativeBanner(adNative) else adNative.beGone()
+        viewNativeBanner(adNative)
     }
 
     private fun ActivityMapBinding.setupSuggestionAdapter() {
@@ -109,6 +108,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 cardSuggestedResult.beGone()
                 addMarker(LatLng(it.latitude, it.longitude), "")
                 moveToLocation(LatLng(it.latitude, it.longitude))
+                mapNavigate.beEnableIf(currentMarker != null)
             }
             adapter = suggestionLocationAdapter
         }
@@ -380,8 +380,8 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
 
     private fun updateUIColors() {
         binding?.apply {
-            val bgColorParsed = Color.parseColor(backgroundColor)
-            val textColorParsed = Color.parseColor(textColor)
+            val bgColorParsed = backgroundColor.toColorInt()
+            val textColorParsed = textColor.toColorInt()
             val textOpacity = textColor.applyOpacity(0.5F)
             val bgTint = ColorStateList.valueOf(bgColorParsed)
             val textTint = ColorStateList.valueOf(textColorParsed)
@@ -440,6 +440,11 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             position(latLng)
             icon(vectorToBitmap(R.drawable.ic_icon_marker_pin))
         }
+        if (tinyDb.getBoolean("pin_guide_enabled", true)) {
+            viewPinGuideSheet {
+                tinyDb.putBoolean("pin_guide_enabled", false)
+            }
+        }
     }
 
     private fun updateMapStyle() {
@@ -450,7 +455,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             val styleRes: Int,
             val updateIcons: () -> Unit,
             val delayed: Boolean = true,
-            val doubleSetup: Boolean = false
+            val doubleSetup: Boolean = false,
         )
 
         val config = if (viewMapType == "standard") {

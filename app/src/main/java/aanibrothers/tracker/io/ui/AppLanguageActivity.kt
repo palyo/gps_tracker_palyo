@@ -14,6 +14,7 @@ import coder.apps.space.library.helper.*
 import java.util.*
 
 class AppLanguageActivity : BaseActivity<ActivityAppLanguageBinding>(ActivityAppLanguageBinding::inflate) {
+
     private var language: String = Locale.getDefault().language
     private var isChangeLanguage: Boolean = false
     override fun ActivityAppLanguageBinding.initExtra() {
@@ -41,12 +42,7 @@ class AppLanguageActivity : BaseActivity<ActivityAppLanguageBinding>(ActivityApp
                 go(AppSettingsActivity::class.java, finish = true)
             } else {
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
-                val isMoreNeeded = !hasOverlayPermission() || !hasPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE))
-                if (isMoreNeeded && !isPremium) {
-                    go(PremiumActivity::class.java, finish = true)
-                } else {
-                    go(DashboardActivity::class.java, finish = true)
-                }
+                go(DashboardActivity::class.java, finish = true)
             }
         }
     }

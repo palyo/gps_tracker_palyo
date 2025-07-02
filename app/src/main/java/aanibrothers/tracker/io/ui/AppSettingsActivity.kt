@@ -8,7 +8,6 @@ import android.content.*
 import androidx.activity.*
 import coder.apps.space.library.base.*
 import coder.apps.space.library.extension.*
-import com.calldorado.ui.settings.*
 
 class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettingsBinding::inflate) {
     override fun ActivitySettingsBinding.initExtra() {}
@@ -36,10 +35,6 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
 
         buttonManageConsent.setOnClickListener {
             consentManager.showPrivacyOptionsForm(this@AppSettingsActivity) {}
-        }
-
-        buttonAboutCallerId.setOnClickListener {
-            go(SettingsActivity::class.java)
         }
     }
 

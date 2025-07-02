@@ -6,9 +6,10 @@ import android.app.*
 import android.content.*
 import android.graphics.drawable.*
 import android.view.*
+import androidx.core.graphics.drawable.toDrawable
 
 fun Context.viewAppOpen(isWait: Boolean = false, isDialogShown: Boolean = false, listener: (() -> Unit)?) {
-    if (appOpenManager == null || isPremium) {
+    if (appOpenManager == null) {
         listener?.invoke()
         return
     }
@@ -38,7 +39,7 @@ fun showProgressDialog(activity: Activity): Dialog {
     dialog.window?.apply {
         setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         statusBarColor = activity.getColor(R.color.colorPrimary)
-        setBackgroundDrawable(ColorDrawable(activity.getColor(R.color.colorPrimary)))
+        setBackgroundDrawable(activity.getColor(R.color.colorPrimary).toDrawable())
         setDimAmount(0.0F)
     }
     try {

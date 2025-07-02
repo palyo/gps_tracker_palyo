@@ -71,7 +71,6 @@
     <string name="menu_map">Karte</string>
     <string name="menu_map_body">Bleiben Sie mit präzisen Standortaktualisierungen auf dem richtigen Weg.</string>
     <string name="menu_voice_navigation">Sprachnavigation</string>
-    <string name="menu_voice_navigation_body">Erhalten Sie beim Fahren oder Gehen klare gesprochene Anweisungen.</string>
     <string name="menu_route_finder">Routenfinder</string>
     <string name="menu_route_finder_body">Finden Sie den kürzesten und schnellsten Weg.</string>
     <string name="menu_speedometer">Tachometer</string>

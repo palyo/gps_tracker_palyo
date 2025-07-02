@@ -45,35 +45,96 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_compass"
         android:layout_width="@dimen/_0sdp"
         android:layout_height="@dimen/_0sdp"
+        android:padding="@dimen/_20sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/image_compass"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/layout_compass_rotate"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_compass_direction" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/image_compass"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_compass_direction" />
+
+            <!--<com.google.android.material.textview.MaterialTextView
+                style="@style/TextExtraBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="W"
+                android:textSize="@dimen/_20ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/image_compass"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/image_compass" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextExtraBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:text="E"
+                android:textSize="@dimen/_20ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/image_compass"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/image_compass" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextExtraBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="N"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/_20ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/image_compass" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextExtraBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:text="S"
+                android:textSize="@dimen/_20ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/image_compass"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_-->toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image_needle"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_64sdp"
+            android:adjustViewBounds="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
             app:srcCompat="@drawable/ic_compass_needle" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <aanibrothers.tracker.io.module.AdsView
         android:id="@+id/ad_native"
