@@ -6,6 +6,7 @@ import aanibrothers.tracker.io.module.*
 import android.*
 import android.content.*
 import android.os.*
+import android.widget.*
 import androidx.activity.*
 import androidx.activity.result.contract.*
 import coder.apps.space.library.base.*
@@ -15,10 +16,23 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.*
 
 class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboardBinding::inflate) {
+
+    private var pendingAction: (() -> Unit)? = null
     private val TAG = DashboardActivity::class.java.simpleName
     private val notificationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.containsValue(false)) {
             incrementPermissionsDeniedCount("notification")
+        }
+    }
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (!allGranted) {
+            pendingAction = null
+            Toast.makeText(this, "Location permissions required", Toast.LENGTH_SHORT).show()
+            incrementPermissionsDeniedCount("PERMISSION_LOCATION")
+        } else {
+            pendingAction?.invoke()
+            pendingAction = null
         }
     }
 
@@ -34,67 +48,49 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
 
     override fun ActivityDashboardBinding.initListeners() {
         mapBanner.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(MapActivity::class.java)
             }
-            go(MapActivity::class.java)
         }
         actionMap.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(MapActivity::class.java)
             }
-            go(MapActivity::class.java)
         }
         actionVoice.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(MapActivity::class.java, listOf("is_voice_navigation" to true))
             }
-            go(MapActivity::class.java, listOf("is_voice_navigation" to true))
         }
         actionRouteFinder.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(RouteActivity::class.java)
             }
-            go(RouteActivity::class.java)
         }
         actionSpeedometer.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(SpeedViewActivity::class.java)
             }
-            go(SpeedViewActivity::class.java)
         }
         actionCompass.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(CompassActivity::class.java)
             }
-            go(CompassActivity::class.java)
         }
         actionNear.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(NearActivity::class.java)
             }
-            go(NearActivity::class.java)
         }
         actionArea.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(AreaCalcActivity::class.java)
             }
-            go(AreaCalcActivity::class.java)
         }
         actionGpsCamera.setOnClickListener {
-            if (!isLocationEnabled()) {
-                checkAndPromptLocationSettings()
-                return@setOnClickListener
+            checkLocationPermissionAndProceed {
+                go(GPSCameraActivity::class.java)
             }
-            go(GPSCameraActivity::class.java)
         }
         buttonSettings.setOnClickListener {
             go(AppSettingsActivity::class.java)
@@ -123,6 +119,23 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
                 } catch (_: IntentSender.SendIntentException) {
                 }
             }
+        }
+    }
+
+    private fun checkLocationPermissionAndProceed(action: () -> Unit) {
+        if (!hasPermissions(LOCATION_PERMISSION)) {
+            pendingAction = {
+                if (isLocationEnabled()) {
+                    action()
+                } else {
+                    checkAndPromptLocationSettings()
+                }
+            }
+            permissionLauncher.launch(LOCATION_PERMISSION)
+        } else if (!isLocationEnabled()) {
+            checkAndPromptLocationSettings()
+        } else {
+            action()
         }
     }
 

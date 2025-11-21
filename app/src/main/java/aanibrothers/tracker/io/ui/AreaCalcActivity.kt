@@ -74,7 +74,6 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
         supportFragmentManager.beginTransaction().replace(R.id.map_fragment, fragment).commit()
         fragment.getMapAsync(this@AreaCalcActivity)
 
-        viewNativeBanner(adNative)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@AreaCalcActivity)
         setupSuggestionAdapter()
 

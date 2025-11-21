@@ -96,8 +96,6 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         cardColor = tinyDb.getString("cardColor", cardColor) ?: cardColor
         textColor = tinyDb.getString("textColor", textColor) ?: textColor
         mapFragment.alpha = 0f
-
-        viewNativeBanner(adNative)
     }
 
     private fun ActivityMapBinding.setupSuggestionAdapter() {

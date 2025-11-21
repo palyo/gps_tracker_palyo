@@ -57,6 +57,15 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
             binding?.initExtra()
         }
     }
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (allGranted) {
+            binding?.initExtra()
+        } else {
+            Toast.makeText(this, "Camera & Location permissions required", Toast.LENGTH_SHORT).show()
+            incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+        }
+    }
     private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         binding?.initExtra()
     }
@@ -83,23 +92,10 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
         } else {
             permissionLayout.beVisible()
             buttonAllowAccess.setOnClickListener {
-                val locationDeniedCount = getPermissionsDeniedCount("PERMISSION_LOCATION")
-                if (locationDeniedCount < 2 && !hasPermissions(LOCATION_PERMISSION)) {
-                    locationPermissionLauncher.launch(LOCATION_PERMISSION)
-                    return@setOnClickListener
-                } else if (!hasPermissions(LOCATION_PERMISSION)) {
-                    viewPermissions {
-                        val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", packageName, null)
-                        }
-                        appSettingsLauncher.launch(appSettingsIntent)
-                    }
-                }
-                val cameraDeniedCount = getPermissionsDeniedCount("CAMERA")
-                if (cameraDeniedCount < 2 && !hasPermissions(arrayOf(Manifest.permission.CAMERA))) {
-                    cameraPermissionLauncher.launch(arrayOf(Manifest.permission.CAMERA))
-                    return@setOnClickListener
-                } else if (!hasPermissions(arrayOf(Manifest.permission.CAMERA))) {
+                val deniedCount = getPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+                if (deniedCount < 2) {
+                    permissionLauncher.launch(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))
+                } else {
                     viewPermissions {
                         val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                             data = Uri.fromParts("package", packageName, null)

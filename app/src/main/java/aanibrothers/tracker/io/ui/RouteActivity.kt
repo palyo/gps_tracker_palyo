@@ -71,8 +71,6 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@RouteActivity)
         setupSuggestionAdapter()
-
-        viewNativeBanner(adNative)
         backgroundColor = tinyDb.getString("backgroundColor", backgroundColor) ?: backgroundColor
         cardColor = tinyDb.getString("cardColor", cardColor) ?: cardColor
         textColor = tinyDb.getString("textColor", textColor) ?: textColor

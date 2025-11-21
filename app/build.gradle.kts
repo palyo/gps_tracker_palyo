@@ -15,8 +15,8 @@ android {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.3.0"
+        versionCode = 10
+        versionName = "1.3.3"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -33,7 +33,7 @@ android {
     dataBinding.enable = true
     buildTypes {
         debug {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isDebuggable = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -63,6 +63,11 @@ android {
         exclude("META-INF/NOTICE.md")
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    configurations {
+        implementation {
+            exclude(group = "com.squareup.okio", module = "okio")
         }
     }
 }
@@ -128,4 +133,12 @@ dependencies {
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
     implementation("com.google.android.gms:play-services-ads:23.6.0")
+
+    implementation("com.google.ads.mediation:applovin:13.3.1.1")
+    implementation("com.google.ads.mediation:inmobi:10.8.3.1")
+    implementation("com.google.ads.mediation:ironsource:8.10.0.0")
+    implementation("com.google.ads.mediation:vungle:7.5.0.1")
+    implementation("com.google.ads.mediation:facebook:6.20.0.0")
+    implementation("com.unity3d.ads:unity-ads:4.15.0")
+    implementation("com.google.ads.mediation:unity:4.15.1.0")
 }
