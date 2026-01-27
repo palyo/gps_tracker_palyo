@@ -7,11 +7,6 @@ import android.content.pm.*
 import coder.apps.space.library.helper.*
 import retrofit2.*
 
-var OPEN_ID = ""
-var INTER_ID = ""
-var NATIVE_ID = ""
-var BANNER_ID = ""
-
 var Context.appOpenCount: Int
     get() = TinyDB(this).getInt("appOpenCount", 0)
     set(value) {
@@ -63,11 +58,27 @@ fun Context.getPolicyLink(): String {
 }
 
 fun Activity.initAds(appJson: ConfigJson) {
-    NATIVE_ID = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/2247696110" else appJson.nativeID ?: ""
-    INTER_ID = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else appJson.interID ?: ""
-    OPEN_ID = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9257395921" else appJson.openID ?: ""
-    BANNER_ID = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741" else appJson.bannerID ?: ""
     registerAppId(appJson.appId ?: "ca-app-pub-3940256099942544~3347511713")
+}
+
+fun Context.getAdmobNativeId(): String {
+    return appJson()?.nativeID ?: ""
+}
+
+fun Context.getAdmobInterId(): String {
+    return appJson()?.interID ?: ""
+}
+
+fun Context.getAdmobBannerId(): String {
+    return appJson()?.bannerID ?: ""
+}
+
+fun Context.getAdmobBannerMRECId(): String {
+    return appJson()?.bannerMREC ?: "ca-app-pub-3940256099942544/6300978111"
+}
+
+fun Context.getAdmobOpenId(): String {
+    return appJson()?.openID ?: ""
 }
 
 fun Activity.registerAppId(appId: String) {

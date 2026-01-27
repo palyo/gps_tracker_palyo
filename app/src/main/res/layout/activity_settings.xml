@@ -59,6 +59,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <LinearLayout
+                android:id="@+id/button_call_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/MaterialButtonTransparent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
+                    android:paddingVertical="@dimen/_12sdp"
+                    android:paddingStart="@dimen/_12sdp"
+                    android:text="Show after call details screen"
+                    android:textSize="@dimen/_12sdp"
+                    app:backgroundTint="@color/colorCardBackground"
+                    app:cornerRadius="@dimen/_0sdp"
+                    app:icon="@drawable/ic_menu_caller_id"
+                    app:iconPadding="@dimen/_12sdp"
+                    app:iconSize="@dimen/_18sdp" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_language"
                 style="@style/MaterialButtonTransparent"
@@ -76,7 +106,7 @@
                 app:iconSize="@dimen/_20sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/button_call_id" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_share"

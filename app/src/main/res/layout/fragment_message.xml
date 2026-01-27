@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".caller.frags.MessageFragment">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/button_cant_talk"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:button="@drawable/ic_check_selector"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/_8sdp"
+        android:text="@string/can_t_talk_right_now"
+        app:buttonTint="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/button_call_you_later"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:button="@drawable/ic_check_selector"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/_8sdp"
+        android:text="@string/i_ll_call_you_later"
+        app:buttonTint="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_cant_talk" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/button_on_my_way"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:button="@drawable/ic_check_selector"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/_8sdp"
+        android:text="@string/i_m_on_my_way"
+        app:buttonTint="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_call_you_later" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/button_on_my_way">
+
+        <ImageView
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_gravity="center"
+            android:padding="@dimen/_3sdp"
+            android:src="@drawable/ic_menu_edit" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/colorTransparent"
+            android:cursorVisible="true"
+            android:gravity="start|center"
+            android:hint="@string/write_personal_message"
+            android:imeOptions="actionNext"
+            android:inputType="textCapSentences|text"
+            android:maxLines="1"
+            android:paddingVertical="@dimen/_10sdp"
+            android:paddingStart="@dimen/_10sdp"
+            android:text=""
+            android:textColor="@color/colorBlack"
+            android:textColorHint="@color/colorTextOpacity"
+            app:fontFamily="@font/medium" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

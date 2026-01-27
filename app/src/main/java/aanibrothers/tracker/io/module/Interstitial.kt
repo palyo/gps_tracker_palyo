@@ -3,10 +3,11 @@ package aanibrothers.tracker.io.module
 import android.app.*
 import android.content.*
 import android.os.*
+import android.util.Log
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.*
 
-private const val TAG = "AdmobInterstitial"
+const val TAG = "ADMOB_TAG"
 private var admobInterstitialAd: InterstitialAd? = null
 private var isLoadingAd = false
 
@@ -15,18 +16,25 @@ fun Context.loadInterAd(listener: ((result: Boolean) -> Unit)? = null) {
 
     isLoadingAd = true
     val adRequest = AdRequest.Builder().build()
+    val start = System.currentTimeMillis()
     InterstitialAd.load(
-        this, INTER_ID, adRequest,
+        this, getAdmobInterId(), adRequest,
         object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
+                val seconds = (System.currentTimeMillis() - start) / 1000.0
+                Log.e("AdTiming", "Inter onAdFailedToLoad in $seconds seconds")
+                Log.e(TAG, "onAdFailedToLoad:Inter: ${adError.code} ${adError.message}")
                 isLoadingAd = false
                 admobInterstitialAd = null
                 listener?.invoke(true)
             }
 
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                val seconds = (System.currentTimeMillis() - start) / 1000.0
                 isLoadingAd = false
                 admobInterstitialAd = interstitialAd
+                Log.e("AdTiming", "Inter loaded in $seconds seconds")
+                Log.e(TAG, "onAdLoaded:Inter ")
                 listener?.invoke(false)
             }
         })
@@ -62,30 +70,6 @@ private fun Activity.displayInter(listener: ((result: Boolean) -> Unit)? = null)
     }
 }
 
-fun Activity.viewInterAdForce(listener: ((result: Boolean) -> Unit)? = null) {
-    if (admobInterstitialAd != null) {
-        displayInter(listener)
-    } else {
-        loadInterAd()
-        object : CountDownTimer((5 * 1000).toLong(), 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                if (admobInterstitialAd != null) {
-                    this.cancel()
-                    this.onFinish()
-                }
-            }
-
-            override fun onFinish() {
-                if (admobInterstitialAd != null) {
-                    displayInter(listener)
-                } else {
-                    listener?.invoke(true)
-                    loadInterAd()
-                }
-            }
-        }.start()
-    }
-}
 
 fun Activity.viewInterAdWithLogic(listener: ((result: Boolean) -> Unit)? = null) {
     currentAdLevel++

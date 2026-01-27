@@ -1,3 +1,6 @@
+import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,8 +18,8 @@ android {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.3.3"
+        versionCode = 11
+        versionName = "1.4"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -101,6 +104,7 @@ dependencies {
     implementation(libs.bundles.lifecycle)
     implementation(libs.livedata.ktx)
     implementation(libs.bundles.coroutines)
+    implementation(libs.shimmer)
 
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
@@ -116,6 +120,8 @@ dependencies {
     implementation("androidx.camera:camera-extensions:1.4.1")
 
     implementation("com.github.anastr:speedviewlib:1.6.1")
+    implementation("com.github.florent37:singledateandtimepicker:2.2.7")
+
 
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
@@ -132,13 +138,13 @@ dependencies {
 
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    implementation("com.google.android.gms:play-services-ads:24.8.0")
 
-    implementation("com.google.ads.mediation:applovin:13.3.1.1")
-    implementation("com.google.ads.mediation:inmobi:10.8.3.1")
-    implementation("com.google.ads.mediation:ironsource:8.10.0.0")
-    implementation("com.google.ads.mediation:vungle:7.5.0.1")
-    implementation("com.google.ads.mediation:facebook:6.20.0.0")
-    implementation("com.unity3d.ads:unity-ads:4.15.0")
-    implementation("com.google.ads.mediation:unity:4.15.1.0")
+    implementation("com.google.ads.mediation:applovin:13.5.1.0")
+    implementation("com.google.ads.mediation:inmobi:10.8.8.1")
+    implementation("com.google.ads.mediation:ironsource:9.1.0.0")
+    implementation("com.google.ads.mediation:vungle:7.6.1.0")
+    implementation("com.google.ads.mediation:facebook:6.21.0.0")
+    implementation("com.unity3d.ads:unity-ads:4.16.4")
+    implementation("com.google.ads.mediation:unity:4.16.4.0")
 }

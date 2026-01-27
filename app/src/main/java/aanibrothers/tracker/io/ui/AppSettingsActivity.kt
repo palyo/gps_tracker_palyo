@@ -1,13 +1,16 @@
 package aanibrothers.tracker.io.ui
 
-import aanibrothers.tracker.io.*
-import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.*
-import android.content.*
-import androidx.activity.*
-import coder.apps.space.library.base.*
-import coder.apps.space.library.extension.*
+import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.databinding.ActivitySettingsBinding
+import aanibrothers.tracker.io.extension.IS_SETTINGS
+import aanibrothers.tracker.io.module.ConsentManager
+import aanibrothers.tracker.io.module.getPolicyLink
+import android.content.Intent
+import androidx.activity.addCallback
+import coder.apps.space.library.base.BaseActivity
+import coder.apps.space.library.extension.beVisibleIf
+import coder.apps.space.library.extension.go
+import coder.apps.space.library.extension.launchUrl
 
 class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettingsBinding::inflate) {
     override fun ActivitySettingsBinding.initExtra() {}
@@ -36,10 +39,22 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
         buttonManageConsent.setOnClickListener {
             consentManager.showPrivacyOptionsForm(this@AppSettingsActivity) {}
         }
+
+        switchCall.setOnCheckedChangeListener { button, isChecked ->
+            if (button.isPressed) {
+                tinyDB?.getBoolean("ShowAfterCall", isChecked)
+            }
+        }
     }
 
     override fun ActivitySettingsBinding.initView() {
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         onBackPressedDispatcher.addCallback { go(DashboardActivity::class.java, finishAll = true) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding?.switchCall?.isChecked = tinyDB?.getBoolean("ShowAfterCall", true) == true
+
     }
 }

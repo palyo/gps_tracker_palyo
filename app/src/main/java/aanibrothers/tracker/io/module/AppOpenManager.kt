@@ -9,7 +9,7 @@ import java.util.*
 
 class AppOpenManager {
     companion object {
-        var openIds = mutableListOf(OPEN_ID)
+        var openIds = listOf<String>()
         private val TAG = "AppOpenManager"
         var isShowingAd = false
     }
@@ -30,7 +30,7 @@ class AppOpenManager {
 
     fun initAd() {
         App.getAppContext().apply {
-            val adId = OPEN_ID
+            val adId = getAdmobOpenId()
             openIds = mutableListOf(adId)
             loadOpen()
         }

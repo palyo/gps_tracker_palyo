@@ -1,12 +1,22 @@
 package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.databinding.*
-import android.app.*
-import android.util.*
-import android.view.*
-import androidx.core.view.*
-import com.google.android.gms.ads.*
+import aanibrothers.tracker.io.databinding.AdUnifiedBannerLoadingBinding
+import android.app.Activity
+import android.content.Context
+import android.util.DisplayMetrics
+import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.core.view.isNotEmpty
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 
 fun Activity.viewBanner(container: ViewGroup) {
     if (container.childCount > 0) container.removeAllViews()
@@ -21,7 +31,7 @@ fun Activity.viewBanner(container: ViewGroup) {
     container.addView(view.root)
     val adView = AdView(this)
     adView.setAdSize(adSize)
-    val adId = BANNER_ID
+    val adId = getAdmobBannerId()
     adView.adUnitId = adId
 
     adView.adListener = object : AdListener() {
@@ -47,4 +57,29 @@ private fun Activity.getAdSize(): AdSize {
     val density = outMetrics.density
     val adWidth = (widthPixels / density).toInt()
     return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth)
+}
+
+
+fun Context.viewMRECBanner(viewGroup: AdsView) {
+    val mAdView = AdView(this)
+    mAdView.adUnitId = getAdmobBannerMRECId()
+    mAdView.setAdSize(AdSize.MEDIUM_RECTANGLE)
+    mAdView.adListener = object : AdListener() {
+        override fun onAdLoaded() {
+            super.onAdLoaded()
+            viewGroup.removeAllViews()
+            val layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.CENTER
+            }
+            viewGroup.addView(mAdView, layoutParams)
+        }
+
+        override fun onAdFailedToLoad(p0: LoadAdError) {
+            super.onAdFailedToLoad(p0)
+            Log.e(TAG, "onAdFailedToLoad:MRECBanner ${p0.message}")
+        }
+    }
+    mAdView.loadAd(AdRequest.Builder().build())
 }

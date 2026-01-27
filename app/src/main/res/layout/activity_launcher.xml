@@ -68,8 +68,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_2sdp"
         android:layout_marginBottom="@dimen/_8sdp"
-        android:text="Please wait while preparing.."
-        android:textSize="@dimen/_7ssp"
+        android:text="This action can contain ad"
+        android:textSize="@dimen/_9ssp"
         app:layout_constraintBottom_toTopOf="@+id/progress_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

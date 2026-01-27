@@ -15,7 +15,7 @@ compiler = "3.1.4"
 
 sdp = "1.1.1"
 ssp = "1.1.0"
-
+shimmer = "0.5.0"
 codespace = "2.0.3"
 lottie = "6.0.1"
 gson = "2.10.1"
@@ -54,7 +54,7 @@ sdp-android = { group = "com.intuit.sdp", name = "sdp-android", version.ref = "s
 ssp-android = { group = "com.intuit.ssp", name = "ssp-android", version.ref = "ssp" }
 
 livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
-
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }

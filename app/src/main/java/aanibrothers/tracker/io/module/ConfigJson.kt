@@ -17,6 +17,8 @@ data class ConfigJson(
     val openID: String? = null,
     @field:SerializedName("banner")
     val bannerID: String? = null,
+    @field:SerializedName("banner_mrec")
+    val bannerMREC: String? = null,
     @field:SerializedName("policy_url")
     val policyUrl: String? = null,
 )
