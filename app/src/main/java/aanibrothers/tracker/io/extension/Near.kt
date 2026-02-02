@@ -1,7 +1,7 @@
 package aanibrothers.tracker.io.extension
 
-import aanibrothers.tracker.io.*
-import aanibrothers.tracker.io.model.*
+import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.model.NearLocation
 
 val nearLocations: MutableList<Any>
     get() {

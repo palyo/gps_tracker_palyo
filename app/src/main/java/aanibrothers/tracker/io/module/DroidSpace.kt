@@ -58,27 +58,27 @@ fun Context.getPolicyLink(): String {
 }
 
 fun Activity.initAds(appJson: ConfigJson) {
-    registerAppId(appJson.appId ?: "ca-app-pub-3940256099942544~3347511713")
+    registerAppId(if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544~3347511713" else appJson.appId ?: "ca-app-pub-3940256099942544~3347511713")
 }
 
 fun Context.getAdmobNativeId(): String {
-    return appJson()?.nativeID ?: ""
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/2247696110" else appJson()?.nativeID ?: ""
 }
 
 fun Context.getAdmobInterId(): String {
-    return appJson()?.interID ?: ""
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else appJson()?.interID ?: ""
 }
 
 fun Context.getAdmobBannerId(): String {
-    return appJson()?.bannerID ?: ""
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741" else appJson()?.bannerID ?: ""
 }
 
 fun Context.getAdmobBannerMRECId(): String {
-    return appJson()?.bannerMREC ?: "ca-app-pub-3940256099942544/6300978111"
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else appJson()?.bannerMREC ?: "ca-app-pub-3940256099942544/6300978111"
 }
 
 fun Context.getAdmobOpenId(): String {
-    return appJson()?.openID ?: ""
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9257395921" else appJson()?.openID ?: ""
 }
 
 fun Activity.registerAppId(appId: String) {

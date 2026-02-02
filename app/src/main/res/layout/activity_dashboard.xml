@@ -33,24 +33,12 @@
                 android:background="@null"
                 android:theme="@style/Theme.Tracker"
                 app:contentInsetStart="@dimen/_12sdp"
+                app:navigationIcon="@drawable/ic_navigation_back"
+                app:navigationIconTint="@color/colorIcon"
                 app:popupTheme="@style/Theme.Space.PopupMenu"
-                app:title="@string/app_name"
-                app:titleCentered="false"
+                app:title="@string/action_tools"
                 app:titleTextAppearance="@style/TextAppearance.Space.TitleSmall"
                 app:titleTextColor="@color/colorText">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_settings"
-                    style="@style/MaterialButtonTransparent"
-                    android:layout_width="?attr/actionBarSize"
-                    android:layout_height="?attr/actionBarSize"
-                    android:layout_gravity="end"
-                    android:paddingHorizontal="@dimen/_0sdp"
-                    app:icon="@drawable/ic_menu_settings"
-                    app:iconPadding="@dimen/_0sdp"
-                    app:iconSize="@dimen/_16sdp"
-                    app:iconTint="@null" />
-
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

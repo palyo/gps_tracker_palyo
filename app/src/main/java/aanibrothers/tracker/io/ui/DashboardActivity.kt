@@ -37,37 +37,6 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
 
     private var pendingAction: (() -> Unit)? = null
     private val TAG = DashboardActivity::class.java.simpleName
-    private var handlerSettingOverLay: HandleSettingPreview? = null
-
-    private val permissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        val allPermissionsGranted = permissions.all { entry -> entry.value }
-        if (!allPermissionsGranted) {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
-                showPermissionExplanationDialog("We need the phone state,notification permission to detecting state of call. Please grant the permission.")
-            } else {
-                showFallbackDialog()
-            }
-        }else if (!isGrantedOverlay()) {
-            sendToSettings()
-        }
-    }
-
-    private fun showPermissionExplanationDialog(message: String) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Phone and Notification Permission Required").setMessage(message).setPositiveButton("OK") { dialog, which -> permissions.launch(PERMISSION_MAIN) }.show()
-    }
-
-
-    private fun showFallbackDialog() {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Phone and Notification Permission Denied").setMessage("The app cannot function properly without that permission. Please enable the permission in the app settings.").setPositiveButton("Open Settings") { dialog, which -> openAppSettings() }.show()
-    }
-
-    private fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        intent.setData(Uri.parse("package:$packageName"))
-        startActivity(intent)
-    }
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val allGranted = permissions.values.all { it }
@@ -82,26 +51,7 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
     }
 
     override fun ActivityDashboardBinding.initExtra() {
-        handlerSettingOverLay = HandleSettingPreview(this@DashboardActivity)
-        appOpenManager = AppOpenManager()
-        if (!hasPermissions(PERMISSION_MAIN)) {
-            permissions.launch(PERMISSION_MAIN)
-        }else if (!isGrantedOverlay()) {
-            sendToSettings()
-        }
-
         viewBanner(adNative)
-    }
-
-    private fun sendToSettings() {
-        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-        handlerSettingOverLay?.startPollingImeSettings()
-        App.isOpenInter=true
-        checkOverlay.launch(intent)
-    }
-
-    private var checkOverlay: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
     }
 
     override fun ActivityDashboardBinding.initListeners() {
@@ -150,9 +100,6 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
                 go(GPSCameraActivity::class.java)
             }
         }
-        buttonSettings.setOnClickListener {
-            go(AppSettingsActivity::class.java)
-        }
     }
 
     private fun checkAndPromptLocationSettings() {
@@ -197,38 +144,8 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
     }
 
     override fun ActivityDashboardBinding.initView() {
-        onBackPressedDispatcher.addCallback {
-            finish()
-        }
-    }
-
-    class HandleSettingPreview internal constructor(activity: DashboardActivity) : LeakGuardHandlerWrapper<DashboardActivity>(activity) {
-
-        fun cancelPollingImeSettings() {
-            removeMessages(0)
-        }
-
-        override fun handleMessage(message: Message) {
-            val ownerInstance = ownerInstance
-            if (ownerInstance != null && message.what == 0) {
-                if (Settings.canDrawOverlays(ownerInstance)) {
-                    ownerInstance.invokeSetupWizardOfThisIme()
-                } else {
-                    startPollingImeSettings()
-                }
-            }
-        }
-
-        fun startPollingImeSettings() {
-            sendMessageDelayed(obtainMessage(0), 200L)
-        }
-    }
-
-    private fun invokeSetupWizardOfThisIme() {
-        handlerSettingOverLay?.cancelPollingImeSettings()
-        val intent = Intent()
-        intent.setClass(this@DashboardActivity, DashboardActivity::class.java)
-        intent.flags = 606076928
-        startActivity(intent)
+        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        onBackPressedDispatcher.addCallback { finish() }
     }
 }

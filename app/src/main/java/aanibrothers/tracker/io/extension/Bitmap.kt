@@ -1,13 +1,17 @@
 package aanibrothers.tracker.io.extension
 
-import android.content.*
-import android.graphics.*
-import androidx.annotation.*
-import androidx.core.content.*
-import com.google.android.gms.maps.model.*
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 fun Context.vectorToBitmap(@DrawableRes vectorResId: Int): BitmapDescriptor {
-    val vectorDrawable = ContextCompat.getDrawable(this, vectorResId) ?: return BitmapDescriptorFactory.defaultMarker()
+    val vectorDrawable = ContextCompat.getDrawable(this, vectorResId)
+        ?: return BitmapDescriptorFactory.defaultMarker()
 
     val bitmap = Bitmap.createBitmap(
         vectorDrawable.intrinsicWidth,

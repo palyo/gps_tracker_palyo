@@ -65,6 +65,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:background="@color/colorCardBackground"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.button.MaterialButton
@@ -83,10 +84,22 @@
                     app:iconPadding="@dimen/_12sdp"
                     app:iconSize="@dimen/_18sdp" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switch_call"
+                    style="@style/TextMedium"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:checked="true"
+                    android:clickable="false"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:gravity="center_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:thumbTint="@color/ic_switch_thumb_tint"
+                    app:trackTint="@color/ic_switch_track_tint" />
+
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton

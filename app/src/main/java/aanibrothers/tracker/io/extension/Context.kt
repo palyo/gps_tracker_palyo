@@ -1,11 +1,11 @@
 package aanibrothers.tracker.io.extension
 
-import android.content.*
-import android.net.*
-import android.os.*
-import android.view.*
-import androidx.core.view.*
-import coder.apps.space.library.helper.*
+import android.content.Context
+import android.os.Build
+import android.view.View
+import android.view.Window
+import androidx.core.view.WindowInsetsControllerCompat
+import coder.apps.space.library.helper.TinyDB
 
 val Context.tinyDb: TinyDB
     get() = TinyDB(this)

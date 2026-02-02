@@ -1,14 +1,17 @@
 package aanibrothers.tracker.io.extension
 
-import android.content.*
-import android.database.*
-import android.net.*
-import android.os.*
-import android.provider.*
-import androidx.documentfile.provider.*
-import java.io.*
-import java.text.*
-import java.util.*
+import android.content.ContentUris
+import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.os.Environment
+import android.provider.DocumentsContract
+import android.provider.MediaStore
+import androidx.documentfile.provider.DocumentFile
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 fun Context.realPath(uri: Uri?): String? {
     var realPath: String? = null
@@ -31,10 +34,10 @@ fun getPathFromURI(context: Context, uri: Uri?): String? {
         } else if (isDownloadsDocument(uri)) {
             val id = DocumentsContract.getDocumentId(uri)
             val contentUri =
-                    ContentUris.withAppendedId(
-                            Uri.parse("content://downloads/public_downloads"),
-                            java.lang.Long.valueOf(id)
-                    )
+                ContentUris.withAppendedId(
+                    Uri.parse("content://downloads/public_downloads"),
+                    java.lang.Long.valueOf(id)
+                )
             return getDataColumn(context, contentUri, null, null)
         } else if (isMediaDocument(uri)) {
             val docId = DocumentsContract.getDocumentId(uri)
@@ -70,11 +73,16 @@ fun getPathFromURI(context: Context, uri: Uri?): String? {
     return null
 }
 
-fun getDataColumn(context: Context, uri: Uri?, selection: String?, selectionArgs: Array<String>?): String? {
+fun getDataColumn(
+    context: Context,
+    uri: Uri?,
+    selection: String?,
+    selectionArgs: Array<String>?
+): String? {
     var cursor: Cursor? = null
     val column = "_data"
     val projection = arrayOf(
-            column
+        column
     )
     try {
         cursor = context.contentResolver.query(uri!!, projection, selection, selectionArgs, null)
@@ -100,13 +108,15 @@ fun isMediaDocument(uri: Uri?): Boolean {
     return "com.android.providers.media.documents" == uri?.authority
 }
 
-private var _savePhotosFolder: String = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
+private var _savePhotosFolder: String =
+    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
 
 var savePhotosFolder: String
     get() {
         var path = _savePhotosFolder
         if (!File(path).exists() || !File(path).isDirectory) {
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
+            path =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
             _savePhotosFolder = path
         }
         return path
@@ -132,6 +142,7 @@ fun getOutputMediaFilePath(isPhoto: Boolean): String {
         "${mediaStorageDir.path}/$mediaName.mp4"
     }
 }
+
 fun getOutputMediaFileName(isPhoto: Boolean): String {
     val mediaName = getRandomMediaName(isPhoto)
     return if (isPhoto) {

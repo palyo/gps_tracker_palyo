@@ -4,6 +4,7 @@ import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
+import aanibrothers.tracker.io.ui.updates.HomeActivity
 import android.animation.*
 import android.os.*
 import android.util.Log
@@ -106,7 +107,7 @@ class LauncherActivity : BaseActivity<ActivityLauncherBinding>(ActivityLauncherB
         if (tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true) {
             go(AppLanguageActivity::class.java, finish = true)
         } else {
-            go(DashboardActivity::class.java, finish = true)
+            go(HomeActivity::class.java, finish = true)
         }
     }
 

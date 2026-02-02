@@ -19,7 +19,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 
 fun Activity.viewBanner(container: ViewGroup) {
-    if (container.childCount > 0) container.removeAllViews()
+    if (container.isNotEmpty()) container.removeAllViews()
     val adSize = getAdSize()
     val height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (adSize.height + 2).toFloat(), resources.displayMetrics).toInt()
     val params: ViewGroup.LayoutParams = container.layoutParams

@@ -4,7 +4,6 @@
     <string name="app_name_manifest" translatable="false">#GPS Map - Track GPS &amp; Maps</string>
     <string name="message_policy" translatable="false">By clicking \'Agree &amp; Continue\' you accept and approve the <a href="https://privacy-and-policy-online.blogspot.com/2021/10/privacy-policy.html">Privacy Policy</a></string>
 
-
     <string name="text_hint_search">Search</string>
     <string name="text_hint_source">Start</string>
     <string name="text_hint_destination">Destination</string>
@@ -158,4 +157,31 @@
     <string name="no_reminders">No reminders</string>
     <string name="create_new_reminder">Create new reminder</string>
     <string name="please_add_reminder_title">Please add reminder title</string>
+
+    <string name="action_templates">Templates</string>
+    <string name="action_manual_focus">Manual</string>
+    <string name="action_auto_focus">Auto</string>
+    <string name="action_switch">Switch</string>
+    <string name="action_flash_off">Flash OFF</string>
+    <string name="action_flash_on">Flash ON</string>
+    <string name="action_sound_off">Sound OFF</string>
+    <string name="action_sound_on">Sound ON</string>
+    <string name="action_timer_off">Timer Off</string>
+    <string name="action_timer_3sec">Timer 3sec</string>
+    <string name="action_timer_5sec">Timer 5sec</string>
+    <string name="action_folder">Folder</string>
+    <string name="action_tools">Tools</string>
+    <string name="action_map_data">Map data</string>
+    <string name="location_storage_directory">GPS Camera App</string>
+    <string name="title_locations">Locations</string>
+    <string name="title_add_location">Add Location</string>
+    <string name="action_save">Save</string>
+    <string name="label_add_title">Add title</string>
+    <string name="label_lat">Latitude</string>
+    <string name="label_long">Longitude</string>
+    <string name="label_address">Address</string>
+    <string name="message_title_validation">Please fill title in the field</string>
+    <string name="label_my_locations">My Locations</string>
+    <string name="label_current_location">Current Location</string>
+    <string name="title_templates">Templates</string>
 </resources>

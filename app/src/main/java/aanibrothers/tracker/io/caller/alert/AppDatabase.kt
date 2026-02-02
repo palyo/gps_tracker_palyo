@@ -5,10 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import aanibrothers.tracker.io.caller.alert.Alert
+import aanibrothers.tracker.io.locations.SavedLocationDao
+import aanibrothers.tracker.io.locations.SavedLocationEntity
 
-@Database(entities = [Alert::class], version = 1)
+@Database(entities = [Alert::class, SavedLocationEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun alertDao(): AlertDao
+    abstract fun savedLocationDao(): SavedLocationDao
 
     companion object {
         @Volatile private var instance: AppDatabase? = null

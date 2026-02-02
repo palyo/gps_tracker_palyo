@@ -185,7 +185,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             }
             speakLauncher.launch(intent)
         } else {
-            if (getPermissionsDeniedCount("MICROPHONE") < 2 && !hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
+            if (fetchPermissionsDeniedCount("MICROPHONE") < 2 && !hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
                 microphonePermissionLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
                 return
             } else {
@@ -299,7 +299,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             googleMap?.isMyLocationEnabled = true
             binding?.moveToCurrentLocation()
         } else {
-            if (getPermissionsDeniedCount("PERMISSION_LOCATION") < 2 && !hasPermissions(LOCATION_PERMISSION)) {
+            if (fetchPermissionsDeniedCount("PERMISSION_LOCATION") < 2 && !hasPermissions(LOCATION_PERMISSION)) {
                 locationPermissionLauncher.launch(LOCATION_PERMISSION)
                 return
             } else {

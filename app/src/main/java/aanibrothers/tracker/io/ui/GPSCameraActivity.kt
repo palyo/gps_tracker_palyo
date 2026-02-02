@@ -92,7 +92,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
         } else {
             permissionLayout.beVisible()
             buttonAllowAccess.setOnClickListener {
-                val deniedCount = getPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+                val deniedCount = fetchPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
                 if (deniedCount < 2) {
                     permissionLauncher.launch(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))
                 } else {

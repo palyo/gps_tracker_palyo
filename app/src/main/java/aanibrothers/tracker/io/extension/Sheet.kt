@@ -1,18 +1,28 @@
 package aanibrothers.tracker.io.extension
 
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.databinding.*
-import android.app.*
-import android.content.res.*
-import android.graphics.*
+import aanibrothers.tracker.io.databinding.LayoutSheetDeleteBinding
+import aanibrothers.tracker.io.databinding.LayoutSheetPermissionNotificationBinding
+import aanibrothers.tracker.io.databinding.LayoutSheetPermissionOtherBinding
+import aanibrothers.tracker.io.databinding.LayoutSheetPinGuideBinding
+import aanibrothers.tracker.io.databinding.SheetMapMarkerDetailsBinding
+import aanibrothers.tracker.io.databinding.SheetMapStyleBinding
+import aanibrothers.tracker.io.databinding.SheetMapVisibilityStyleBinding
+import android.app.Activity
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
-import androidx.core.content.*
-import coder.apps.space.library.extension.*
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.*
-import com.google.android.material.bottomsheet.*
-import kotlinx.coroutines.*
+import androidx.core.content.ContextCompat
+import coder.apps.space.library.extension.applyDialogConfig
+import coder.apps.space.library.extension.beGone
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 fun Activity.viewMapStylingSheet(
     isTrafficEnabled: Boolean,
@@ -22,15 +32,28 @@ fun Activity.viewMapStylingSheet(
     listener: ((Int, String) -> Unit)?,
     detailListener: ((Boolean, String) -> Unit)?
 ) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val binding = SheetMapStyleBinding.inflate(layoutInflater)
     dialog.setContentView(binding.root)
     dialog.window?.apply { applyDialogConfig() }
 
     binding.apply {
-        sheetRoot.backgroundTintList = ColorStateList.valueOf(Color.parseColor(tinyDb.getString("backgroundColor", "#FFFFFF") ?: "#FFFFFF"))
-        textMapTypeTitle.setTextColor(Color.parseColor(tinyDb.getString("textColor", "#000000") ?: "#000000"))
-        textMapDetailsTitle.setTextColor(Color.parseColor(tinyDb.getString("textColor", "#000000") ?: "#000000"))
+        sheetRoot.backgroundTintList = ColorStateList.valueOf(
+            Color.parseColor(
+                tinyDb.getString("backgroundColor", "#FFFFFF") ?: "#FFFFFF"
+            )
+        )
+        textMapTypeTitle.setTextColor(
+            Color.parseColor(
+                tinyDb.getString("textColor", "#000000") ?: "#000000"
+            )
+        )
+        textMapDetailsTitle.setTextColor(
+            Color.parseColor(
+                tinyDb.getString("textColor", "#000000") ?: "#000000"
+            )
+        )
 
         fun updateTint(bg: ColorStateList, content: ColorStateList) {
             listOf(
@@ -46,48 +69,90 @@ fun Activity.viewMapStylingSheet(
         fun updateSelection() {
             when (viewMapType) {
                 "silver" -> {
-                    val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_silver_selector)
-                    val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_silver_selector)
+                    val bg = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_bg_silver_selector
+                    )
+                    val content = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_content_silver_selector
+                    )
                     if (bg != null && content != null) updateTint(bg, content)
                     mapSilver.isSelected = true
                 }
 
                 "retro" -> {
-                    val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_retro_selector)
-                    val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_retro_selector)
+                    val bg = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_bg_retro_selector
+                    )
+                    val content = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_content_retro_selector
+                    )
                     if (bg != null && content != null) updateTint(bg, content)
                     mapRetro.isSelected = true
                 }
 
                 "dark" -> {
-                    val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_dark_selector)
-                    val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_dark_selector)
+                    val bg = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_bg_dark_selector
+                    )
+                    val content = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_content_dark_selector
+                    )
                     if (bg != null && content != null) updateTint(bg, content)
                     mapDark.isSelected = true
                 }
 
                 "night" -> {
-                    val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_night_selector)
-                    val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_night_selector)
+                    val bg = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_bg_night_selector
+                    )
+                    val content = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_content_night_selector
+                    )
                     if (bg != null && content != null) updateTint(bg, content)
                     mapNight.isSelected = true
                 }
 
                 "aubergine" -> {
-                    val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_aubergine_selector)
-                    val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_aubergine_selector)
+                    val bg = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_bg_aubergine_selector
+                    )
+                    val content = ContextCompat.getColorStateList(
+                        this@viewMapStylingSheet,
+                        R.color.ic_action_content_aubergine_selector
+                    )
                     if (bg != null && content != null) updateTint(bg, content)
                     mapAubergine.isSelected = true
                 }
 
                 else -> {
                     if (selected == GoogleMap.MAP_TYPE_SATELLITE) {
-                        val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_satellite_selector)
-                        val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_satellite_selector)
+                        val bg = ContextCompat.getColorStateList(
+                            this@viewMapStylingSheet,
+                            R.color.ic_action_bg_satellite_selector
+                        )
+                        val content = ContextCompat.getColorStateList(
+                            this@viewMapStylingSheet,
+                            R.color.ic_action_content_satellite_selector
+                        )
                         if (bg != null && content != null) updateTint(bg, content)
                     } else {
-                        val bg = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_bg_standard_selector)
-                        val content = ContextCompat.getColorStateList(this@viewMapStylingSheet, R.color.ic_action_content_standard_selector)
+                        val bg = ContextCompat.getColorStateList(
+                            this@viewMapStylingSheet,
+                            R.color.ic_action_bg_standard_selector
+                        )
+                        val content = ContextCompat.getColorStateList(
+                            this@viewMapStylingSheet,
+                            R.color.ic_action_content_standard_selector
+                        )
                         if (bg != null && content != null) updateTint(bg, content)
                     }
                     mapNormal.isSelected = selected == GoogleMap.MAP_TYPE_NORMAL
@@ -150,7 +215,8 @@ fun Activity.viewMapVisibilitySheet(
     viewMapType: String,
     listener: (() -> Unit)?
 ) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val binding = SheetMapVisibilityStyleBinding.inflate(layoutInflater)
     dialog.setContentView(binding.root)
     dialog.window?.apply { applyDialogConfig() }
@@ -243,7 +309,8 @@ fun Activity.viewMapVisibilitySheet(
 }
 
 fun Activity.viewMapMarkerDetailsSheet(currentLocation: LatLng, marker: LatLng, name: String) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val binding = SheetMapMarkerDetailsBinding.inflate(layoutInflater)
     dialog.setContentView(binding.root)
     dialog.window?.apply {
@@ -272,13 +339,19 @@ fun Activity.viewMapMarkerDetailsSheet(currentLocation: LatLng, marker: LatLng, 
                         if (name.isEmpty()) {
                             val addressParts = it.getAddressLine(0)
                                 .split(",")
-                                .map { part -> part.trim().replace(Regex("^\\d+-\\s*"), "") } // Remove only leading "digits-"
+                                .map { part ->
+                                    part.trim().replace(Regex("^\\d+-\\s*"), "")
+                                } // Remove only leading "digits-"
                             val firstPositionName = addressParts.getOrNull(0)?.trim().orEmpty()
-                            val formattedPositionName = if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(Regex("^\\d+$"))) {
-                                ""
-                            } else {
-                                firstPositionName
-                            }
+                            val formattedPositionName =
+                                if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(
+                                        Regex("^\\d+$")
+                                    )
+                                ) {
+                                    ""
+                                } else {
+                                    firstPositionName
+                                }
                             val secondPositionName = addressParts.getOrNull(1)?.trim().orEmpty()
                             val subLocality = it.subLocality.orEmpty()
                             val mergedLocation = listOfNotNull(
@@ -293,13 +366,19 @@ fun Activity.viewMapMarkerDetailsSheet(currentLocation: LatLng, marker: LatLng, 
                         } else {
                             val addressParts = it.getAddressLine(0)
                                 .split(",")
-                                .map { part -> part.trim().replace(Regex("^\\d+-\\s*"), "") } // Remove only leading "digits-"
+                                .map { part ->
+                                    part.trim().replace(Regex("^\\d+-\\s*"), "")
+                                } // Remove only leading "digits-"
                             val firstPositionName = addressParts.getOrNull(0)?.trim().orEmpty()
-                            val formattedPositionName = if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(Regex("^\\d+$"))) {
-                                ""
-                            } else {
-                                firstPositionName
-                            }
+                            val formattedPositionName =
+                                if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(
+                                        Regex("^\\d+$")
+                                    )
+                                ) {
+                                    ""
+                                } else {
+                                    firstPositionName
+                                }
                             val secondPositionName = addressParts.getOrNull(1)?.trim().orEmpty()
                             val subLocality = it.subLocality.orEmpty()
                             val mergedLocation = listOfNotNull(
@@ -323,8 +402,10 @@ fun Activity.viewPermissions(
     onDismiss: (() -> Unit)? = null,
     onContinue: () -> Unit
 ) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
-    val bindDialog: LayoutSheetPermissionOtherBinding = LayoutSheetPermissionOtherBinding.inflate(layoutInflater)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val bindDialog: LayoutSheetPermissionOtherBinding =
+        LayoutSheetPermissionOtherBinding.inflate(layoutInflater)
     dialog.setContentView(bindDialog.root)
 
     dialog.window?.apply {
@@ -336,7 +417,8 @@ fun Activity.viewPermissions(
 
     dialog.setOnShowListener { dialogInterface ->
         val bottomSheetDialog = dialogInterface as BottomSheetDialog
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         bottomSheet?.let { sheet ->
             val behavior = BottomSheetBehavior.from(sheet)
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -363,8 +445,10 @@ fun Activity.viewPermissions(
 }
 
 fun Activity.viewNotificationPermission(listener: () -> Unit) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
-    val bindDialog: LayoutSheetPermissionNotificationBinding = LayoutSheetPermissionNotificationBinding.inflate(layoutInflater)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val bindDialog: LayoutSheetPermissionNotificationBinding =
+        LayoutSheetPermissionNotificationBinding.inflate(layoutInflater)
     dialog.setContentView(bindDialog.root)
     dialog.window?.apply {
         applyDialogConfig()
@@ -384,7 +468,8 @@ fun Activity.viewNotificationPermission(listener: () -> Unit) {
 }
 
 fun Activity.viewTrashOrDeleteSheet(listener: () -> Unit) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val binding = LayoutSheetDeleteBinding.inflate(layoutInflater)
     dialog.setContentView(binding.root)
     dialog.window?.apply {
@@ -403,7 +488,8 @@ fun Activity.viewTrashOrDeleteSheet(listener: () -> Unit) {
 }
 
 fun Activity.viewPinGuideSheet(listener: () -> Unit) {
-    val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val binding = LayoutSheetPinGuideBinding.inflate(layoutInflater)
     dialog.setContentView(binding.root)
     dialog.window?.apply {

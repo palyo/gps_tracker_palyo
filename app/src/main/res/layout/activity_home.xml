@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack"
+    tools:context=".ui.updates.HomeActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:id="@+id/layout_root_container_preview"
+        app:layout_constraintBottom_toTopOf="@+id/tabCaptureMode"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:scaleType="fillCenter" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_map_data"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:layout_marginVertical="@dimen/_12sdp"
+            android:backgroundTint="@color/colorBlack24"
+            android:clipToOutline="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/map_card_view"
+                android:layout_width="@dimen/_80sdp"
+                android:layout_height="@dimen/_0sdp"
+                app:cardBackgroundColor="@color/colorTransparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cardBackgroundColor="@color/colorTransparent">
+
+                    <fragment
+                        android:id="@+id/map_fragment"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_location_details"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:paddingHorizontal="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/map_card_view"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/text_address"
+                    style="@style/TextSemiBold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:text="Address"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <TextView
+                    android:id="@+id/text_latitude"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:gravity="center_vertical"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude_value"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude"
+                    app:layout_constraintStart_toStartOf="@id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_address" />
+
+                <TextView
+                    android:id="@+id/text_longitude"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude" />
+
+                <TextView
+                    android:id="@+id/text_latitude_value"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_local_time"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude_value"
+                    app:layout_constraintStart_toStartOf="@id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude" />
+
+                <TextView
+                    android:id="@+id/text_longitude_value"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude_value"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude_value" />
+
+                <TextView
+                    android:id="@+id/text_local_time"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Local:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_gmt_time"
+                    app:layout_constraintEnd_toStartOf="@+id/text_altitude"
+                    app:layout_constraintStart_toStartOf="@id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude_value" />
+
+                <TextView
+                    android:id="@+id/text_altitude"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Altitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_local_time"
+                    app:layout_constraintTop_toTopOf="@+id/text_local_time" />
+
+                <TextView
+                    android:id="@+id/text_gmt_time"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="GMT:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_captured_by"
+                    app:layout_constraintEnd_toStartOf="@+id/text_date"
+                    app:layout_constraintStart_toStartOf="@id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_local_time" />
+
+                <TextView
+                    android:id="@+id/text_date"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Date"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_gmt_time"
+                    app:layout_constraintTop_toTopOf="@+id/text_gmt_time" />
+
+                <TextView
+                    android:id="@+id/text_captured_by"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Captured by"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/text_address"
+                    app:layout_constraintTop_toBottomOf="@+id/text_gmt_time" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_map_data_classic"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:layout_marginVertical="@dimen/_12sdp"
+            android:clipToOutline="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/map_card_view_classic"
+                android:layout_width="@dimen/_80sdp"
+                android:layout_height="@dimen/_0sdp"
+                app:cardBackgroundColor="@color/colorTransparent"
+                app:cardCornerRadius="@dimen/_12sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <fragment
+                    android:id="@+id/map_fragment_classic"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_location_details_classic"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:background="@drawable/ic_bg_rounded_8sdp"
+                android:backgroundTint="@color/colorBlack24"
+                android:paddingHorizontal="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/map_card_view_classic"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/text_address_classic"
+                    style="@style/TextSemiBold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:text="Address"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude_classic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <TextView
+                    android:id="@+id/text_latitude_classic"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude_value_classic"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude_classic"
+                    app:layout_constraintStart_toStartOf="@id/text_address_classic"
+                    app:layout_constraintTop_toBottomOf="@+id/text_address_classic" />
+
+                <TextView
+                    android:id="@+id/text_longitude_classic"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude_classic"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude_classic" />
+
+                <TextView
+                    android:id="@+id/text_latitude_value_classic"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_local_time_classic"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude_value_classic"
+                    app:layout_constraintStart_toStartOf="@id/text_address_classic"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude_classic" />
+
+                <TextView
+                    android:id="@+id/text_longitude_value_classic"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude_value_classic"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude_value_classic" />
+
+                <TextView
+                    android:id="@+id/text_local_time_classic"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Local:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_gmt_time_classic"
+                    app:layout_constraintEnd_toStartOf="@+id/text_altitude_classic"
+                    app:layout_constraintStart_toStartOf="@id/text_address_classic"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude_value_classic" />
+
+                <TextView
+                    android:id="@+id/text_altitude_classic"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Altitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_local_time_classic"
+                    app:layout_constraintTop_toTopOf="@+id/text_local_time_classic" />
+
+                <TextView
+                    android:id="@+id/text_gmt_time_classic"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="GMT:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_captured_by_classic"
+                    app:layout_constraintEnd_toStartOf="@+id/text_date_classic"
+                    app:layout_constraintStart_toStartOf="@id/text_address_classic"
+                    app:layout_constraintTop_toBottomOf="@+id/text_local_time_classic" />
+
+                <TextView
+                    android:id="@+id/text_date_classic"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Date"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_gmt_time_classic"
+                    app:layout_constraintTop_toTopOf="@+id/text_gmt_time_classic" />
+
+                <TextView
+                    android:id="@+id/text_captured_by_classic"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Captured by"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/text_address_classic"
+                    app:layout_constraintTop_toBottomOf="@+id/text_gmt_time_classic" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_map_data_squarise"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:layout_marginVertical="@dimen/_12sdp"
+            android:clipToOutline="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/map_card_view_squarise"
+                android:layout_width="@dimen/_80sdp"
+                android:layout_height="@dimen/_0sdp"
+                app:cardBackgroundColor="@color/colorTransparent"
+                app:cardCornerRadius="@dimen/_0sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <fragment
+                    android:id="@+id/map_fragment_squarise"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_location_details_squarise"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:background="@drawable/ic_bg_rounded_8sdp"
+                android:backgroundTint="@color/colorBlack24"
+                android:paddingHorizontal="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/map_card_view_squarise"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/text_address_squarise"
+                    style="@style/TextSemiBold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:text="Address"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude_squarise"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <TextView
+                    android:id="@+id/text_latitude_squarise"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_latitude_value_squarise"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude_squarise"
+                    app:layout_constraintStart_toStartOf="@id/text_address_squarise"
+                    app:layout_constraintTop_toBottomOf="@+id/text_address_squarise" />
+
+                <TextView
+                    android:id="@+id/text_longitude_squarise"
+                    style="@style/TextSemiBold"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude_squarise"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude_squarise" />
+
+                <TextView
+                    android:id="@+id/text_latitude_value_squarise"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Latitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_local_time_squarise"
+                    app:layout_constraintEnd_toStartOf="@+id/text_longitude_value_squarise"
+                    app:layout_constraintStart_toStartOf="@id/text_address_squarise"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude_squarise" />
+
+                <TextView
+                    android:id="@+id/text_longitude_value_squarise"
+                    style="@style/TextRegular"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Longitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_latitude_value_squarise"
+                    app:layout_constraintTop_toTopOf="@+id/text_latitude_value_squarise" />
+
+                <TextView
+                    android:id="@+id/text_local_time_squarise"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Local:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_gmt_time_squarise"
+                    app:layout_constraintEnd_toStartOf="@+id/text_altitude_squarise"
+                    app:layout_constraintStart_toStartOf="@id/text_address_squarise"
+                    app:layout_constraintTop_toBottomOf="@+id/text_latitude_value_squarise" />
+
+                <TextView
+                    android:id="@+id/text_altitude_squarise"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Altitude"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_local_time_squarise"
+                    app:layout_constraintTop_toTopOf="@+id/text_local_time_squarise" />
+
+                <TextView
+                    android:id="@+id/text_gmt_time_squarise"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="GMT:"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_captured_by_squarise"
+                    app:layout_constraintEnd_toStartOf="@+id/text_date_squarise"
+                    app:layout_constraintStart_toStartOf="@id/text_address_squarise"
+                    app:layout_constraintTop_toBottomOf="@+id/text_local_time_squarise" />
+
+                <TextView
+                    android:id="@+id/text_date_squarise"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Date"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_8ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/text_gmt_time_squarise"
+                    app:layout_constraintTop_toTopOf="@+id/text_gmt_time_squarise" />
+
+                <TextView
+                    android:id="@+id/text_captured_by_squarise"
+                    style="@style/TextMedium"
+                    android:layout_width="@dimen/_0sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:gravity="center_vertical"
+                    android:text="Captured by"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/_6ssp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/text_address_squarise"
+                    app:layout_constraintTop_toBottomOf="@+id/text_gmt_time_squarise" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <aanibrothers.tracker.io.widgets.FocusView
+        android:id="@+id/focusView"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/three_to_one_animation_view"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/ic_three_second_timer_animation" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/five_to_one_animation_view"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/ic_five_second_timer_animation" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/progress_bar_animation"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/ic_capture_timer_animation" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_top_controller"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_focus_mode"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_manual_focus"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_focus_mode"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/action_sound"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_sound"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_sound_off"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_sound_off"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/action_timer"
+            app:layout_constraintStart_toEndOf="@+id/action_focus_mode"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_timer"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_manual_focus"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_timer"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/action_flash_mode"
+            app:layout_constraintStart_toEndOf="@+id/action_sound"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_flash_mode"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_flash_off"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_flash_off"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/action_change_camera"
+            app:layout_constraintStart_toEndOf="@+id/action_timer"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_change_camera"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_switch"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_camera_change"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/action_settings"
+            app:layout_constraintStart_toEndOf="@+id/action_flash_mode"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_settings"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/tool_settings"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_settings"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/action_change_camera"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabCaptureMode"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="@dimen/_28sdp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_bg_rounded"
+        android:backgroundTint="#1D1D1D"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_controls"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabIndicatorColor="@color/colorWhite"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="@dimen/_0sdp"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextAppearance="@style/Theme.Space.TabTextAppearance"
+        app:tabSelectedTextColor="@color/colorAccent"
+        app:tabTextAppearance="@style/Theme.Space.TabText"
+        app:tabTextColor="@color/colorWhite80" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_controls"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/_6sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_templates"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_48sdp"
+            android:layout_height="@dimen/_48sdp"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_templates"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_templates"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@id/action_capture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/action_capture" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_map_data"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_48sdp"
+            android:layout_height="@dimen/_48sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_map_data"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_map_data"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@id/action_capture"
+            app:layout_constraintStart_toEndOf="@+id/action_templates"
+            app:layout_constraintTop_toTopOf="@id/action_capture" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_capture"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:icon="@drawable/ic_action_capture_button"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_56sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/action_tools"
+            app:layout_constraintStart_toEndOf="@id/action_map_data" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_tools"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_48sdp"
+            android:layout_height="@dimen/_48sdp"
+            android:layout_marginEnd="@dimen/_4sdp"
+            android:padding="@dimen/_0sdp"
+            android:text="@string/action_tools"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_6ssp"
+            app:icon="@drawable/ic_action_more_options"
+            app:iconGravity="textTop"
+            app:iconPadding="@dimen/_6sdp"
+            app:iconSize="@dimen/_20sdp"
+            app:iconTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@id/action_capture"
+            app:layout_constraintEnd_toStartOf="@+id/action_captured"
+            app:layout_constraintTop_toTopOf="@id/action_capture" />
+
+        <com.google.android.material.circularreveal.CircularRevealFrameLayout
+            android:id="@+id/action_captured"
+            android:layout_width="@dimen/_48sdp"
+            android:layout_height="@dimen/_48sdp"
+            android:layout_marginEnd="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@id/action_capture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/action_capture">
+
+            <ImageView
+                android:id="@+id/image_captured"
+                android:layout_width="@dimen/_36sdp"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_bg_rounded_stroke_8sdp"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop" />
+        </com.google.android.material.circularreveal.CircularRevealFrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
