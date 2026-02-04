@@ -1,13 +1,23 @@
 package aanibrothers.tracker.io
 
-import aanibrothers.tracker.io.module.*
-import aanibrothers.tracker.io.ui.*
+import aanibrothers.tracker.io.module.AppOpenManager
+import aanibrothers.tracker.io.module.appOpenCount
+import aanibrothers.tracker.io.module.viewAppOpen
 import aanibrothers.tracker.io.ui.LauncherActivity
-import android.app.*
-import android.content.*
-import android.os.*
-import androidx.lifecycle.*
-import androidx.multidex.*
+import android.app.Activity
+import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import android.os.Bundle
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.multidex.MultiDexApplication
+import coder.apps.space.library.extension.THEME
+import coder.apps.space.library.extension.themeToggleMode
+import coder.apps.space.library.helper.TinyDB
 
 class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
     companion object {
@@ -15,8 +25,12 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
         var isOpenInter = false
         private var instance: App? = null
         private var appContext: Context? = null
-        fun getInstance(): App = instance ?: throw IllegalStateException("Application is not created yet!")
-        fun getAppContext(): Context = appContext ?: throw IllegalStateException("Application is not created yet!")
+        fun getInstance(): App =
+            instance ?: throw IllegalStateException("Application is not created yet!")
+
+        fun getAppContext(): Context =
+            appContext ?: throw IllegalStateException("Application is not created yet!")
+
         var appOpenManager: AppOpenManager? = null
         var currentActivity: Activity? = null
         var classes: MutableList<Class<*>> = mutableListOf()
@@ -28,7 +42,8 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
         appContext = applicationContext
         registerActivityLifecycleCallbacks(this)
         createNotificationChannel()
-
+        TinyDB(this).putInt(THEME, 1)
+        themeToggleMode()
         setAvoidMultipleClass(
             mutableListOf(
                 LauncherActivity::class.java,

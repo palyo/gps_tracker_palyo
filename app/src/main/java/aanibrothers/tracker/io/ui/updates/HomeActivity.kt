@@ -4,23 +4,25 @@ import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
-import aanibrothers.tracker.io.extension.ALL_PERMISSION
-import aanibrothers.tracker.io.extension.PERMISSION_MAIN
+import aanibrothers.tracker.io.extension.AFTER_CALL_PERMISSION
 import aanibrothers.tracker.io.extension.isGrantedOverlay
+import aanibrothers.tracker.io.extension.viewPermission
 import aanibrothers.tracker.io.helper.HandleSettingPreview
+import aanibrothers.tracker.io.helper.PaintOverlayRenderer
 import aanibrothers.tracker.io.locations.LocationPreference
 import aanibrothers.tracker.io.model.CaptureMode
 import aanibrothers.tracker.io.model.LocationMode
+import aanibrothers.tracker.io.model.OverlayState
+import aanibrothers.tracker.io.model.OverlayTemplate
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.ui.AppSettingsActivity
-import aanibrothers.tracker.io.ui.DashboardActivity
+import aanibrothers.tracker.io.ui.ToolsActivity
 import aanibrothers.tracker.io.widgets.FocusView
 import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
@@ -52,6 +54,7 @@ import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -83,6 +86,14 @@ import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
+import androidx.media3.effect.OverlayEffect
+import androidx.media3.transformer.Composition
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.Effects
+import androidx.media3.transformer.ExportException
+import androidx.media3.transformer.ExportResult
+import androidx.media3.transformer.Transformer
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.beInvisible
 import coder.apps.space.library.extension.beVisible
@@ -131,7 +142,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private var doubleBackToExitPressedOnce = false
     private val PERMISSION_REQUEST_CODE = 100
-    private val MAP_FRAGMENT_ID = R.id.map_fragment
     private var handlerSettingOverLay: HandleSettingPreview? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -157,16 +167,58 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private lateinit var timeRunnable: Runnable
 
     private var orientationEventListener: OrientationEventListener? = null
-
     private lateinit var locationCallback: LocationCallback
+
     private val locationUpdateResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
             restoreLocationModeFromPref()
         }
 
+    /*private val permissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allPermissionsGranted = permissions.all { entry -> entry.value }
+            if (!allPermissionsGranted) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
+                    showPermissionExplanationDialog()
+                } else {
+                    showFallbackDialog()
+                }
+            } else if (!isGrantedOverlay()) {
+                sendToSettings()
+            }
+        }*/
+
+    private val permissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+            if (result[Manifest.permission.READ_PHONE_STATE] == false) {
+                incrementPermissionsDeniedCount("phone_state")
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                result[Manifest.permission.POST_NOTIFICATIONS] == false
+            ) {
+                incrementPermissionsDeniedCount("post_notifications")
+            }
+
+            if (result.values.any { !it }) {
+                showPermissionExplanationDialog()
+                return@registerForActivityResult
+            }
+
+            if (!isGrantedOverlay()) {
+                sendToSettings()
+            }
+        }
+
+    private var checkOverlay: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+
     private var locationMode = LocationMode.CURRENT
     private var customLocation: Location? = null
+
+    private var overlayState = OverlayState()
+    private val REQ_AUDIO = 999
+    private var allowAudio = false
 
     override fun ActivityHomeBinding.initExtra() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -176,12 +228,61 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         setupOrientationListener()
         setupFocusView()
         setupTab()
+        setupMapSnapshot()
         displayCurrentLocation()
         setupTimeDisplay()
         handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
         appOpenManager = AppOpenManager()
         requestPermissions()
     }
+
+    private var googleMap: GoogleMap? = null
+    private val lastMapSnapshot = java.util.concurrent.atomic.AtomicReference<Bitmap?>()
+
+    private fun getActiveMapFragment(): SupportMapFragment? {
+        return when (tinyDB?.getString("template", "default")) {
+            "classic" -> supportFragmentManager.findFragmentById(R.id.map_fragment_classic) as? SupportMapFragment
+
+            "squarise" -> supportFragmentManager.findFragmentById(R.id.map_fragment_squarise) as? SupportMapFragment
+
+            else -> supportFragmentManager.findFragmentById(R.id.map_fragment) as? SupportMapFragment
+        }
+    }
+
+    private fun setupMapSnapshot() {
+        val fragment = getActiveMapFragment() ?: return
+        fragment.getMapAsync { map ->
+            googleMap = map
+            map.setOnMapLoadedCallback {
+                captureMapSnapshotSafe()
+            }
+        }
+    }
+
+    private fun captureMapSnapshotSafe() {
+        val fragment = getActiveMapFragment() ?: return
+        fragment.getMapAsync { map ->
+            val mapView = fragment.view ?: return@getMapAsync
+
+            if (mapView.width == 0 || mapView.height == 0) {
+                mapView.viewTreeObserver.addOnGlobalLayoutListener(object :
+                    ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        captureMapSnapshotSafe()
+                    }
+                })
+                return@getMapAsync
+            }
+
+            map.snapshot { bmp ->
+                if (bmp != null && bmp.width > 0 && bmp.height > 0) {
+                    lastMapSnapshot.getAndSet(bmp)?.recycle()
+                }
+            }
+        }
+    }
+
 
     fun ActivityHomeBinding.setupTab() {
         tabCaptureMode.apply {
@@ -191,8 +292,12 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     captureMode = if (tab.position == 0) CaptureMode.PHOTO else CaptureMode.VIDEO
-
                     updateCaptureUI()
+                    if (captureMode == CaptureMode.VIDEO && !hasPermission(Manifest.permission.RECORD_AUDIO)) {
+                        showAudioPermissionDialog()
+                    } else {
+                        allowAudio = hasPermission(Manifest.permission.RECORD_AUDIO)
+                    }
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -203,9 +308,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun updateCaptureUI() {
         binding?.apply {
-            val params =
-                layoutRootContainerPreview.layoutParams as ConstraintLayout.LayoutParams
-
+            val params = layoutRootContainerPreview.layoutParams as ConstraintLayout.LayoutParams
             if (captureMode == CaptureMode.VIDEO) {
                 params.dimensionRatio = "9:16"
                 actionCapture.icon = drawable(R.drawable.ic_action_record_button)
@@ -228,6 +331,35 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+    private fun showAudioPermissionDialog() {
+        viewPermission(
+            title = "Microphone Permission",
+            body = "Allow microphone to record video with sound?",
+            positiveButton = "Okay", isNegativeButton = false
+        ) {
+            if (it) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    REQ_AUDIO
+                )
+            } else {
+                allowAudio = false
+            }
+        }
+    }
+
+    private fun showPermissionBlockedDialog(message: String) {
+        viewPermission(
+            title = "Permission Required",
+            body = message,
+            positiveButton = "Open Settings", isNegativeButton = false
+        ) {
+            if (it) {
+                openAppSettings()
+            }
+        }
+    }
 
     private fun restoreLocationModeFromPref() {
         val savedLocation = LocationPreference.getSelectedLocation(this)
@@ -245,15 +377,21 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             }
 
             updateLocationUI(customLocation!!)
-            updateMapWithSelectedLocation()
         }
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_AUDIO) {
+            val granted = grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+            allowAudio = granted
+            if (!granted) {
+                showPermissionBlockedDialog("Microphone permission is required for audio. You can enable it in Settings.")
+            }
+            return
+        }
         handlePermissionResults(permissions, grantResults, requestCode)
     }
 
@@ -263,9 +401,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             if (isLocationEnabled()) {
                 startLocationUpdates()
                 displayCurrentLocation()
-                val mapFragment =
-                    supportFragmentManager.findFragmentById(MAP_FRAGMENT_ID) as? SupportMapFragment
-                mapFragment?.getMapAsync { googleMap -> updateMapMarker(googleMap) }
+                val mapFragment = getActiveMapFragment()
+                mapFragment?.getMapAsync { googleMap ->
+                    updateMapMarker(googleMap)
+                    captureMapSnapshotSafe()
+                }
             } else {
                 Toast.makeText(this, "Location still disabled", Toast.LENGTH_SHORT).show()
             }
@@ -343,7 +483,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
-
     private fun restartCameraWithCorrectOrientation(cameraProvider: ProcessCameraProvider) {
         binding?.let { binding ->
             val targetRotation = currentScreenRotation
@@ -367,21 +506,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 } else {
                     CameraSelector.DEFAULT_FRONT_CAMERA
                 }
-                val recorder =
-                    Recorder.Builder().setQualitySelector(
-                        QualitySelector.from(
-                            Quality.FHD,
-                            FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                        )
-                    ).build()
+                val recorder = Recorder.Builder().setQualitySelector(
+                    QualitySelector.from(
+                        Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
+                    )
+                ).build()
 
                 videoCapture = VideoCapture.withOutput(recorder)
                 cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageCapture,
-                    videoCapture
+                    this, cameraSelector, preview, imageCapture, videoCapture
                 )
             } catch (exc: Exception) {
                 Log.e(HomeActivity::class.java.simpleName, "Camera restart failed", exc)
@@ -410,11 +543,75 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         getSelectedLocation(location)?.let {
                             updateLocationUI(it)
                         }
-
                     }
                 }
             }
         }
+    }
+
+    private fun updateOverlayState(location: Location, addressText: String) {
+        val localTime = SimpleDateFormat("HH:mm:ss a", Locale.getDefault()).format(Date())
+        val gmtFormat = SimpleDateFormat("HH:mm:ss a", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("GMT")
+        }
+        val gmtTime = gmtFormat.format(Date())
+        val date = SimpleDateFormat("EEEE, dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+        overlayState = OverlayState(
+            address = addressText,
+            lat = location.latitude,
+            lng = location.longitude,
+            altitudeMeters = if (location.hasAltitude()) location.altitude else null,
+            localTime = localTime,
+            gmtTime = gmtTime,
+            date = date
+        )
+    }
+
+    private fun getTypeFragment(): OverlayTemplate {
+        return when (tinyDB?.getString("template", "default")) {
+            "classic" -> OverlayTemplate.CLASSIC
+            "squarise" -> OverlayTemplate.SQUARISE
+            else -> OverlayTemplate.DEFAULT
+        }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun processVideoWithOverlay(
+        inputFile: File, outputFile: File, onSuccess: () -> Unit, onError: (Exception) -> Unit
+    ) {
+        val bmp = lastMapSnapshot.get()
+        val overlay = PaintOverlayRenderer(
+            this@HomeActivity,
+            stateProvider = { overlayState },
+            mapProvider = { bmp },
+            mapViewType = getTypeFragment()
+        )
+
+        val overlayEffect = OverlayEffect(listOf(overlay))
+        val effects = Effects(listOf(), listOf(overlayEffect))
+
+        val mediaItem = MediaItem.fromUri(Uri.fromFile(inputFile))
+        val edited = EditedMediaItem.Builder(mediaItem).setEffects(effects).build()
+
+        val transformer = Transformer.Builder(this).build()
+        transformer.addListener(object : Transformer.Listener {
+            override fun onCompleted(composition: Composition, exportResult: ExportResult) {
+                super.onCompleted(composition, exportResult)
+                onSuccess()
+            }
+
+            override fun onError(
+                composition: Composition,
+                exportResult: ExportResult,
+                exportException: ExportException
+            ) {
+                super.onError(composition, exportResult, exportException)
+                onError(exportException)
+            }
+        })
+
+        transformer.start(edited, outputFile.absolutePath)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -438,31 +635,66 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun requestPermissions() {
-        if (!hasPermissions(ALL_PERMISSION)) {
-            ActivityCompat.requestPermissions(
-                this@HomeActivity, ALL_PERMISSION, PERMISSION_REQUEST_CODE
-            )
+        displayCurrentLocation()
+        if(!hasPermissions(AFTER_CALL_PERMISSION) || !isGrantedOverlay()) {
+            showPermissionExplanationDialog()
+        }
+    }
+
+    private fun showPermissionExplanationDialog() {
+        val phoneDenied = fetchPermissionsDeniedCount("phone_state")
+        val notifDenied = fetchPermissionsDeniedCount("post_notifications")
+
+        val phoneBlocked =
+            !shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE) && phoneDenied > 0
+
+        val notifBlocked =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) &&
+                    notifDenied > 0
+        if (phoneBlocked || notifBlocked) {
+            showFallbackDialog()
         } else {
-            displayCurrentLocation()
-            if (!hasPermissions(PERMISSION_MAIN)) {
-                permissions.launch(PERMISSION_MAIN)
-            } else if (!isGrantedOverlay()) {
-                sendToSettings()
+            viewPermission(
+                title = "Phone and Notification Permission Required",
+                body = "We need the phone state and notification permissions to detect call state and show alerts.",
+                positiveButton = "Okay",
+                isNegativeButton = false
+            ) { accepted ->
+                if (!accepted) return@viewPermission
+
+                val permissionsToAsk = mutableListOf(Manifest.permission.READ_PHONE_STATE)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionsToAsk.add(Manifest.permission.POST_NOTIFICATIONS)
+                }
+
+                if (permissionsToAsk.all { hasPermission(it) }) {
+                    if (!isGrantedOverlay()) sendToSettings()
+                    return@viewPermission
+                }
+
+
+                if (phoneDenied >= 1 || notifDenied >= 1) {
+                    showPermissionBlockedDialog(
+                        "Phone or notification permission is required. Please enable it in Settings."
+                    )
+                } else {
+                    permissions.launch(permissionsToAsk.toTypedArray())
+                }
             }
         }
     }
 
-    private fun showPermissionExplanationDialog(message: String) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Phone and Notification Permission Required").setMessage(message)
-            .setPositiveButton("OK") { dialog, which -> permissions.launch(PERMISSION_MAIN) }.show()
-    }
-
     private fun showFallbackDialog() {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Phone and Notification Permission Denied")
-            .setMessage("The app cannot function properly without that permission. Please enable the permission in the app settings.")
-            .setPositiveButton("Open Settings") { dialog, which -> openAppSettings() }.show()
+        viewPermission(
+            title = "Phone and Notification Permission Denied",
+            body = "The app cannot function properly without that permission. Please enable the permission in the app settings.",
+            positiveButton = "Open Settings", isNegativeButton = false
+        ) {
+            if (it) {
+                openAppSettings()
+            }
+        }
     }
 
     private fun openAppSettings() {
@@ -470,23 +702,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         intent.setData("package:$packageName".toUri())
         startActivity(intent)
     }
-
-    private val permissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allPermissionsGranted = permissions.all { entry -> entry.value }
-            if (!allPermissionsGranted) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
-                    showPermissionExplanationDialog("We need the phone state, notification permission to detecting state of call. Please grant the permission.")
-                } else {
-                    showFallbackDialog()
-                }
-            } else if (!isGrantedOverlay()) {
-                sendToSettings()
-            }
-        }
-
-    private var checkOverlay: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
     private fun sendToSettings() {
         val intent =
@@ -522,13 +737,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
             try {
                 cameraProvider.unbindAll()
-                val recorder =
-                    Recorder.Builder().setQualitySelector(
-                        QualitySelector.from(
-                            Quality.FHD,
-                            FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                        )
-                    ).build()
+                val recorder = Recorder.Builder().setQualitySelector(
+                    QualitySelector.from(
+                        Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
+                    )
+                ).build()
 
                 videoCapture = VideoCapture.withOutput(recorder)
 
@@ -579,13 +792,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                     .setTargetAspectRatio(targetAspectRatio).setTargetRotation(targetRotation)
                     .build()
-            val recorder =
-                Recorder.Builder().setQualitySelector(
-                    QualitySelector.from(
-                        Quality.FHD,
-                        FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                    )
-                ).build()
+            val recorder = Recorder.Builder().setQualitySelector(
+                QualitySelector.from(
+                    Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
+                )
+            ).build()
 
             videoCapture = VideoCapture.withOutput(recorder)
             cameraProvider.bindToLifecycle(
@@ -822,9 +1033,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 capturedBitmap
             }
 
-            val mapFragment =
-                supportFragmentManager.findFragmentById(MAP_FRAGMENT_ID) as SupportMapFragment
-            mapFragment.getMapAsync { googleMap ->
+            val mapFragment = getActiveMapFragment()
+            mapFragment?.getMapAsync { googleMap ->
                 googleMap.snapshot { mapBitmap ->
                     try {
                         val parentOverlayBitmap = createParentOverlayBitmap()
@@ -995,32 +1205,54 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
         val outputOptions = FileOutputOptions.Builder(videoFile).build()
 
-        activeRecording =
-            videoCapture.output.prepareRecording(this, outputOptions).apply {
-                if (hasPermission(Manifest.permission.RECORD_AUDIO)) {
-                    withAudioEnabled()
+        activeRecording = videoCapture.output.prepareRecording(this, outputOptions).apply {
+            if (allowAudio && hasPermission(Manifest.permission.RECORD_AUDIO)) {
+                withAudioEnabled()
+            }
+        }.start(ContextCompat.getMainExecutor(this)) { event ->
+            when (event) {
+                is VideoRecordEvent.Start -> {
+                    isRecording = true
+                    runOnUiThread { updateVideoUI(true) }
                 }
-            }.start(ContextCompat.getMainExecutor(this)) { event ->
-                when (event) {
-                    is VideoRecordEvent.Start -> {
-                        isRecording = true
-                        runOnUiThread { updateVideoUI(true) }
-                    }
 
-                    is VideoRecordEvent.Finalize -> {
+                is VideoRecordEvent.Finalize -> {
+                    isRecording = false
+                    runOnUiThread { updateVideoUI(false) }
+
+                    if (!event.hasError()) {
                         isRecording = false
-                        runOnUiThread { updateVideoUI(false) }
 
                         if (!event.hasError()) {
-                            Toast.makeText(
-                                this, "Video saved", Toast.LENGTH_SHORT
-                            ).show()
+                            val inputFile = videoFile
+                            val outputFile = File(inputFile.parent, "FINAL_${inputFile.name}")
+
+                            processVideoWithOverlay(
+                                inputFile = inputFile,
+                                outputFile = outputFile,
+                                onSuccess = {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            this, "Overlay video saved", Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                },
+                                onError = { e ->
+                                    Log.e(
+                                        "startVideoRecording:", "Overlay failed: ${e.message}"
+                                    )
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            this, "Overlay failed: ${e.message}", Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                })
                         }
                     }
                 }
             }
+        }
     }
-
 
     private fun updateVideoUI(recording: Boolean) {
         binding?.apply {
@@ -1107,10 +1339,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 updateLocationUI(location)
             }
         }
-        val mapFragment =
-            supportFragmentManager.findFragmentById(MAP_FRAGMENT_ID) as? SupportMapFragment
+        val mapFragment = getActiveMapFragment()
         mapFragment?.getMapAsync { googleMap ->
             updateMapMarker(googleMap)
+            captureMapSnapshotSafe()
         }
     }
 
@@ -1135,7 +1367,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
                 val marker = googleMap.addMarker(markerOptions)
                 marker?.showInfoWindow()
-
                 val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16f)
                 googleMap.animateCamera(cameraUpdate)
             }
@@ -1182,8 +1413,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun updateMapWithSelectedLocation() {
-        val mapFragment =
-            supportFragmentManager.findFragmentById(MAP_FRAGMENT_ID) as? SupportMapFragment
+        val mapFragment = getActiveMapFragment()
 
         mapFragment?.getMapAsync { googleMap ->
             val loc = getSelectedLocation() ?: return@getMapAsync
@@ -1204,6 +1434,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun updateLocationUI(location: Location) {
         try {
             binding?.apply {
+                updateMapWithSelectedLocation()
                 getAddress(location.latitude, location.longitude) { address ->
                     val parts = mutableListOf<String>()
                     address.subThoroughfare?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
@@ -1220,6 +1451,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     } else {
                         address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: "Unknown location"
                     }
+                    updateOverlayState(location, fullAddress)
                     textAddressClassic.text = if (address.getAddressLine(0).isEmpty()) {
                         fullAddress
                     } else {
@@ -1379,8 +1611,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun updateMapTypeFromTemplate(mapType: Int) {
-        val mapFragment =
-            supportFragmentManager.findFragmentById(MAP_FRAGMENT_ID) as? SupportMapFragment
+        val mapFragment = getActiveMapFragment()
         mapFragment?.getMapAsync { googleMap ->
             googleMap.mapType = mapType
         }
@@ -1394,9 +1625,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun handlePermissionResults(
-        permissionList: Array<out String>,
-        grantResults: IntArray,
-        requestCode: Int
+        permissionList: Array<out String>, grantResults: IntArray, requestCode: Int
     ) {
         if (requestCode != PERMISSION_REQUEST_CODE) return
 
@@ -1420,7 +1649,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             displayCurrentLocation()
 
             when {
-                !hasPermissions(PERMISSION_MAIN) -> permissions.launch(PERMISSION_MAIN)
+                !hasPermissions(AFTER_CALL_PERMISSION) -> permissions.launch(AFTER_CALL_PERMISSION)
                 !isGrantedOverlay() -> sendToSettings()
             }
 
@@ -1561,7 +1790,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         actionTools.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
-            go(DashboardActivity::class.java)
+            go(ToolsActivity::class.java)
         }
         actionMapData.setOnClickListener {
             stopLocationUpdates()

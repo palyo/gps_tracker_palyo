@@ -7,59 +7,71 @@
     android:background="@color/colorBackground"
     tools:context=".ui.LauncherActivity">
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_bg_splash_screen" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/icon_app"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/_0sdp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_100sdp"
+        app:layout_constraintBottom_toTopOf="@+id/text_contain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_app"
+            style="@style/TextExtraBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPS"
+            android:textColor="#13194B"
+            android:textSize="@dimen/_22ssp"
+            app:layout_constraintBottom_toBottomOf="@id/icon_app"
+            app:layout_constraintEnd_toStartOf="@id/icon_app"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/image_app"
-            android:layout_width="@dimen/_150sdp"
-            android:layout_height="@dimen/_150sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/icon_app"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:layout_marginStart="@dimen/_8sdp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_app"
             app:srcCompat="@drawable/ic_app_icon" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="@dimen/_180sdp"
-            android:layout_height="@dimen/_180sdp"
-            android:background="@color/colorAccent12"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_subtitle"
+            style="@style/TextExtraBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:text="Camera Map"
+            android:textColor="#13194B"
+            android:textSize="@dimen/_22ssp"
+            app:layout_constraintStart_toStartOf="@id/text_app"
+            app:layout_constraintTop_toBottomOf="@id/icon_app" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextSemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:text="Trusted Location Photo Proof"
+            android:textColor="#13194B"
+            android:textSize="@dimen/_12ssp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+            app:layout_constraintTop_toBottomOf="@id/text_subtitle" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/text_app"
-        style="@style/TextBold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_24sdp"
-        android:text="@string/app_name_splash"
-        android:textColor="@color/colorAccent"
-        android:textSize="@dimen/_24ssp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_app" />
-
-    <com.google.android.material.textview.MaterialTextView
-        style="@style/TextRegular"
-        android:layout_width="@dimen/_0sdp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/_56sdp"
-        android:text="Your smart map tracker for real-time location and seamless navigation!"
-        android:textSize="@dimen/_12ssp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_app" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/text_contain"

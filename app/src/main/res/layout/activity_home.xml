@@ -855,7 +855,7 @@
             app:iconGravity="textStart"
             app:iconPadding="@dimen/_0sdp"
             app:iconSize="@dimen/_56sdp"
-            app:iconTint="@color/colorWhite"
+            app:iconTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/action_tools"
             app:layout_constraintStart_toEndOf="@id/action_map_data" />

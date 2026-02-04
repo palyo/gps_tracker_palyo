@@ -71,17 +71,14 @@
     <string name="action_apply_theme">Apply theme</string>
 
     <string name="button_next">Next</string>
-    <string name="button_allow_and_continue">Allow &amp; Continue</string>
+    <string name="button_allow_and_continue">Continue</string>
 
-    <string name="text_intro_page_1">Quickly access important tools after every call with our new post-call feature!</string>
-    <string name="text_intro_page_2">Explore your map with customizable styles, real-time speed tracking, and smart navigation tools.</string>
-
-    <string name="title_permission_required">We Need Your Permission!</string>
-    <string name="body_permission_required">To provide the best experience, please allow the following:</string>
-    <string name="title_phone_state">Phone State</string>
-    <string name="body_phone_state">Helps to identify incoming and outgoing call states.</string>
-    <string name="title_display_over_other_apps">Display Over Other Apps</string>
-    <string name="body_display_over_other_apps">Used in order for the aftercall feature to function properly.</string>
+    <string name="title_onboarding1">Capture Photos with GPS Details</string>
+    <string name="body_onboarding1">Automatically add location, date, time, and map view to every photo you take.</string>
+    <string name="title_onboarding2">Rename Your Location</string>
+    <string name="body_onboarding2">Change the location name to match your memory or purpose.</string>
+    <string name="title_onboarding3">Record Videos with GPS Location</string>
+    <string name="body_onboarding3">Capture videos with live GPS map, address, latitude, longitude, date &amp; time.</string>
 
     <string name="notification_permission_title">Stay Updated with Important Notifications</string>
     <string name="notification_permission_body">Enable notifications to receive important updates and reminders related to your budget and financial tracking.</string>

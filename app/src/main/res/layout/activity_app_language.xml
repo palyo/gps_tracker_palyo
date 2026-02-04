@@ -34,6 +34,8 @@
                 app:contentInsetStartWithNavigation="@dimen/_0sdp"
                 app:title="@string/menu_app_language"
                 app:titleTextAppearance="@style/TextAppearance.Space.TitleSmall"
+                app:subtitle="Use the app in your preferred language"
+                app:subtitleTextAppearance="@style/TextAppearance.Space.SubTitleSmall"
                 app:titleTextColor="@color/colorText">
 
                 <com.google.android.material.button.MaterialButton

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".ui.updates.AppPermissionActivity">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_permission"
+        style="@style/TextBold"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_24sdp"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:text="Allow Required Permissions"
+        android:textColor="#FEAA01"
+        android:textSize="@dimen/_18ssp"
+        app:layout_constraintBottom_toTopOf="@id/text_note"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_note"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginEnd="@dimen/_24sdp"
+        android:gravity="start|center_vertical"
+        android:text="To capture photos with GPS location, map, date, and time, we need a few permissions."
+        android:textSize="@dimen/_10ssp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/text_permission"
+        app:layout_constraintTop_toBottomOf="@+id/text_permission" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image_vector"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:adjustViewBounds="true"
+        app:contentPaddingRight="@dimen/_24sdp"
+        app:contentPaddingTop="@dimen/_12sdp"
+        app:contentPaddingBottom="@dimen/_12sdp"
+        app:contentPaddingStart="@dimen/_24sdp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_root"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_note"
+        app:srcCompat="@drawable/ic_vector_ui_permission" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_root"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/_24sdp"
+        android:paddingVertical="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_camera_permission"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/ic_bg_rounded_12sdp"
+            android:backgroundTint="@color/colorCardBackground"
+            android:padding="@dimen/_12sdp"
+            app:layout_constraintBottom_toTopOf="@+id/card_location_permission"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_camera"
+                style="@style/TextSemiBold"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:text="Camera Access"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintBottom_toTopOf="@id/body_camera"
+                app:layout_constraintEnd_toStartOf="@+id/is_camera_access"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/is_camera_access"
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:checked="true"
+                android:clickable="false"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:thumbTint="@color/ic_switch_thumb_tint"
+                app:trackTint="@color/ic_switch_track_tint" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/body_camera"
+                style="@style/TextRegular"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:gravity="start|center_vertical"
+                android:text="Capture photos with live GPS map, date, time, and location stamp."
+                android:textSize="@dimen/_9ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_camera"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_camera" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_location_permission"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/ic_bg_rounded_12sdp"
+            android:backgroundTint="@color/colorCardBackground"
+            android:padding="@dimen/_12sdp"
+            app:layout_constraintBottom_toTopOf="@+id/card_storage_permission"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_location"
+                style="@style/TextSemiBold"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="Location Access"
+                android:textSize="@dimen/_14ssp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                app:layout_constraintBottom_toTopOf="@id/body_location"
+                app:layout_constraintEnd_toStartOf="@+id/is_location_access"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/is_location_access"
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:checked="true"
+                android:clickable="false"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:thumbTint="@color/ic_switch_thumb_tint"
+                app:trackTint="@color/ic_switch_track_tint" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/body_location"
+                style="@style/TextRegular"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:gravity="start|center_vertical"
+                android:text="To show accurate GPS coordinates, address, and map on your photos."
+                android:textSize="@dimen/_9ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_location" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_storage_permission"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:background="@drawable/ic_bg_rounded_12sdp"
+            android:backgroundTint="@color/colorCardBackground"
+            android:padding="@dimen/_12sdp"
+            app:layout_constraintBottom_toTopOf="@+id/is_terms_agree"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_storage"
+                style="@style/TextSemiBold"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="Storage / Media Access"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintBottom_toTopOf="@id/body_storage"
+                app:layout_constraintEnd_toStartOf="@+id/is_storage_access"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/is_storage_access"
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:checked="true"
+                android:clickable="false"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:thumbTint="@color/ic_switch_thumb_tint"
+                app:trackTint="@color/ic_switch_track_tint" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/body_storage"
+                style="@style/TextRegular"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:gravity="start|center_vertical"
+                android:text="Store photos and videos securely on your device."
+                android:textSize="@dimen/_9ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_storage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_storage" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/is_terms_agree"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:checked="true"
+            android:gravity="start|center_vertical"
+            android:linksClickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="@dimen/_4sdp"
+            android:textColorLink="@color/colorAccent"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="@id/text_terms_agree"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_terms_agree"
+            app:useMaterialThemeColors="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_terms_agree"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:checked="false"
+            android:gravity="start|center_vertical"
+            android:linksClickable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="@dimen/_4sdp"
+            android:text="@string/message_policy"
+            android:textColorLink="@color/colorAccent"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintBottom_toTopOf="@id/button_continue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/is_terms_agree"
+            app:useMaterialThemeColors="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_continue"
+            style="@style/MaterialButtonAccent"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:text="@string/button_allow_and_continue"
+            app:cornerRadius="@dimen/_8sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

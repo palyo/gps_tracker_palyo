@@ -1,41 +1,77 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.adapter.*
-import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.*
-import android.*
-import android.annotation.*
-import android.content.*
-import android.content.res.*
-import android.graphics.*
-import android.net.*
-import android.provider.*
-import android.speech.*
-import android.text.*
-import android.view.*
-import android.widget.*
-import androidx.activity.*
-import androidx.activity.result.contract.*
-import androidx.core.content.*
-import androidx.core.view.*
-import androidx.core.widget.*
-import androidx.lifecycle.*
-import androidx.recyclerview.widget.*
-import coder.apps.space.library.base.*
-import coder.apps.space.library.extension.*
-import com.google.android.gms.location.*
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.*
-import com.google.maps.android.*
-import com.google.maps.android.collections.*
-import com.google.maps.android.ktx.utils.collection.*
-import kotlinx.coroutines.*
-import org.json.*
+import aanibrothers.tracker.io.adapter.SuggestionLocationAdapter
+import aanibrothers.tracker.io.databinding.ActivityMapBinding
+import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
+import aanibrothers.tracker.io.extension.VISIBILITY
+import aanibrothers.tracker.io.extension.applyOpacity
+import aanibrothers.tracker.io.extension.getSuggestedLocations
+import aanibrothers.tracker.io.extension.hideKeyboard
+import aanibrothers.tracker.io.extension.searchPlaceInGoogleMaps
+import aanibrothers.tracker.io.extension.tinyDb
+import aanibrothers.tracker.io.extension.updateStatusBarIcons
+import aanibrothers.tracker.io.extension.vectorToBitmap
+import aanibrothers.tracker.io.extension.viewMapMarkerDetailsSheet
+import aanibrothers.tracker.io.extension.viewMapStylingSheet
+import aanibrothers.tracker.io.extension.viewMapVisibilitySheet
+import aanibrothers.tracker.io.extension.viewPinGuideSheet
+import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Resources
+import android.net.Uri
+import android.provider.Settings
+import android.speech.RecognizerIntent
+import android.text.InputType
+import android.text.TextUtils
+import android.view.View
+import android.view.WindowInsets
+import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import coder.apps.space.library.base.BaseActivity
+import coder.apps.space.library.extension.beEnableIf
+import coder.apps.space.library.extension.beGone
+import coder.apps.space.library.extension.beVisibleIf
+import coder.apps.space.library.extension.delayed
+import coder.apps.space.library.extension.disable
+import coder.apps.space.library.extension.hasPermissions
+import coder.apps.space.library.extension.log
+import coder.apps.space.library.extension.navigationBarHeight
+import coder.apps.space.library.extension.statusBarHeight
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.PointOfInterest
+import com.google.maps.android.SphericalUtil
+import com.google.maps.android.collections.MarkerManager
+import com.google.maps.android.ktx.utils.collection.addMarker
+import kotlinx.coroutines.launch
+import org.json.JSONArray
 
-class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+class MapActivity : BaseActivity<ActivityMapBinding>(
+    ActivityMapBinding::inflate,
+    isFullScreen = true,
+    isFullScreenIncludeNav = false
+), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
 
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "MapActivity"
@@ -53,29 +89,33 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
     private var markerCollection: MarkerManager.Collection? = null
     private var maxZoom: Float = 0f
     private var minZoom: Float = 0f
-    private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        if (permissions.containsValue(false)) {
-            incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-            Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
-        } else {
-            enableMyLocation()
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if (permissions.containsValue(false)) {
+                incrementPermissionsDeniedCount("PERMISSION_LOCATION")
+                Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+            } else {
+                enableMyLocation()
+            }
         }
-    }
-    private val microphonePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        if (permissions.containsValue(false)) {
-            incrementPermissionsDeniedCount("MICROPHONE")
-            Toast.makeText(this, "Microphone permission required", Toast.LENGTH_SHORT).show()
-        } else {
-            startVoiceInput()
+    private val microphonePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if (permissions.containsValue(false)) {
+                incrementPermissionsDeniedCount("MICROPHONE")
+                Toast.makeText(this, "Microphone permission required", Toast.LENGTH_SHORT).show()
+            } else {
+                startVoiceInput()
+            }
         }
-    }
-    private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
-    private val speakLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-        matches?.firstOrNull()?.let { placeName ->
-            binding?.editSearch?.setText(placeName)
+    private val appSettingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
+    private val speakLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            matches?.firstOrNull()?.let { placeName ->
+                binding?.editSearch?.setText(placeName)
+            }
         }
-    }
 
     override fun ActivityMapBinding.initExtra() {
         val googleMapOptions = GoogleMapOptions()
@@ -139,7 +179,12 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         mapNavigate.setOnClickListener {
             searchPlaceInGoogleMaps(editSearch.text.toString())
         }
-        mapVoiceNavigation.beVisibleIf(intent?.getBooleanExtra("is_voice_navigation", false) == true)
+        mapVoiceNavigation.beVisibleIf(
+            intent?.getBooleanExtra(
+                "is_voice_navigation",
+                false
+            ) == true
+        )
         mapVoiceNavigation.setOnClickListener {
             if (hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
                 startVoiceInput()
@@ -180,7 +225,10 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
     private fun startVoiceInput() {
         if (hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                )
                 putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the place name...")
             }
             speakLauncher.launch(intent)
@@ -189,13 +237,16 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 microphonePermissionLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
                 return
             } else {
-                Toast.makeText(this@MapActivity, "Need Microphone permission enable manually..", Toast.LENGTH_SHORT).show()
-                viewPermissions {
-                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", packageName, null)
-                    }
-                    appSettingsLauncher.launch(appSettingsIntent)
+                Toast.makeText(
+                    this@MapActivity,
+                    "Need Microphone permission enable manually..",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", packageName, null)
                 }
+                appSettingsLauncher.launch(appSettingsIntent)
             }
         }
     }
@@ -299,17 +350,24 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             googleMap?.isMyLocationEnabled = true
             binding?.moveToCurrentLocation()
         } else {
-            if (fetchPermissionsDeniedCount("PERMISSION_LOCATION") < 2 && !hasPermissions(LOCATION_PERMISSION)) {
+            if (fetchPermissionsDeniedCount("PERMISSION_LOCATION") < 2 && !hasPermissions(
+                    LOCATION_PERMISSION
+                )
+            ) {
                 locationPermissionLauncher.launch(LOCATION_PERMISSION)
                 return
             } else {
-                Toast.makeText(this@MapActivity, "Need location permission enable manually..", Toast.LENGTH_SHORT).show()
-                viewPermissions {
-                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                Toast.makeText(
+                    this@MapActivity,
+                    "Need location permission enable manually..",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                val appSettingsIntent =
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.fromParts("package", packageName, null)
                     }
-                    appSettingsLauncher.launch(appSettingsIntent)
-                }
+                appSettingsLauncher.launch(appSettingsIntent)
             }
         }
     }
@@ -397,27 +455,76 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 compoundDrawableTintList = textTint
             }
 
-            listOf(mapNavigate, mapStyle, mapVoiceNavigation, mapVisibility, mapCurrentLocation, mapZoomIn, mapZoomOut).forEach {
+            listOf(
+                mapNavigate,
+                mapStyle,
+                mapVoiceNavigation,
+                mapVisibility,
+                mapCurrentLocation,
+                mapZoomIn,
+                mapZoomOut
+            ).forEach {
                 it.backgroundTintList = bgTint
             }
-            listOf(mapNavigate, mapStyle, mapVisibility, mapVoiceNavigation, mapZoomIn, mapZoomOut).forEach {
+            listOf(
+                mapNavigate,
+                mapStyle,
+                mapVisibility,
+                mapVoiceNavigation,
+                mapZoomIn,
+                mapZoomOut
+            ).forEach {
                 it.iconTint = textTint
             }
-            listOf(mapNavigate, mapStyle, mapVoiceNavigation, mapVisibility, mapCurrentLocation, mapZoomIn, mapZoomOut).forEach {
+            listOf(
+                mapNavigate,
+                mapStyle,
+                mapVoiceNavigation,
+                mapVisibility,
+                mapCurrentLocation,
+                mapZoomIn,
+                mapZoomOut
+            ).forEach {
                 it.strokeColor = textOpacityTint
             }
 
             googleMap?.apply {
                 mapCurrentLocation.iconTint = when (viewMapType) {
-                    "silver" -> ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_silver_selector)
-                    "retro" -> ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_retro_selector)
-                    "dark" -> ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_dark_selector)
-                    "night" -> ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_night_selector)
-                    "aubergine" -> ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_aubergine_selector)
+                    "silver" -> ContextCompat.getColorStateList(
+                        this@MapActivity,
+                        R.color.ic_action_accent_silver_selector
+                    )
+
+                    "retro" -> ContextCompat.getColorStateList(
+                        this@MapActivity,
+                        R.color.ic_action_accent_retro_selector
+                    )
+
+                    "dark" -> ContextCompat.getColorStateList(
+                        this@MapActivity,
+                        R.color.ic_action_accent_dark_selector
+                    )
+
+                    "night" -> ContextCompat.getColorStateList(
+                        this@MapActivity,
+                        R.color.ic_action_accent_night_selector
+                    )
+
+                    "aubergine" -> ContextCompat.getColorStateList(
+                        this@MapActivity,
+                        R.color.ic_action_accent_aubergine_selector
+                    )
+
                     else -> if (mapType == GoogleMap.MAP_TYPE_SATELLITE)
-                        ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_satellite_selector)
+                        ContextCompat.getColorStateList(
+                            this@MapActivity,
+                            R.color.ic_action_accent_satellite_selector
+                        )
                     else
-                        ContextCompat.getColorStateList(this@MapActivity, R.color.ic_action_accent_standard_selector)
+                        ContextCompat.getColorStateList(
+                            this@MapActivity,
+                            R.color.ic_action_accent_standard_selector
+                        )
                 }
             }
         }
@@ -551,7 +658,8 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 for (j in 0 until stylers.length()) {
                     val newStyle = stylers.optJSONObject(j) ?: continue
                     if (newStyle.has("visibility")) {
-                        val visibility = if (tinyDb.getBoolean(featureType, value = true)) "on" else "off"
+                        val visibility =
+                            if (tinyDb.getBoolean(featureType, value = true)) "on" else "off"
                         newStyle.put("visibility", visibility)
                     }
                 }

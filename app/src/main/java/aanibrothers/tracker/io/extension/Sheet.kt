@@ -2,8 +2,8 @@ package aanibrothers.tracker.io.extension
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.LayoutSheetDeleteBinding
+import aanibrothers.tracker.io.databinding.LayoutSheetPermissionBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetPermissionNotificationBinding
-import aanibrothers.tracker.io.databinding.LayoutSheetPermissionOtherBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetPinGuideBinding
 import aanibrothers.tracker.io.databinding.SheetMapMarkerDetailsBinding
 import aanibrothers.tracker.io.databinding.SheetMapStyleBinding
@@ -11,14 +11,12 @@ import aanibrothers.tracker.io.databinding.SheetMapVisibilityStyleBinding
 import android.app.Activity
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.View
 import androidx.core.content.ContextCompat
 import coder.apps.space.library.extension.applyDialogConfig
 import coder.apps.space.library.extension.beGone
+import coder.apps.space.library.extension.beVisibleIf
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -397,53 +395,6 @@ fun Activity.viewMapMarkerDetailsSheet(currentLocation: LatLng, marker: LatLng, 
     }
 }
 
-
-fun Activity.viewPermissions(
-    onDismiss: (() -> Unit)? = null,
-    onContinue: () -> Unit
-) {
-    val dialog =
-        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
-    val bindDialog: LayoutSheetPermissionOtherBinding =
-        LayoutSheetPermissionOtherBinding.inflate(layoutInflater)
-    dialog.setContentView(bindDialog.root)
-
-    dialog.window?.apply {
-        setDimAmount(.50f)
-        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    }
-
-    var isContinueClicked = false // Flag to track if "Continue" was clicked
-
-    dialog.setOnShowListener { dialogInterface ->
-        val bottomSheetDialog = dialogInterface as BottomSheetDialog
-        val bottomSheet =
-            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-        bottomSheet?.let { sheet ->
-            val behavior = BottomSheetBehavior.from(sheet)
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-    }
-
-    dialog.setOnDismissListener {
-        if (!isContinueClicked) { // Only call onDismiss if "Continue" was NOT clicked
-            onDismiss?.invoke()
-        }
-    }
-
-    with(bindDialog) {
-        buttonContinue.setOnClickListener {
-            isContinueClicked = true // Mark as "Continue" clicked
-            onContinue.invoke()
-            dialog.dismiss()
-        }
-    }
-
-    if (!isFinishing && !isDestroyed) {
-        dialog.show()
-    }
-}
-
 fun Activity.viewNotificationPermission(listener: () -> Unit) {
     val dialog =
         BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
@@ -458,6 +409,43 @@ fun Activity.viewNotificationPermission(listener: () -> Unit) {
     with(bindDialog) {
         buttonContinue.setOnClickListener {
             listener.invoke()
+            dialog.dismiss()
+        }
+    }
+
+    if (!isFinishing || !isDestroyed) {
+        dialog.show()
+    }
+}
+
+fun Activity.viewPermission(
+    title: String,
+    body: String,
+    positiveButton: String,
+    isNegativeButton: Boolean,
+    listener: (Boolean) -> Unit
+) {
+    val dialog =
+        BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+    val bindDialog: LayoutSheetPermissionBinding =
+        LayoutSheetPermissionBinding.inflate(layoutInflater)
+    dialog.setContentView(bindDialog.root)
+    dialog.window?.apply {
+        applyDialogConfig()
+        setDimAmount(.24f)
+    }
+
+    with(bindDialog) {
+        textTitle.text = title
+        textDescription.text = body
+        actionPositive.text = positiveButton
+        actionPositive.setOnClickListener {
+            listener.invoke(true)
+            dialog.dismiss()
+        }
+        actionNegative.beVisibleIf(isNegativeButton)
+        actionNegative.setOnClickListener {
+            listener.invoke(false)
             dialog.dismiss()
         }
     }

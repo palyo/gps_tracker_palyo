@@ -12,6 +12,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_intro_1" />
+        app:srcCompat="@drawable/ic_onboarding1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

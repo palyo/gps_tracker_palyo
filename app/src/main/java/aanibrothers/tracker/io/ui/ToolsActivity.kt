@@ -1,60 +1,47 @@
 package aanibrothers.tracker.io.ui
 
-import aanibrothers.tracker.io.App
-import aanibrothers.tracker.io.App.Companion.appOpenManager
-import aanibrothers.tracker.io.databinding.ActivityDashboardBinding
+import aanibrothers.tracker.io.databinding.ActivityToolsBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
-import aanibrothers.tracker.io.extension.PERMISSION_MAIN
-import aanibrothers.tracker.io.extension.isGrantedOverlay
 import aanibrothers.tracker.io.extension.isLocationEnabled
-import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.viewBanner
-import android.Manifest
-import android.app.AlertDialog
-import android.content.Intent
 import android.content.IntentSender
-import android.net.Uri
-import android.os.Message
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.hasPermissions
 import coder.apps.space.library.extension.log
-import coder.apps.space.library.helper.LeakGuardHandlerWrapper
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.tasks.Task
-import kotlin.jvm.java
 
-class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboardBinding::inflate) {
+class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::inflate) {
 
     private var pendingAction: (() -> Unit)? = null
-    private val TAG = DashboardActivity::class.java.simpleName
+    private val TAG = ToolsActivity::class.java.simpleName
 
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (!allGranted) {
-            pendingAction = null
-            Toast.makeText(this, "Location permissions required", Toast.LENGTH_SHORT).show()
-            incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-        } else {
-            pendingAction?.invoke()
-            pendingAction = null
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (!allGranted) {
+                pendingAction = null
+                Toast.makeText(this, "Location permissions required", Toast.LENGTH_SHORT).show()
+                incrementPermissionsDeniedCount("PERMISSION_LOCATION")
+            } else {
+                pendingAction?.invoke()
+                pendingAction = null
+            }
         }
-    }
 
-    override fun ActivityDashboardBinding.initExtra() {
+    override fun ActivityToolsBinding.initExtra() {
         viewBanner(adNative)
     }
 
-    override fun ActivityDashboardBinding.initListeners() {
+    override fun ActivityToolsBinding.initListeners() {
         mapBanner.setOnClickListener {
             checkLocationPermissionAndProceed {
                 go(MapActivity::class.java)
@@ -109,7 +96,7 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val client = LocationServices.getSettingsClient(this@DashboardActivity)
+        val client = LocationServices.getSettingsClient(this@ToolsActivity)
         val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
 
         task.addOnSuccessListener { response: LocationSettingsResponse ->
@@ -119,7 +106,7 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException) {
                 try {
-                    exception.startResolutionForResult(this@DashboardActivity, 4634)
+                    exception.startResolutionForResult(this@ToolsActivity, 4634)
                 } catch (_: IntentSender.SendIntentException) {
                 }
             }
@@ -143,7 +130,7 @@ class DashboardActivity : BaseActivity<ActivityDashboardBinding>(ActivityDashboa
         }
     }
 
-    override fun ActivityDashboardBinding.initView() {
+    override fun ActivityToolsBinding.initView() {
         setSupportActionBar(toolbar)
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         onBackPressedDispatcher.addCallback { finish() }

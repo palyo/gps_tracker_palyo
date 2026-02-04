@@ -119,9 +119,12 @@ dependencies {
     implementation("androidx.camera:camera-core:1.4.1")
     implementation("androidx.camera:camera-extensions:1.4.1")
 
+    implementation("androidx.media3:media3-transformer:1.9.1")
+    implementation("androidx.media3:media3-effect:1.9.1")
+    implementation("androidx.media3:media3-common:1.9.1")
+
     implementation("com.github.anastr:speedviewlib:1.6.1")
     implementation("com.github.florent37:singledateandtimepicker:2.2.7")
-
 
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")

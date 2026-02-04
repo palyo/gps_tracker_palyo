@@ -1,38 +1,66 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.databinding.*
-import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.*
+import aanibrothers.tracker.io.databinding.ActivityGpsCameraBinding
+import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
+import aanibrothers.tracker.io.extension.findAddressFromLatLng
+import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewNativeBanner
 import android.Manifest
-import android.annotation.*
-import android.content.*
-import android.graphics.*
-import android.net.*
-import android.os.*
-import android.provider.*
-import android.view.*
-import android.widget.*
-import androidx.activity.*
-import androidx.activity.result.contract.*
-import androidx.camera.core.*
-import androidx.camera.lifecycle.*
-import androidx.core.content.*
-import androidx.exifinterface.media.*
-import coder.apps.space.library.base.*
-import coder.apps.space.library.extension.*
-import com.bumptech.glide.*
-import com.bumptech.glide.load.resource.drawable.*
-import com.bumptech.glide.request.*
-import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.*
-import kotlinx.coroutines.*
-import java.io.*
-import java.text.*
-import java.util.*
-import java.util.concurrent.*
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
+import android.view.View
+import android.view.WindowInsets
+import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
+import coder.apps.space.library.base.BaseActivity
+import coder.apps.space.library.extension.beGone
+import coder.apps.space.library.extension.beVisible
+import coder.apps.space.library.extension.delayed
+import coder.apps.space.library.extension.disable
+import coder.apps.space.library.extension.enable
+import coder.apps.space.library.extension.go
+import coder.apps.space.library.extension.hasPermissions
+import coder.apps.space.library.extension.navigationBarHeight
+import coder.apps.space.library.extension.statusBarHeight
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCameraBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false) {
+class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
+    ActivityGpsCameraBinding::inflate,
+    isFullScreen = true,
+    isFullScreenIncludeNav = false
+) {
     private var imageCapture: ImageCapture? = null
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var aspectRatio = AspectRatio.RATIO_DEFAULT
@@ -41,34 +69,30 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
     private var currentCameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var currentFlashMode = ImageCapture.FLASH_MODE_OFF
     private var lastModified: File? = null
-    private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        if (permissions.containsValue(false)) {
-            incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-            Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
-        } else {
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if (permissions.containsValue(false)) {
+                incrementPermissionsDeniedCount("PERMISSION_LOCATION")
+                Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+            } else {
+                binding?.initExtra()
+            }
+        }
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (allGranted) {
+                binding?.initExtra()
+            } else {
+                Toast.makeText(this, "Camera & Location permissions required", Toast.LENGTH_SHORT)
+                    .show()
+                incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+            }
+        }
+    private val appSettingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             binding?.initExtra()
         }
-    }
-    private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        if (permissions.containsValue(false)) {
-            incrementPermissionsDeniedCount("CAMERA")
-            Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
-        } else {
-            binding?.initExtra()
-        }
-    }
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (allGranted) {
-            binding?.initExtra()
-        } else {
-            Toast.makeText(this, "Camera & Location permissions required", Toast.LENGTH_SHORT).show()
-            incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
-        }
-    }
-    private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        binding?.initExtra()
-    }
 
     override fun ActivityGpsCameraBinding.initExtra() {
         if (hasPermissions(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))) {
@@ -79,12 +103,14 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
             }
             setupCamera()
             val filesList = (File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "GPS Camera"
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                "GPS Camera"
             ).listFiles()?.toMutableList() ?: mutableListOf())
             filesList.sortByDescending { it.lastModified() }
             if (filesList.isNotEmpty()) {
                 lastModified = filesList[0]
-                Glide.with(applicationContext).load(lastModified?.absolutePath).transition(DrawableTransitionOptions.withCrossFade()).apply(
+                Glide.with(applicationContext).load(lastModified?.absolutePath)
+                    .transition(DrawableTransitionOptions.withCrossFade()).apply(
                     RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)
                 ).into(imageLastCaptured)
             }
@@ -96,12 +122,11 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
                 if (deniedCount < 2) {
                     permissionLauncher.launch(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))
                 } else {
-                    viewPermissions {
-                        val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    val appSettingsIntent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                             data = Uri.fromParts("package", packageName, null)
                         }
-                        appSettingsLauncher.launch(appSettingsIntent)
-                    }
+                    appSettingsLauncher.launch(appSettingsIntent)
                 }
             }
         }
@@ -115,7 +140,8 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
     @SuppressLint("MissingPermission")
     private fun setupLocation() {
         if (hasPermissions(LOCATION_PERMISSION)) {
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@GPSCameraActivity)
+            fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(this@GPSCameraActivity)
             fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
                 location?.let {
                     currentLocation = LatLng(it.latitude, it.longitude)
@@ -124,21 +150,29 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
                             address?.apply {
                                 val addressParts = address.getAddressLine(0)
                                     .split(",")
-                                    .map { part -> part.trim().replace(Regex("^\\d+-\\s*"), "") } // Remove only leading "digits-"
+                                    .map { part ->
+                                        part.trim().replace(Regex("^\\d+-\\s*"), "")
+                                    } // Remove only leading "digits-"
                                 val firstPositionName = addressParts.getOrNull(0)?.trim().orEmpty()
-                                val formattedPositionName = if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(Regex("^\\d+$"))) {
-                                    ""
-                                } else {
-                                    firstPositionName
-                                }
-                                val secondFormattedPositionName = addressParts.getOrNull(1)?.trim().orEmpty()
-                                val secondPositionName = if (secondFormattedPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$"))
-                                    || secondFormattedPositionName.matches(Regex("^\\d+$"))
-                                ) {
-                                    ""
-                                } else {
-                                    secondFormattedPositionName
-                                }
+                                val formattedPositionName =
+                                    if (firstPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$")) || firstPositionName.matches(
+                                            Regex("^\\d+$")
+                                        )
+                                    ) {
+                                        ""
+                                    } else {
+                                        firstPositionName
+                                    }
+                                val secondFormattedPositionName =
+                                    addressParts.getOrNull(1)?.trim().orEmpty()
+                                val secondPositionName =
+                                    if (secondFormattedPositionName.matches(Regex("^[0-9A-Z]+\\+[0-9A-Z]+$"))
+                                        || secondFormattedPositionName.matches(Regex("^\\d+$"))
+                                    ) {
+                                        ""
+                                    } else {
+                                        secondFormattedPositionName
+                                    }
                                 val subLocality = address.subLocality.orEmpty()
                                 val locality = address.locality.orEmpty()
                                 val adminArea = address.adminArea.orEmpty()
@@ -344,13 +378,18 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(ActivityGpsCame
                             lastModified = photoFile
                             processPhotoToLandscape(photoFile.absolutePath)
                             val overlay = layoutMapDetail.bitmapFromView()
-                            val bitmap = overlayBitmapAtBottom(BitmapFactory.decodeFile(photoFile.absolutePath), overlay)
+                            val bitmap = overlayBitmapAtBottom(
+                                BitmapFactory.decodeFile(photoFile.absolutePath),
+                                overlay
+                            )
                             FileOutputStream(photoFile).use { outStream ->
                                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream)
                             }
                             launch(Dispatchers.Main) {
-                                Glide.with(applicationContext).load(lastModified?.absolutePath).transition(DrawableTransitionOptions.withCrossFade()).apply(
-                                    RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)
+                                Glide.with(applicationContext).load(lastModified?.absolutePath)
+                                    .transition(DrawableTransitionOptions.withCrossFade()).apply(
+                                    RequestOptions().dontTransform().dontAnimate()
+                                        .skipMemoryCache(false)
                                 ).into(imageLastCaptured)
                                 buttonCapture.enable()
                                 progressBar.beGone()

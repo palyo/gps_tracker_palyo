@@ -5,6 +5,7 @@ import aanibrothers.tracker.io.databinding.ActivitySettingsBinding
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.getPolicyLink
+import aanibrothers.tracker.io.ui.updates.HomeActivity
 import android.content.Intent
 import androidx.activity.addCallback
 import coder.apps.space.library.base.BaseActivity
@@ -49,7 +50,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
 
     override fun ActivitySettingsBinding.initView() {
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        onBackPressedDispatcher.addCallback { go(DashboardActivity::class.java, finishAll = true) }
+        onBackPressedDispatcher.addCallback { go(HomeActivity::class.java, finishAll = true) }
     }
 
     override fun onResume() {

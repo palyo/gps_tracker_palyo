@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -24,6 +25,17 @@ fun Context.vectorToBitmap(@DrawableRes vectorResId: Int): BitmapDescriptor {
     vectorDrawable.draw(canvas)
 
     return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
+
+fun View.toBitmapSafe(): Bitmap {
+    if (width == 0 || height == 0) {
+        return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    }
+
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    draw(canvas)
+    return bitmap
 }
 
 fun String.applyOpacity(alpha: Float): Int {
