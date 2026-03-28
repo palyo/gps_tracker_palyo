@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io.ui
 
+import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
@@ -33,7 +34,8 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
     private fun fetchData() {
         CoroutineScope(Dispatchers.IO).launch {
             filesList = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "GPS Camera"
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                getString(R.string.folder_gps_camera)
             ).listFiles()?.toMutableList() ?: mutableListOf()
             filesList?.sortByDescending { it.lastModified() }
             launch(Dispatchers.Main) {
@@ -140,7 +142,7 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
             type = "application/*"
             putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(Intent.createChooser(this, "Share"))
+            startActivity(Intent.createChooser(this, getString(R.string.chooser_share_files)))
         }
     }
 

@@ -1,13 +1,9 @@
 package aanibrothers.tracker.io.ui.updates
 
-import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
-import aanibrothers.tracker.io.extension.AFTER_CALL_PERMISSION
-import aanibrothers.tracker.io.extension.isGrantedOverlay
 import aanibrothers.tracker.io.extension.viewPermission
-import aanibrothers.tracker.io.helper.HandleSettingPreview
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
 import aanibrothers.tracker.io.locations.LocationPreference
 import aanibrothers.tracker.io.model.CaptureMode
@@ -58,7 +54,6 @@ import android.view.ViewTreeObserver
 import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.camera.core.AspectRatio
@@ -85,6 +80,7 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.effect.OverlayEffect
@@ -104,7 +100,6 @@ import coder.apps.space.library.extension.enable
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.goResult
 import coder.apps.space.library.extension.hasPermission
-import coder.apps.space.library.extension.hasPermissions
 import coder.apps.space.library.extension.statusBarHeight
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
@@ -142,7 +137,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private var doubleBackToExitPressedOnce = false
     private val PERMISSION_REQUEST_CODE = 100
-    private var handlerSettingOverLay: HandleSettingPreview? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -163,6 +157,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private var isPortraitMode = true
     private val LOCATION_SETTINGS_REQUEST = 4634
 
+    @Volatile
+    private var allowMapSnapshot = false
+
     private val timeHandler = Handler(Looper.getMainLooper())
     private lateinit var timeRunnable: Runnable
 
@@ -174,44 +171,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
             restoreLocationModeFromPref()
         }
-
-    /*private val permissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allPermissionsGranted = permissions.all { entry -> entry.value }
-            if (!allPermissionsGranted) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
-                    showPermissionExplanationDialog()
-                } else {
-                    showFallbackDialog()
-                }
-            } else if (!isGrantedOverlay()) {
-                sendToSettings()
-            }
-        }*/
-
-    private val permissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-            if (result[Manifest.permission.READ_PHONE_STATE] == false) {
-                incrementPermissionsDeniedCount("phone_state")
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                result[Manifest.permission.POST_NOTIFICATIONS] == false
-            ) {
-                incrementPermissionsDeniedCount("post_notifications")
-            }
-
-            if (result.values.any { !it }) {
-                showPermissionExplanationDialog()
-                return@registerForActivityResult
-            }
-
-            if (!isGrantedOverlay()) {
-                sendToSettings()
-            }
-        }
-
-    private var checkOverlay: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
     private var locationMode = LocationMode.CURRENT
     private var customLocation: Location? = null
@@ -231,9 +190,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         setupMapSnapshot()
         displayCurrentLocation()
         setupTimeDisplay()
-        handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
         appOpenManager = AppOpenManager()
         requestPermissions()
+        updateCameraPermissionUi()
     }
 
     private var googleMap: GoogleMap? = null
@@ -242,9 +201,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun getActiveMapFragment(): SupportMapFragment? {
         return when (tinyDB?.getString("template", "default")) {
             "classic" -> supportFragmentManager.findFragmentById(R.id.map_fragment_classic) as? SupportMapFragment
-
             "squarise" -> supportFragmentManager.findFragmentById(R.id.map_fragment_squarise) as? SupportMapFragment
-
             else -> supportFragmentManager.findFragmentById(R.id.map_fragment) as? SupportMapFragment
         }
     }
@@ -254,12 +211,22 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         fragment.getMapAsync { map ->
             googleMap = map
             map.setOnMapLoadedCallback {
-                captureMapSnapshotSafe()
+                if (canSnapshotMap()) {
+                    captureMapSnapshotSafe()
+                }
             }
         }
     }
 
+    private fun canSnapshotMap(): Boolean {
+        return allowMapSnapshot &&
+                lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) &&
+                !isFinishing && !isDestroyed &&
+                window?.decorView?.isShown == true
+    }
+
     private fun captureMapSnapshotSafe() {
+        if (!canSnapshotMap()) return
         val fragment = getActiveMapFragment() ?: return
         fragment.getMapAsync { map ->
             val mapView = fragment.view ?: return@getMapAsync
@@ -269,16 +236,23 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
                         mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        captureMapSnapshotSafe()
+                        if (canSnapshotMap()) {
+                            captureMapSnapshotSafe()
+                        }
                     }
                 })
                 return@getMapAsync
             }
 
-            map.snapshot { bmp ->
-                if (bmp != null && bmp.width > 0 && bmp.height > 0) {
-                    lastMapSnapshot.getAndSet(bmp)?.recycle()
+            if (!canSnapshotMap()) return@getMapAsync
+            try {
+                map.snapshot { bmp ->
+                    if (bmp != null && bmp.width > 0 && bmp.height > 0) {
+                        lastMapSnapshot.getAndSet(bmp)?.recycle()
+                    }
                 }
+            } catch (_: IllegalStateException) {
+                // Ignore snapshots while backgrounded
             }
         }
     }
@@ -286,8 +260,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     fun ActivityHomeBinding.setupTab() {
         tabCaptureMode.apply {
-            addTab(newTab().setText("PHOTO"))
-            addTab(newTab().setText("VIDEO"))
+            addTab(newTab().setText(getString(R.string.tab_photo)))
+            addTab(newTab().setText(getString(R.string.tab_video)))
 
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
@@ -333,9 +307,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun showAudioPermissionDialog() {
         viewPermission(
-            title = "Microphone Permission",
-            body = "Allow microphone to record video with sound?",
-            positiveButton = "Okay", isNegativeButton = false
+            title = getString(R.string.title_microphone_permission),
+            body = getString(R.string.body_microphone_permission),
+            positiveButton = getString(R.string.button_allow),
+            isNegativeButton = false,
+            isIconShown = true
         ) {
             if (it) {
                 ActivityCompat.requestPermissions(
@@ -351,9 +327,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun showPermissionBlockedDialog(message: String) {
         viewPermission(
-            title = "Permission Required",
+            title = getString(R.string.title_permission_required),
             body = message,
-            positiveButton = "Open Settings", isNegativeButton = false
+            positiveButton = getString(R.string.button_open_settings),
+            isNegativeButton = false
         ) {
             if (it) {
                 openAppSettings()
@@ -388,7 +365,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             val granted = grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
             allowAudio = granted
             if (!granted) {
-                showPermissionBlockedDialog("Microphone permission is required for audio. You can enable it in Settings.")
+                showPermissionBlockedDialog(getString(R.string.message_microphone_permission_required_for_audio))
             }
             return
         }
@@ -407,7 +384,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     captureMapSnapshotSafe()
                 }
             } else {
-                Toast.makeText(this, "Location still disabled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.toast_location_still_disabled),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -415,33 +396,35 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun onStart() {
         super.onStart()
         orientationEventListener?.enable()
-        if (hasPermission(Manifest.permission.CAMERA)) {
-            checkAndPromptLocationSettings()
-            binding?.startCamera()
-        }
+        binding?.updateCameraPermissionUi()
         restoreLocationModeFromPref()
     }
 
     override fun onStop() {
         super.onStop()
+        allowMapSnapshot = false
         orientationEventListener?.disable()
         stopLocationUpdates()
     }
 
     override fun onResume() {
         super.onResume()
+        allowMapSnapshot = true
         restoreUIState()
         checkGooglePlayServices()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         binding?.apply {
-            layoutMapData.isVisible = tinyDB?.getString("template", "default") == "default"
-            layoutMapDataClassic.isVisible = tinyDB?.getString("template", "default") == "classic"
-            layoutMapDataSquarise.isVisible = tinyDB?.getString("template", "default") == "squarise"
             getLatestCapturedFile()?.let { latestFile ->
                 lastCapturedFile = latestFile
                 Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
             }
         }
+        binding?.updateCameraPermissionUi()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        allowMapSnapshot = false
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -531,7 +514,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         binding?.apply {
-            val capturedBy = "Captured by: ${getString(R.string.app_name)}"
+            val capturedBy = getString(R.string.format_captured_by, getString(R.string.app_name))
             textCapturedBy.text = capturedBy
             textCapturedByClassic.text = capturedBy
             textCapturedBySquarise.text = capturedBy
@@ -556,9 +539,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
         val gmtTime = gmtFormat.format(Date())
         val date = SimpleDateFormat("EEEE, dd/MM/yyyy", Locale.getDefault()).format(Date())
+        val safeAddress = addressText.ifBlank { getString(R.string.label_unknown_location) }
 
         overlayState = OverlayState(
-            address = addressText,
+            address = safeAddress,
             lat = location.latitude,
             lng = location.longitude,
             altitudeMeters = if (location.hasAltitude()) location.altitude else null,
@@ -636,80 +620,80 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun requestPermissions() {
         displayCurrentLocation()
-        if(!hasPermissions(AFTER_CALL_PERMISSION) || !isGrantedOverlay()) {
-            showPermissionExplanationDialog()
-        }
     }
 
-    private fun showPermissionExplanationDialog() {
-        val phoneDenied = fetchPermissionsDeniedCount("phone_state")
-        val notifDenied = fetchPermissionsDeniedCount("post_notifications")
+    private fun requiredCameraPermissions(): Array<String> {
+        val permissions = mutableListOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        return permissions.toTypedArray()
+    }
 
-        val phoneBlocked =
-            !shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE) && phoneDenied > 0
+    private fun needsStoragePermission(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+    }
 
-        val notifBlocked =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                    !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) &&
-                    notifDenied > 0
-        if (phoneBlocked || notifBlocked) {
-            showFallbackDialog()
-        } else {
-            viewPermission(
-                title = "Phone and Notification Permission Required",
-                body = "We need the phone state and notification permissions to detect call state and show alerts.",
-                positiveButton = "Okay",
-                isNegativeButton = false
-            ) { accepted ->
-                if (!accepted) return@viewPermission
+    private fun hasCameraLocationStoragePermissions(): Boolean {
+        return requiredCameraPermissions().all { hasPermission(it) }
+    }
 
-                val permissionsToAsk = mutableListOf(Manifest.permission.READ_PHONE_STATE)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionsToAsk.add(Manifest.permission.POST_NOTIFICATIONS)
-                }
+    private fun requestCameraLocationStoragePermissions() {
+        val deniedCount = fetchPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+        if (deniedCount >= 2) {
+            openAppSettings()
+            return
+        }
+        ActivityCompat.requestPermissions(
+            this,
+            requiredCameraPermissions(),
+            PERMISSION_REQUEST_CODE
+        )
+    }
 
-                if (permissionsToAsk.all { hasPermission(it) }) {
-                    if (!isGrantedOverlay()) sendToSettings()
-                    return@viewPermission
-                }
+    private fun ActivityHomeBinding.updateCameraPermissionUi() {
+        val hasAllPermissions = hasCameraLocationStoragePermissions()
+        permissionLayout.isVisible = !hasAllPermissions
+        previewView.isVisible = hasAllPermissions
 
+        val template = tinyDB?.getString("template", "default")
+        layoutMapData.isVisible = hasAllPermissions && template == "default"
+        layoutMapDataClassic.isVisible = hasAllPermissions && template == "classic"
+        layoutMapDataSquarise.isVisible = hasAllPermissions && template == "squarise"
 
-                if (phoneDenied >= 1 || notifDenied >= 1) {
-                    showPermissionBlockedDialog(
-                        "Phone or notification permission is required. Please enable it in Settings."
-                    )
+        if (!hasAllPermissions) {
+            permissionTitle.setText(
+                if (needsStoragePermission()) {
+                    R.string.title_camera_location_storage
                 } else {
-                    permissions.launch(permissionsToAsk.toTypedArray())
+                    R.string.title_camera_location
                 }
-            }
+            )
+            permissionBody.setText(
+                if (needsStoragePermission()) {
+                    R.string.body_camera_location_storage
+                } else {
+                    R.string.body_camera_location
+                }
+            )
+            cameraProvider?.unbindAll()
+            stopLocationUpdates()
+            return
         }
-    }
 
-    private fun showFallbackDialog() {
-        viewPermission(
-            title = "Phone and Notification Permission Denied",
-            body = "The app cannot function properly without that permission. Please enable the permission in the app settings.",
-            positiveButton = "Open Settings", isNegativeButton = false
-        ) {
-            if (it) {
-                openAppSettings()
-            }
-        }
+        checkAndPromptLocationSettings()
+        startCamera()
+        displayCurrentLocation()
     }
 
     private fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         intent.setData("package:$packageName".toUri())
         startActivity(intent)
-    }
-
-    private fun sendToSettings() {
-        val intent =
-            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, "package:$packageName".toUri())
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-        handlerSettingOverLay?.startPollingImeSettings()
-        App.isOpenInter = true
-        checkOverlay.launch(intent)
     }
 
     private fun ActivityHomeBinding.startCamera() {
@@ -751,7 +735,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 setupCameraControls(cameraProvider, cameraSelector)
 
             } catch (exc: Exception) {
-                Toast.makeText(this@HomeActivity, "Failed to start camera", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    this@HomeActivity,
+                    getString(R.string.toast_failed_start_camera),
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }, ContextCompat.getMainExecutor(this@HomeActivity))
@@ -806,7 +794,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             updateFlashIcon()
             isBackCameraSelected = !isBackCameraSelected
         } catch (exc: Exception) {
-            Toast.makeText(this@HomeActivity, "Failed to switch camera", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@HomeActivity,
+                getString(R.string.toast_failed_switch_camera),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -824,7 +816,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 updateFlashIcon(isTorchOn)
                 cameraControl.enableTorch(!isTorchOn)
             } else {
-                Toast.makeText(this@HomeActivity, "Flash not available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@HomeActivity,
+                    getString(R.string.toast_flash_not_available),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         } catch (e: Exception) {
         }
@@ -940,7 +936,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun ActivityHomeBinding.captureImageWithOverlays() {
         val imageCapture = imageCapture ?: run {
-            Toast.makeText(this@HomeActivity, "Camera not ready", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@HomeActivity,
+                getString(R.string.toast_camera_not_ready),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -971,7 +971,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         hideProgressAnimations()
                         Toast.makeText(
                             this@HomeActivity,
-                            "Capture failed: ${exception.message}",
+                            getString(
+                                R.string.message_capture_failed,
+                                exception.message ?: ""
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -1099,9 +1102,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         runOnUiThread {
                             hideProgressAnimations()
                             val message = if (saveSuccess) {
-                                "Portrait image saved with GPS data"
+                                getString(R.string.message_portrait_saved_with_gps)
                             } else {
-                                "Image saved without GPS data"
+                                getString(R.string.message_image_saved_without_gps)
                             }
 
                             Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
@@ -1120,7 +1123,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                             hideProgressAnimations()
                             Toast.makeText(
                                 this@HomeActivity,
-                                if (fallbackSuccess) "Image saved (map failed)" else "Save failed",
+                                if (fallbackSuccess) {
+                                    getString(R.string.message_image_saved_map_failed)
+                                } else {
+                                    getString(R.string.message_save_failed)
+                                },
                                 Toast.LENGTH_SHORT
                             ).show()
                             if (fallbackSuccess) broadcastMediaScan(photoFile)
@@ -1194,7 +1201,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun startVideoRecording() {
         if (!::videoCapture.isInitialized) {
-            Toast.makeText(this, "Video not ready", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_video_not_ready), Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
@@ -1233,7 +1241,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                 onSuccess = {
                                     runOnUiThread {
                                         Toast.makeText(
-                                            this, "Overlay video saved", Toast.LENGTH_SHORT
+                                            this,
+                                            getString(R.string.message_overlay_video_saved),
+                                            Toast.LENGTH_SHORT
                                         ).show()
                                     }
                                 },
@@ -1243,7 +1253,12 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                     )
                                     runOnUiThread {
                                         Toast.makeText(
-                                            this, "Overlay failed: ${e.message}", Toast.LENGTH_SHORT
+                                            this,
+                                            getString(
+                                                R.string.message_overlay_failed,
+                                                e.message ?: ""
+                                            ),
+                                            Toast.LENGTH_SHORT
                                         ).show()
                                     }
                                 })
@@ -1306,7 +1321,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun handleCaptureError() {
         runOnUiThread {
             hideProgressAnimations()
-            Toast.makeText(this@HomeActivity, "Failed to capture image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@HomeActivity,
+                getString(R.string.toast_failed_capture_image),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -1357,13 +1376,16 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 googleMap.clear()
 
                 val markerOptions =
-                    MarkerOptions().position(latLng).title("Current Location").snippet(
-                        "Lat: ${String.format("%.6f", loc.latitude)}, Lng: ${
-                            String.format(
-                                "%.6f", loc.longitude
+                    MarkerOptions().position(latLng)
+                        .title(getString(R.string.label_current_location))
+                        .snippet(
+                            getString(
+                                R.string.format_lat_lng,
+                                loc.latitude,
+                                loc.longitude
                             )
-                        }"
-                    ).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                        )
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
 
                 val marker = googleMap.addMarker(markerOptions)
                 marker?.showInfoWindow()
@@ -1422,8 +1444,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             googleMap.clear()
             googleMap.addMarker(
                 MarkerOptions().position(latLng).title(
-                    if (locationMode == LocationMode.CUSTOM) "Custom Location"
-                    else "Current Location"
+                    if (locationMode == LocationMode.CUSTOM) getString(R.string.label_custom_location)
+                    else getString(R.string.label_current_location)
                 )
             )
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
@@ -1436,6 +1458,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             binding?.apply {
                 updateMapWithSelectedLocation()
                 getAddress(location.latitude, location.longitude) { address ->
+                    val unknownLocation = getString(R.string.label_unknown_location)
                     val parts = mutableListOf<String>()
                     address.subThoroughfare?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
                     address.thoroughfare?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
@@ -1449,18 +1472,18 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     textAddress.text = if (address.getAddressLine(0).isEmpty()) {
                         fullAddress
                     } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: "Unknown location"
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
                     }
                     updateOverlayState(location, fullAddress)
                     textAddressClassic.text = if (address.getAddressLine(0).isEmpty()) {
                         fullAddress
                     } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: "Unknown location"
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
                     }
                     textAddressSquarise.text = if (address.getAddressLine(0).isEmpty()) {
                         fullAddress
                     } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: "Unknown location"
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
                     }
                 }
 
@@ -1471,27 +1494,20 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 textLongitudeValueSquarise.text = String.format("%.6f", location.longitude)
                 textLongitudeValueClassic.text = String.format("%.6f", location.longitude)
 
-                textAltitude.text = "Altitude: ${
-                    if (location.hasAltitude()) String.format(
-                        "%.1f m", location.altitude
-                    ) else "N/A"
-                }"
-                textAltitudeSquarise.text = "Altitude: ${
-                    if (location.hasAltitude()) String.format(
-                        "%.1f m", location.altitude
-                    ) else "N/A"
-                }"
-                textAltitudeClassic.text = "Altitude: ${
-                    if (location.hasAltitude()) String.format(
-                        "%.1f m", location.altitude
-                    ) else "N/A"
-                }"
+                val altitudeText = if (location.hasAltitude()) {
+                    String.format("%.1f m", location.altitude)
+                } else {
+                    getString(R.string.label_not_available)
+                }
+                textAltitude.text = getString(R.string.format_altitude, altitudeText)
+                textAltitudeSquarise.text = getString(R.string.format_altitude, altitudeText)
+                textAltitudeClassic.text = getString(R.string.format_altitude, altitudeText)
 
                 val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
                 val currentDay = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
-                textDate.text = "$currentDay, $currentDate"
-                textDateSquarise.text = "$currentDay, $currentDate"
-                textDateClassic.text = "$currentDay, $currentDate"
+                textDate.text = getString(R.string.format_day_date, currentDay, currentDate)
+                textDateSquarise.text = getString(R.string.format_day_date, currentDay, currentDate)
+                textDateClassic.text = getString(R.string.format_day_date, currentDay, currentDate)
             }
         } catch (e: Exception) {
         }
@@ -1629,51 +1645,55 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ) {
         if (requestCode != PERMISSION_REQUEST_CODE) return
 
-        var cameraGranted = false
-        var locationGranted = false
+        var cameraGranted = hasPermission(Manifest.permission.CAMERA)
+        var fineGranted = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        var coarseGranted = hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        var storageGranted =
+            !needsStoragePermission() || hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         permissionList.forEachIndexed { index, permission ->
             if (grantResults.getOrNull(index) != PackageManager.PERMISSION_GRANTED) return@forEachIndexed
 
             when (permission) {
                 Manifest.permission.CAMERA -> cameraGranted = true
-                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION -> locationGranted =
-                    true
+                Manifest.permission.ACCESS_FINE_LOCATION -> fineGranted = true
+                Manifest.permission.ACCESS_COARSE_LOCATION -> coarseGranted = true
+                Manifest.permission.WRITE_EXTERNAL_STORAGE -> storageGranted = true
             }
         }
 
-        if (cameraGranted && locationGranted) {
+        val locationGranted = fineGranted && coarseGranted
 
-            checkAndPromptLocationSettings()
-            binding?.startCamera()
-            displayCurrentLocation()
-
-            when {
-                !hasPermissions(AFTER_CALL_PERMISSION) -> permissions.launch(AFTER_CALL_PERMISSION)
-                !isGrantedOverlay() -> sendToSettings()
-            }
-
-            Toast.makeText(this, "Camera & GPS ready", Toast.LENGTH_SHORT).show()
-
+        if (cameraGranted && locationGranted && storageGranted) {
+            binding?.updateCameraPermissionUi()
+            Toast.makeText(this, getString(R.string.toast_camera_gps_ready), Toast.LENGTH_SHORT)
+                .show()
         } else {
+            incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
+            binding?.updateCameraPermissionUi()
+            val message = if (needsStoragePermission()) {
+                getString(R.string.message_camera_location_storage_permissions_required)
+            } else {
+                getString(R.string.message_camera_gps_permissions_required)
+            }
             Toast.makeText(
-                this, "Camera and GPS permissions required", Toast.LENGTH_LONG
+                this, message, Toast.LENGTH_LONG
             ).show()
         }
     }
 
     private fun ActivityHomeBinding.updateTimeDisplay() {
         val localTime = SimpleDateFormat("HH:mm:ss a", Locale.getDefault()).format(Date())
-        textLocalTime.text = "Local: $localTime"
-        textLocalTimeSquarise.text = "Local: $localTime"
-        textLocalTimeClassic.text = "Local: $localTime"
+        textLocalTime.text = getString(R.string.format_local_time, localTime)
+        textLocalTimeSquarise.text = getString(R.string.format_local_time, localTime)
+        textLocalTimeClassic.text = getString(R.string.format_local_time, localTime)
 
         val gmtFormat = SimpleDateFormat("HH:mm:ss a", Locale.getDefault())
         gmtFormat.timeZone = TimeZone.getTimeZone("GMT")
         val gmtTime = gmtFormat.format(Date())
-        textGmtTime.text = "GMT: $gmtTime"
-        textGmtTimeSquarise.text = "GMT: $gmtTime"
-        textGmtTimeClassic.text = "GMT: $gmtTime"
+        textGmtTime.text = getString(R.string.format_gmt_time, gmtTime)
+        textGmtTimeSquarise.text = getString(R.string.format_gmt_time, gmtTime)
+        textGmtTimeClassic.text = getString(R.string.format_gmt_time, gmtTime)
     }
 
     private fun saveTimerState(timerState: Int, iconResId: Int) {
@@ -1694,23 +1714,24 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     @Suppress("DEPRECATION")
     private fun getAddress(latitude: Double, longitude: Double, callback: (Address) -> Unit) {
         val geocoder = Geocoder(this, Locale.getDefault())
+        val unknownValue = getString(R.string.label_unknown)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
                 override fun onGeocode(addresses: MutableList<Address>) {
                     val address = addresses.firstOrNull() ?: Address(Locale.getDefault()).apply {
-                        locality = "Unknown"
-                        adminArea = "Unknown"
-                        countryName = "Unknown"
+                        locality = unknownValue
+                        adminArea = unknownValue
+                        countryName = unknownValue
                     }
                     callback(address)
                 }
 
                 override fun onError(errorMessage: String?) {
                     callback(Address(Locale.getDefault()).apply {
-                        locality = "Unknown"
-                        adminArea = "Unknown"
-                        countryName = "Unknown"
+                        locality = unknownValue
+                        adminArea = unknownValue
+                        countryName = unknownValue
                     })
                 }
             })
@@ -1718,17 +1739,17 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             try {
                 val addresses = geocoder.getFromLocation(latitude, longitude, 1)
                 val address = addresses?.firstOrNull() ?: Address(Locale.getDefault()).apply {
-                    locality = "Unknown"
-                    adminArea = "Unknown"
-                    countryName = "Unknown"
+                    locality = unknownValue
+                    adminArea = unknownValue
+                    countryName = unknownValue
                 }
                 callback(address)
             } catch (e: Exception) {
                 Log.e("Geocoder", "Geocoding failed: ${e.message}")
                 callback(Address(Locale.getDefault()).apply {
-                    locality = "Unknown"
-                    adminArea = "Unknown"
-                    countryName = "Unknown"
+                    locality = unknownValue
+                    adminArea = unknownValue
+                    countryName = unknownValue
                 })
             }
         }
@@ -1777,7 +1798,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     }
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this@HomeActivity, "No image available", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this@HomeActivity,
+                        getString(R.string.toast_no_image_available),
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
@@ -1785,22 +1810,52 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         actionTemplates.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
+            allowMapSnapshot = false
             go(TemplatesActivity::class.java)
         }
         actionTools.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
+            allowMapSnapshot = false
             go(ToolsActivity::class.java)
         }
         actionMapData.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
+            allowMapSnapshot = false
             locationUpdateResult.launch(goResult(LocationsActivity::class.java))
         }
         actionSettings.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
+            allowMapSnapshot = false
             go(AppSettingsActivity::class.java)
+        }
+        buttonAllowAccess.setOnClickListener {
+            requestCameraLocationStoragePermissions()
+        }
+
+        when (intent?.getIntExtra("action", 0)) {
+            1 -> {
+                stopLocationUpdates()
+                timeHandler.removeCallbacks(timeRunnable)
+                allowMapSnapshot = false
+                go(TemplatesActivity::class.java)
+            }
+
+            2 -> {
+                stopLocationUpdates()
+                timeHandler.removeCallbacks(timeRunnable)
+                allowMapSnapshot = false
+                locationUpdateResult.launch(goResult(LocationsActivity::class.java))
+            }
+
+            3 -> {
+                stopLocationUpdates()
+                timeHandler.removeCallbacks(timeRunnable)
+                allowMapSnapshot = false
+                go(ToolsActivity::class.java)
+            }
         }
     }
 
@@ -1828,19 +1883,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             }
 
             doubleBackToExitPressedOnce = true
-            Toast.makeText(this@HomeActivity, "Please click BACK again to exit", Toast.LENGTH_SHORT)
+            Toast.makeText(
+                this@HomeActivity,
+                getString(R.string.toast_press_back_again),
+                Toast.LENGTH_SHORT
+            )
                 .show()
             Handler(Looper.getMainLooper()).postDelayed(Runnable {
                 doubleBackToExitPressedOnce = false
             }, 2000)
         }
-    }
-
-    fun invokeSetupWizardOfThisIme() {
-        handlerSettingOverLay?.cancelPollingImeSettings()
-        val intent = Intent()
-        intent.setClass(this@HomeActivity, HomeActivity::class.java)
-        intent.flags = 606076928
-        startActivity(intent)
     }
 }

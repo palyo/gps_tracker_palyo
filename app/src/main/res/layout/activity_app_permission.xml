@@ -13,10 +13,10 @@
         android:layout_width="@dimen/_0sdp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_24sdp"
-        android:layout_marginTop="@dimen/_24sdp"
+        android:layout_marginTop="@dimen/_12sdp"
         android:text="Allow Required Permissions"
         android:textColor="#FEAA01"
-        android:textSize="@dimen/_18ssp"
+        android:textSize="@dimen/_16ssp"
         app:layout_constraintBottom_toTopOf="@id/text_note"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,8 +29,8 @@
         android:layout_marginTop="@dimen/_4sdp"
         android:layout_marginEnd="@dimen/_24sdp"
         android:gravity="start|center_vertical"
-        android:text="To capture photos with GPS location, map, date, and time, we need a few permissions."
-        android:textSize="@dimen/_10ssp"
+        android:text="To detect call state and show alerts, we need phone, notification, and display-over-apps access."
+        android:textSize="@dimen/_9ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/text_permission"
         app:layout_constraintTop_toBottomOf="@+id/text_permission" />
@@ -55,40 +55,40 @@
         android:layout_width="@dimen/_0sdp"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/_24sdp"
-        android:paddingVertical="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_4sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/card_camera_permission"
+            android:id="@+id/card_phone_permission"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
             android:background="@drawable/ic_bg_rounded_12sdp"
             android:backgroundTint="@color/colorCardBackground"
             android:padding="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/card_location_permission"
+            app:layout_constraintBottom_toTopOf="@+id/card_notification_permission"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_camera"
+                android:id="@+id/text_phone"
                 style="@style/TextSemiBold"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
                 android:layout_marginEnd="@dimen/_8sdp"
-                android:text="Camera Access"
+                android:text="Phone State Access"
                 android:textSize="@dimen/_14ssp"
-                app:layout_constraintBottom_toTopOf="@id/body_camera"
-                app:layout_constraintEnd_toStartOf="@+id/is_camera_access"
+                app:layout_constraintBottom_toTopOf="@id/body_phone"
+                app:layout_constraintEnd_toStartOf="@+id/is_phone_access"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/is_camera_access"
+                android:id="@+id/is_phone_access"
                 style="@style/TextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,47 +102,47 @@
                 app:trackTint="@color/ic_switch_track_tint" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/body_camera"
+                android:id="@+id/body_phone"
                 style="@style/TextRegular"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_2sdp"
                 android:gravity="start|center_vertical"
-                android:text="Capture photos with live GPS map, date, time, and location stamp."
-                android:textSize="@dimen/_9ssp"
-                app:layout_constraintEnd_toEndOf="@+id/text_camera"
+                android:text="Detect call state to show GPS alerts during and after calls."
+                android:textSize="@dimen/_8ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_phone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_camera" />
+                app:layout_constraintTop_toBottomOf="@+id/text_phone" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/card_location_permission"
+            android:id="@+id/card_notification_permission"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
             android:background="@drawable/ic_bg_rounded_12sdp"
             android:backgroundTint="@color/colorCardBackground"
             android:padding="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/card_storage_permission"
+            app:layout_constraintBottom_toTopOf="@+id/card_overlay_permission"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_location"
+                android:id="@+id/text_notification"
                 style="@style/TextSemiBold"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
-                android:text="Location Access"
+                android:text="Notification Access"
                 android:textSize="@dimen/_14ssp"
                 android:layout_marginEnd="@dimen/_8sdp"
-                app:layout_constraintBottom_toTopOf="@id/body_location"
-                app:layout_constraintEnd_toStartOf="@+id/is_location_access"
+                app:layout_constraintBottom_toTopOf="@id/body_notification"
+                app:layout_constraintEnd_toStartOf="@+id/is_notification_access"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/is_location_access"
+                android:id="@+id/is_notification_access"
                 style="@style/TextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,24 +156,24 @@
                 app:trackTint="@color/ic_switch_track_tint" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/body_location"
+                android:id="@+id/body_notification"
                 style="@style/TextRegular"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_2sdp"
                 android:gravity="start|center_vertical"
-                android:text="To show accurate GPS coordinates, address, and map on your photos."
-                android:textSize="@dimen/_9ssp"
-                app:layout_constraintEnd_toEndOf="@+id/text_location"
+                android:text="Stay updated with important notifications and alerts."
+                android:textSize="@dimen/_8ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_notification"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_location" />
+                app:layout_constraintTop_toBottomOf="@+id/text_notification" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/card_storage_permission"
+            android:id="@+id/card_overlay_permission"
             android:layout_width="@dimen/_0sdp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_16sdp"
             android:background="@drawable/ic_bg_rounded_12sdp"
             android:backgroundTint="@color/colorCardBackground"
             android:padding="@dimen/_12sdp"
@@ -182,21 +182,21 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_storage"
+                android:id="@+id/text_overlay"
                 style="@style/TextSemiBold"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:gravity="start|center_vertical"
-                android:text="Storage / Media Access"
+                android:text="Display Over Other Apps"
                 android:layout_marginEnd="@dimen/_8sdp"
                 android:textSize="@dimen/_14ssp"
-                app:layout_constraintBottom_toTopOf="@id/body_storage"
-                app:layout_constraintEnd_toStartOf="@+id/is_storage_access"
+                app:layout_constraintBottom_toTopOf="@id/body_overlay"
+                app:layout_constraintEnd_toStartOf="@+id/is_overlay_access"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/is_storage_access"
+                android:id="@+id/is_overlay_access"
                 style="@style/TextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -210,17 +210,17 @@
                 app:trackTint="@color/ic_switch_track_tint" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/body_storage"
+                android:id="@+id/body_overlay"
                 style="@style/TextRegular"
                 android:layout_width="@dimen/_0sdp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_2sdp"
                 android:gravity="start|center_vertical"
-                android:text="Store photos and videos securely on your device."
-                android:textSize="@dimen/_9ssp"
-                app:layout_constraintEnd_toEndOf="@+id/text_storage"
+                android:text="Allow overlay to show alerts on top of other apps."
+                android:textSize="@dimen/_8ssp"
+                app:layout_constraintEnd_toEndOf="@+id/text_overlay"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_storage" />
+                app:layout_constraintTop_toBottomOf="@+id/text_overlay" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.checkbox.MaterialCheckBox

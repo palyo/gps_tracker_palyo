@@ -107,15 +107,32 @@ class PaintOverlayRenderer(
         }
 
         val maxTextWidth = cardRight - textLeft - padding
-        val addressLines = wrapText(state.address, addressPaint, maxTextWidth)
+        val addressText = state.address.ifBlank {
+            context.getString(R.string.label_unknown_location)
+        }
+        val addressLines = wrapText(addressText, addressPaint, maxTextWidth)
 
         for (line in addressLines.take(2)) {
             canvas.drawText(line, textLeft, y, addressPaint)
             y += addressPaint.textSize + rowGap / 2
         }
 
-        drawText(canvas, "Latitude", textLeft, y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontSemiBold)
-        drawText(canvas, "Longitude", textLeft + context.dimen(com.intuit.sdp.R.dimen._80sdp), y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontSemiBold)
+        drawText(
+            canvas,
+            context.getString(R.string.label_latitude),
+            textLeft,
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontSemiBold
+        )
+        drawText(
+            canvas,
+            context.getString(R.string.label_longitude),
+            textLeft + context.dimen(com.intuit.sdp.R.dimen._80sdp),
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontSemiBold
+        )
         y += context.dimen(com.intuit.sdp.R.dimen._4sdp) + rowGap
 
         drawText(canvas, "%.6f".format(state.lat), textLeft, y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontRegular)
@@ -125,15 +142,44 @@ class PaintOverlayRenderer(
         val nowMillis = state.startTimeMillis + (presentationTimeUs / 1000L)
         val (localTime, gmtTime) = formatTime(nowMillis)
 
-        drawText(canvas, "Local: $localTime}", textLeft, y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontMedium)
-        drawText(canvas, "Altitude: ${state.altitudeMeters ?: "N/A"}", textLeft + context.dimen(com.intuit.sdp.R.dimen._80sdp), y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontMedium)
+        val altitudeValue = state.altitudeMeters?.toString() ?: context.getString(R.string.label_not_available)
+        drawText(
+            canvas,
+            context.getString(R.string.format_local_time, localTime),
+            textLeft,
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontMedium
+        )
+        drawText(
+            canvas,
+            context.getString(R.string.format_altitude, altitudeValue),
+            textLeft + context.dimen(com.intuit.sdp.R.dimen._80sdp),
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontMedium
+        )
         y += context.dimen(com.intuit.sdp.R.dimen._2sdp) + rowGap
 
-        drawText(canvas, "GMT: ${gmtTime}", textLeft, y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontMedium)
+        drawText(
+            canvas,
+            context.getString(R.string.format_gmt_time, gmtTime),
+            textLeft,
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontMedium
+        )
         drawText(canvas, state.date, textLeft + context.dimen(com.intuit.sdp.R.dimen._80sdp), y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontMedium)
         y += context.dimen(com.intuit.sdp.R.dimen._2sdp) + rowGap
 
-        drawText(canvas, "Captured by: ${context.getString(R.string.app_name)}", textLeft, y, context.dimen(com.intuit.ssp.R.dimen._6ssp), fontMedium)
+        drawText(
+            canvas,
+            context.getString(R.string.format_captured_by, context.getString(R.string.app_name)),
+            textLeft,
+            y,
+            context.dimen(com.intuit.ssp.R.dimen._6ssp),
+            fontMedium
+        )
     }
 
     private fun formatTime(nowMillis: Long): Pair<String, String> {

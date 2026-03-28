@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io
 
+import aanibrothers.tracker.io.afterCall.PostCallApplication
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewAppOpen
@@ -19,7 +20,7 @@ import coder.apps.space.library.extension.THEME
 import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
 
-class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
+class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
     companion object {
 
         var isOpenInter = false
@@ -87,10 +88,10 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val navigationChannel = NotificationChannel(
                 "navigation_channel",
-                "Navigation",
+                getString(R.string.channel_navigation_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Channel for navigation"
+                description = getString(R.string.channel_navigation_description)
             }
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(navigationChannel)

@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 11
         versionName = "1.4"

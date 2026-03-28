@@ -149,7 +149,7 @@ class LocationsActivity :
                 address.countryName
             ).joinToString(", ")
         } else {
-            "Unknown location"
+            getString(R.string.label_unknown_location)
         }
 
         binding?.apply {

@@ -56,4 +56,14 @@
         <item name="android:color">#001F1D2B</item>
     </style>
 
+    <style name="Theme.SlideAnimWindow" parent="@style/Theme.Tracker">
+        <item name="android:windowAnimationStyle">@style/SlideAnimation</item>
+    </style>
+    <style name="SlideAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/post_slide_from_bottom</item>
+        <item name="android:activityOpenExitAnimation">@anim/post_none</item>
+        <item name="android:activityCloseEnterAnimation">@anim/post_none</item>
+        <item name="android:activityCloseExitAnimation">@anim/post_slide_to_bottom</item>
+    </style>
+
 </resources>

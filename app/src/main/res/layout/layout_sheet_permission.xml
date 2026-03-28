@@ -21,6 +21,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:strokeWidth="@dimen/_0sdp" />
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        app:srcCompat="@drawable/ic_caller_permission_vector"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:id="@+id/sheet_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drag_handle"/>
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/text_title"
         style="@style/TextBold"
@@ -32,7 +42,7 @@
         android:textSize="@dimen/_16ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/drag_handle" />
+        app:layout_constraintTop_toBottomOf="@+id/sheet_icon" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/text_description"
@@ -81,7 +91,7 @@
         app:backgroundTint="@color/colorCardBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_remove" />
+        app:layout_constraintTop_toBottomOf="@+id/action_positive" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

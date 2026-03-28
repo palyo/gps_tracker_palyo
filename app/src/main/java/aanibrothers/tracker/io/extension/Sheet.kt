@@ -423,6 +423,7 @@ fun Activity.viewPermission(
     body: String,
     positiveButton: String,
     isNegativeButton: Boolean,
+    isIconShown: Boolean? = false,
     listener: (Boolean) -> Unit
 ) {
     val dialog =
@@ -436,6 +437,7 @@ fun Activity.viewPermission(
     }
 
     with(bindDialog) {
+        sheetIcon.beVisibleIf(isIconShown == true)
         textTitle.text = title
         textDescription.text = body
         actionPositive.text = positiveButton

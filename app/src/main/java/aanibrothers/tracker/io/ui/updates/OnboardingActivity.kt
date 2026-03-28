@@ -3,7 +3,7 @@ package aanibrothers.tracker.io.ui.updates
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityOnboardingBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
-import aanibrothers.tracker.io.extension.SCREEN_PERMISSION
+import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +12,6 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
-import coder.apps.space.library.extension.hasPermissions
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 
@@ -39,7 +38,7 @@ class OnboardingActivity :
                 updateTabs()
             } else {
                 tinyDB?.putBoolean(IS_INTRO_ENABLED, false)
-                if (!hasPermissions(SCREEN_PERMISSION)) {
+                if (!hasRequiredAppPermissions()) {
                     go(AppPermissionActivity::class.java, finish = true)
                     return@setOnClickListener
                 }

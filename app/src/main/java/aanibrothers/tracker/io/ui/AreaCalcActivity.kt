@@ -56,7 +56,7 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.containsValue(false)) {
             incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-            Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_location_permission_required), Toast.LENGTH_SHORT).show()
         } else {
             enableMyLocation()
         }

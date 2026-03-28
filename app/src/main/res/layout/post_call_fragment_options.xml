@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="12dp"
+    android:paddingBottom="8dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:background="@drawable/ic_bg_rounded_12sdp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:paddingLeft="6dp"
+            android:paddingTop="2dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="2dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/edit_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/post_ic_post_call_edit"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/edit_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="14dp"
+                android:text="Edit Contact"
+                android:textColor="@color/colorText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_icon"
+                app:layout_constraintEnd_toStartOf="@+id/edit_icon_arrow"
+                app:layout_constraintStart_toEndOf="@+id/edit_icon"
+                app:layout_constraintTop_toTopOf="@+id/edit_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/edit_icon_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:tint="@color/colorTextOpacity"
+                android:src="@drawable/post_ic_next_post_call"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/edit_icon" />
+
+            <View
+                android:id="@+id/edit_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="12dp"
+                android:background="@color/colorInverseCardBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/message_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/post_ic_post_call_message"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_view" />
+
+            <TextView
+                android:id="@+id/message_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="14dp"
+                android:text="Messages"
+                android:textColor="@color/colorText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/message_icon"
+                app:layout_constraintEnd_toStartOf="@+id/message_txt_arrow"
+                app:layout_constraintStart_toEndOf="@+id/message_icon"
+                app:layout_constraintTop_toTopOf="@+id/message_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/message_txt_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:tint="@color/colorTextOpacity"
+                android:src="@drawable/post_ic_next_post_call"
+                app:layout_constraintBottom_toBottomOf="@+id/message_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/message_icon" />
+
+            <View
+                android:id="@+id/message_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="12dp"
+                android:background="@color/colorInverseCardBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/message_icon" />
+
+            <ImageView
+                android:id="@+id/mail_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/post_ic_post_call_email"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/message_view" />
+
+            <TextView
+                android:id="@+id/mail_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="14dp"
+                android:text="Sent Mail"
+                android:textColor="@color/colorText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/mail_icon"
+                app:layout_constraintEnd_toStartOf="@+id/mail_txt_arrow"
+                app:layout_constraintStart_toEndOf="@+id/mail_icon"
+                app:layout_constraintTop_toTopOf="@+id/mail_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/mail_txt_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:tint="@color/colorTextOpacity"
+                android:src="@drawable/post_ic_next_post_call"
+                app:layout_constraintBottom_toBottomOf="@+id/mail_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/mail_icon" />
+
+            <View
+                android:id="@+id/mail_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="12dp"
+                android:background="@color/colorInverseCardBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mail_icon" />
+
+            <ImageView
+                android:id="@+id/calendar_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/post_ic_post_call_calendar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mail_view" />
+
+            <TextView
+                android:id="@+id/calendar_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="14dp"
+                android:text="Calendar"
+                android:textColor="@color/colorText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/calendar_icon"
+                app:layout_constraintEnd_toStartOf="@+id/calendar_txt_arrow"
+                app:layout_constraintStart_toEndOf="@+id/calendar_icon"
+                app:layout_constraintTop_toTopOf="@+id/calendar_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/calendar_txt_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:tint="@color/colorTextOpacity"
+                android:src="@drawable/post_ic_next_post_call"
+                app:layout_constraintBottom_toBottomOf="@+id/calendar_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/calendar_icon" />
+
+            <View
+                android:id="@+id/calendar_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="12dp"
+                android:background="@color/colorInverseCardBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/calendar_icon" />
+
+            <ImageView
+                android:id="@+id/web_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/post_ic_post_call_browser"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/calendar_view" />
+
+            <TextView
+                android:id="@+id/web_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="14dp"
+                android:text="Web"
+                android:textColor="@color/colorText"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/web_icon"
+                app:layout_constraintEnd_toStartOf="@+id/web_txt_arrow"
+                app:layout_constraintStart_toEndOf="@+id/web_icon"
+                app:layout_constraintTop_toTopOf="@+id/web_icon" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/web_txt_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:tint="@color/colorTextOpacity"
+                android:src="@drawable/post_ic_next_post_call"
+                app:layout_constraintBottom_toBottomOf="@+id/web_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/web_icon" />
+
+            <View
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="12dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/web_icon" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

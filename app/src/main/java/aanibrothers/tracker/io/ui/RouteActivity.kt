@@ -54,7 +54,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.containsValue(false)) {
             incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-            Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_location_permission_required), Toast.LENGTH_SHORT).show()
         } else {
             enableMyLocation()
         }
@@ -78,6 +78,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
     }
 
     private fun ActivityRoutesBinding.setupSuggestionAdapter() {
+        val yourLocationLabel = getString(R.string.label_your_location)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@RouteActivity, RecyclerView.VERTICAL, false)
             suggestionLocationAdapter = SuggestionLocationAdapter(this@RouteActivity) {
@@ -86,13 +87,13 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
                     cardSuggestedResult.beGone()
                     addMarker(LatLng(it.latitude, it.longitude), isSource)
                     moveToLocation(LatLng(it.latitude, it.longitude))
-                    if (it.featureName == "Your location") editSearchSource.setText("Your location")
+                    if (it.featureName == yourLocationLabel) editSearchSource.setText(yourLocationLabel)
                 } else {
                     hideKeyboard(editSearchDestination)
                     cardSuggestedResult.beGone()
                     addMarker(LatLng(it.latitude, it.longitude), isSource)
                     moveToLocation(LatLng(it.latitude, it.longitude))
-                    if (it.featureName == "Your location") editSearchDestination.setText("Your location")
+                    if (it.featureName == yourLocationLabel) editSearchDestination.setText(yourLocationLabel)
                 }
             }
             adapter = suggestionLocationAdapter
@@ -100,6 +101,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
     }
 
     override fun ActivityRoutesBinding.initListeners() {
+        val yourLocationLabel = getString(R.string.label_your_location)
         mapStyle.setOnClickListener {
             googleMap?.apply {
                 viewMapStylingSheet(
@@ -162,7 +164,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
             cardSuggestedResult.beVisibleIf(hasFocus)
         }
         editSearchDestination.setOnFocusChangeListener { v, hasFocus ->
-            if (editSearchSource.text.toString() != "Your location") {
+            if (editSearchSource.text.toString() != yourLocationLabel) {
                 cardSuggestedResult.beVisibleIf(hasFocus)
             }
         }
@@ -511,9 +513,15 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
 
     override fun onPoiClick(poi: PointOfInterest) {
         Toast.makeText(
-            this, """Clicked: ${poi.name}
-            Place ID:${poi.placeId}
-            Latitude:${poi.latLng.latitude} Longitude:${poi.latLng.longitude}""", Toast.LENGTH_SHORT
+            this,
+            getString(
+                R.string.message_poi_clicked,
+                poi.name,
+                poi.placeId,
+                poi.latLng.latitude,
+                poi.latLng.longitude
+            ),
+            Toast.LENGTH_SHORT
         ).show()
     }
 

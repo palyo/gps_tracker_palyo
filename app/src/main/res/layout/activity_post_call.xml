@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:layoutDirection="locale">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@color/colorTextOpacity24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/caller_app_icon"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/_10sdp"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/caller_icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="33dp"
+        android:padding="@dimen/_2sdp"
+        android:src="@drawable/post_circle_background_post_call"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/caller_person"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="33dp"
+        android:padding="@dimen/_16sdp"
+        android:src="@drawable/post_ic_people_vector_post_call"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/caller_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:text="@string/private_number"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_16sdp"
+        app:layout_constraintEnd_toStartOf="@+id/caller_app_icon"
+        app:layout_constraintStart_toEndOf="@+id/caller_icon"
+        app:layout_constraintTop_toTopOf="@+id/caller_icon" />
+
+    <View
+        android:id="@+id/space_view"
+        android:layout_width="100dp"
+        android:layout_height="10dp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        app:layout_constraintStart_toEndOf="@+id/caller_icon"
+        app:layout_constraintTop_toBottomOf="@+id/caller_name" />
+
+    <TextView
+        android:id="@+id/caller_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_6sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_14sdp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/caller_icon"
+        app:layout_constraintTop_toBottomOf="@+id/space_view" />
+
+    <TextView
+        android:id="@+id/caller_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/caller_time"
+        app:layout_constraintStart_toEndOf="@+id/caller_time"
+        app:layout_constraintTop_toTopOf="@+id/caller_time" />
+
+    <TextView
+        android:id="@+id/caller_duration_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:text="@string/label_duration"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintStart_toEndOf="@+id/caller_icon"
+        app:layout_constraintTop_toBottomOf="@+id/caller_time" />
+
+    <TextView
+        android:id="@+id/caller_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:text="00:00"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/caller_duration_txt"
+        app:layout_constraintStart_toEndOf="@+id/caller_duration_txt"
+        app:layout_constraintTop_toTopOf="@+id/caller_duration_txt" />
+
+    <ImageView
+        android:id="@+id/mobile_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:src="@drawable/post_ic_call_post_call"
+        app:layout_constraintBottom_toBottomOf="@+id/caller_duration_txt"
+        app:layout_constraintEnd_toEndOf="@+id/caller_app_icon"
+        app:layout_constraintStart_toStartOf="@+id/caller_app_icon"
+        app:layout_constraintTop_toTopOf="@+id/caller_time" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tb_caller_category"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caller_duration"
+        app:tabIconTint="@color/colorAccentTool"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorColor="@color/colorAccentTool"
+        app:tabIndicatorFullWidth="true"
+        app:tabMode="fixed"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextColor="@color/colorAccentTool" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardView_native"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_caller_category" />
+
+    <LinearLayout
+        android:id="@+id/cardView_native"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeWidth="0dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="@dimen/_4sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
+            android:background="@color/colorTextOpacity" />
+
+        <FrameLayout
+            android:id="@+id/frame_native"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorCardBackground"
+            android:gravity="center"
+            android:orientation="vertical" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,12 +1,13 @@
 package aanibrothers.tracker.io.helper
 
+import aanibrothers.tracker.io.ui.updates.AppPermissionActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import android.os.Message
 import android.provider.Settings
 import coder.apps.space.library.helper.LeakGuardHandlerWrapper
 
-class HandleSettingPreview internal constructor(activity: HomeActivity) :
-        LeakGuardHandlerWrapper<HomeActivity>(activity) {
+class HandleSettingPreview internal constructor(activity: AppPermissionActivity) :
+        LeakGuardHandlerWrapper<AppPermissionActivity>(activity) {
 
         fun cancelPollingImeSettings() {
             removeMessages(0)

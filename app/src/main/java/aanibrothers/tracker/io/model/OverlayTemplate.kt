@@ -15,7 +15,7 @@ fun getSelectedTemplate(context: Context): OverlayTemplate {
     }
 }
 data class OverlayState(
-    val address: String = "Unknown",
+    val address: String = "",
     val lat: Double = 0.0,
     val lng: Double = 0.0,
     val altitudeMeters: Double? = null,
@@ -24,4 +24,3 @@ data class OverlayState(
     val date: String = "",
     val startTimeMillis: Long = System.currentTimeMillis()
 )
-

@@ -1,5 +1,8 @@
 package aanibrothers.tracker.io.extension
 
+import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.R
+
 import android.content.*
 import android.location.*
 import android.net.*
@@ -69,15 +72,15 @@ fun calculateDistance(currentLatLng: LatLng, markerLatLng: LatLng): String {
     val distanceInMeters = results[0]
     "Distance".log("Distance: ${distanceInMeters} meters")
     val distanceInKm = distanceInMeters / 1000
-    return "$distanceInKm km"
+    return App.getAppContext().getString(R.string.format_distance_km, distanceInKm)
 }
 
 fun Context.shareLocation(latLong: LatLng) {
     val locationLink = "https://www.google.com/maps?q=${latLong.latitude},${latLong.longitude}"
     Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, "Check out this location: $locationLink")
-        startActivity(Intent.createChooser(this, "Share location via"))
+        putExtra(Intent.EXTRA_TEXT, getString(R.string.message_share_location, locationLink))
+        startActivity(Intent.createChooser(this, getString(R.string.chooser_share_location)))
     }
 }
 
@@ -95,10 +98,10 @@ fun Context.navigateLocation(currentLatLng: LatLng?, markerLatLng: LatLng?) {
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
         } else {
-            Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_google_maps_not_installed), Toast.LENGTH_SHORT).show()
         }
     } catch (e: ActivityNotFoundException) {
-        Toast.makeText(this, "No app found to handle maps", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.toast_no_maps_app_found), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -114,10 +117,10 @@ fun Context.navigateLocationByPlace(origin: String?, destination: String?) {
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
         } else {
-            Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_google_maps_not_installed), Toast.LENGTH_SHORT).show()
         }
     } catch (e: ActivityNotFoundException) {
-        Toast.makeText(this, "No app found to handle maps", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.toast_no_maps_app_found), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -128,7 +131,7 @@ fun Context.searchPlaceInGoogleMaps(query: String) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
-        Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.toast_google_maps_not_installed), Toast.LENGTH_SHORT).show()
     }
 }
 

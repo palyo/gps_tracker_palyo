@@ -93,7 +93,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.containsValue(false)) {
                 incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-                Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_location_permission_required), Toast.LENGTH_SHORT).show()
             } else {
                 enableMyLocation()
             }
@@ -102,7 +102,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.containsValue(false)) {
                 incrementPermissionsDeniedCount("MICROPHONE")
-                Toast.makeText(this, "Microphone permission required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_microphone_permission_required), Toast.LENGTH_SHORT).show()
             } else {
                 startVoiceInput()
             }
@@ -229,7 +229,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
                     RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                 )
-                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the place name...")
+                putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.prompt_speak_place_name))
             }
             speakLauncher.launch(intent)
         } else {
@@ -239,7 +239,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
             } else {
                 Toast.makeText(
                     this@MapActivity,
-                    "Need Microphone permission enable manually..",
+                    getString(R.string.toast_microphone_permission_manual),
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -359,7 +359,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
             } else {
                 Toast.makeText(
                     this@MapActivity,
-                    "Need location permission enable manually..",
+                    getString(R.string.toast_location_permission_manual),
                     Toast.LENGTH_SHORT
                 ).show()
 

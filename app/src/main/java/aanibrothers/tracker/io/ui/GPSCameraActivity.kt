@@ -73,7 +73,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.containsValue(false)) {
                 incrementPermissionsDeniedCount("PERMISSION_LOCATION")
-                Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_location_permission_required), Toast.LENGTH_SHORT).show()
             } else {
                 binding?.initExtra()
             }
@@ -84,7 +84,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
             if (allGranted) {
                 binding?.initExtra()
             } else {
-                Toast.makeText(this, "Camera & Location permissions required", Toast.LENGTH_SHORT)
+                Toast.makeText(this, getString(R.string.toast_camera_location_permissions_required), Toast.LENGTH_SHORT)
                     .show()
                 incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
             }
@@ -97,14 +97,14 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
     override fun ActivityGpsCameraBinding.initExtra() {
         if (hasPermissions(LOCATION_PERMISSION + arrayOf(Manifest.permission.CAMERA))) {
             permissionLayout.beGone()
-            textAddress.text = "Fetching.."
+            textAddress.text = getString(R.string.label_fetching)
             delayed(1000L) {
                 setupLocation()
             }
             setupCamera()
             val filesList = (File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                "GPS Camera"
+                getString(R.string.folder_gps_camera)
             ).listFiles()?.toMutableList() ?: mutableListOf())
             filesList.sortByDescending { it.lastModified() }
             if (filesList.isNotEmpty()) {
@@ -189,7 +189,11 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
                                 binding?.apply {
                                     layoutMapDetail.beVisible()
                                     textAddress.text = mergedLocation
-                                    textLatlong.text = "${location.latitude}, ${location.longitude}"
+                                    textLatlong.text = getString(
+                                        R.string.format_lat_lng_plain,
+                                        location.latitude,
+                                        location.longitude
+                                    )
                                 }
                             }
                         }
@@ -300,7 +304,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
         } catch (exc: Exception) {
             Toast.makeText(
                 this@GPSCameraActivity,
-                "Camera binding failed",
+                getString(R.string.toast_camera_binding_failed),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -348,7 +352,8 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
         buttonCapture.disable()
         progressBar.beVisible()
         val outputDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "GPS Camera"
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+            getString(R.string.folder_gps_camera)
         ).apply { mkdirs() }
         val photoFile = File(
             outputDir,
@@ -362,9 +367,10 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
             ContextCompat.getMainExecutor(this@GPSCameraActivity),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
+                    val errorMessage = exc.message ?: getString(R.string.label_unknown)
                     Toast.makeText(
                         this@GPSCameraActivity,
-                        "Error: ${exc.message}",
+                        getString(R.string.message_camera_error, errorMessage),
                         Toast.LENGTH_SHORT
                     ).show()
 

@@ -1,53 +1,48 @@
 package aanibrothers.tracker.io.ui.updates
 
+import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.databinding.ActivityAppPermissionBinding
+import aanibrothers.tracker.io.extension.isGrantedOverlay
+import aanibrothers.tracker.io.helper.HandleSettingPreview
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.beGone
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.hasPermission
 import coder.apps.space.library.extension.hasPermissions
-import androidx.core.content.edit
 
 class AppPermissionActivity :
     BaseActivity<ActivityAppPermissionBinding>(ActivityAppPermissionBinding::inflate) {
 
+    private var handlerSettingOverLay: HandleSettingPreview? = null
     private val maxDeniedCount = 1
 
-    private val allPermissions by lazy {
-        arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            *storagePermissions()
-        )
-    }
-
-    private fun storagePermissions(): Array<String> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            emptyArray()
+    private val phonePermissions = arrayOf(Manifest.permission.READ_PHONE_STATE)
+    private val notificationPermissions =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            emptyArray()
         }
+
+    private val allPermissions by lazy {
+        buildList {
+            add(Manifest.permission.READ_PHONE_STATE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }.toTypedArray()
     }
-
-    private val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
-
-    private val locationPermissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    )
 
     private val permissionKeyMap = mapOf(
-        Manifest.permission.CAMERA to "camera",
-        Manifest.permission.ACCESS_FINE_LOCATION to "location",
-        Manifest.permission.ACCESS_COARSE_LOCATION to "location",
-        Manifest.permission.WRITE_EXTERNAL_STORAGE to "storage"
+        Manifest.permission.READ_PHONE_STATE to "phone_state",
+        Manifest.permission.POST_NOTIFICATIONS to "post_notifications"
     )
 
     private val requestPermissionsLauncher =
@@ -61,6 +56,11 @@ class AppPermissionActivity :
                 }
             }
 
+            if (allRuntimeGranted() && !isGrantedOverlay()) {
+                openOverlaySettings()
+                return@registerForActivityResult
+            }
+
             if (allGranted()) {
                 go(HomeActivity::class.java)
             }
@@ -68,43 +68,49 @@ class AppPermissionActivity :
 
     override fun ActivityAppPermissionBinding.initView() {
         updateSwitchStates()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            cardStoragePermission.beGone()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            cardNotificationPermission.beGone()
         }
     }
 
-    override fun ActivityAppPermissionBinding.initExtra() {}
+    override fun ActivityAppPermissionBinding.initExtra() {
+        handlerSettingOverLay = HandleSettingPreview(this@AppPermissionActivity)
+    }
 
     override fun ActivityAppPermissionBinding.initListeners() {
-        isCameraAccess.setOnClickListener {
-            if (hasPermissions(cameraPermissions)) {
-                isCameraAccess.isChecked = true
+        isPhoneAccess.setOnClickListener {
+            if (hasPermissions(phonePermissions)) {
+                isPhoneAccess.isChecked = true
                 return@setOnClickListener
             }
-            requestWithLimit("camera", cameraPermissions)
+            requestWithLimit("phone_state", phonePermissions)
         }
 
-        isLocationAccess.setOnClickListener {
-            if (hasPermissions(locationPermissions)) {
-                isLocationAccess.isChecked = true
+        isNotificationAccess.setOnClickListener {
+            if (notificationPermissions.isEmpty()) {
+                isNotificationAccess.isChecked = true
                 return@setOnClickListener
             }
-            requestWithLimit("location", locationPermissions)
+            if (hasPermissions(notificationPermissions)) {
+                isNotificationAccess.isChecked = true
+                return@setOnClickListener
+            }
+            requestWithLimit("post_notifications", notificationPermissions)
         }
 
-        isStorageAccess.setOnClickListener {
-            if (storagePermissions().isEmpty()) {
-                isStorageAccess.isChecked = true
+        isOverlayAccess.setOnClickListener {
+            if (isGrantedOverlay()) {
+                isOverlayAccess.isChecked = true
                 return@setOnClickListener
             }
-            requestWithLimit("storage", storagePermissions())
+            openOverlaySettings()
         }
 
         buttonContinue.setOnClickListener {
-            if (!allGranted()) {
-                requestWithLimit("all", allPermissions)
-            } else {
-                go(HomeActivity::class.java)
+            when {
+                !allRuntimeGranted() -> requestWithLimit("all", allPermissions)
+                !isGrantedOverlay() -> openOverlaySettings()
+                else -> go(HomeActivity::class.java)
             }
         }
     }
@@ -112,28 +118,46 @@ class AppPermissionActivity :
     override fun onResume() {
         super.onResume()
         updateSwitchStates()
+        if (allGranted()) {
+            go(HomeActivity::class.java)
+        }
     }
 
     private fun updateSwitchStates() {
         binding?.apply {
-            isCameraAccess.isChecked = hasPermissions(cameraPermissions)
-            isLocationAccess.isChecked = hasPermissions(locationPermissions)
-            isStorageAccess.isChecked =
-                storagePermissions().isEmpty() || hasPermissions(storagePermissions())
+            isPhoneAccess.isChecked = hasPermissions(phonePermissions)
+            isNotificationAccess.isChecked =
+                notificationPermissions.isEmpty() || hasPermissions(notificationPermissions)
+            isOverlayAccess.isChecked = isGrantedOverlay()
         }
     }
 
-    private fun allGranted(): Boolean {
+    private fun allRuntimeGranted(): Boolean {
         return allPermissions.all { hasPermission(it) }
     }
 
+    private fun allGranted(): Boolean {
+        return allRuntimeGranted() && isGrantedOverlay()
+    }
+
     private fun requestWithLimit(key: String, permissions: Array<String>) {
+        if (permissions.isEmpty()) return
+
         val deniedCount = getDeniedCount(key)
         if (deniedCount <= maxDeniedCount) {
             requestPermissionsLauncher.launch(permissions)
         } else {
             openAppSettings()
         }
+    }
+
+    private fun openOverlaySettings() {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        handlerSettingOverLay?.startPollingImeSettings()
+        App.isOpenInter = true
+        startActivity(intent)
     }
 
     private fun openAppSettings() {
@@ -154,5 +178,15 @@ class AppPermissionActivity :
     private fun getDeniedCount(key: String): Int {
         return getSharedPreferences("permission_denials", MODE_PRIVATE)
             .getInt(key, 0)
+    }
+
+
+
+    fun invokeSetupWizardOfThisIme() {
+        handlerSettingOverLay?.cancelPollingImeSettings()
+        val intent = Intent()
+        intent.setClass(this@AppPermissionActivity, HomeActivity::class.java)
+        intent.flags = 606076928
+        startActivity(intent)
     }
 }

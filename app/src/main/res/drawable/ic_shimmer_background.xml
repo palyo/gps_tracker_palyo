@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#34C7CFFF" />
+    <solid android:color="@color/colorInverseCardBackground" />
     <padding
         android:bottom="@dimen/_1sdp"
         android:left="@dimen/_1sdp"

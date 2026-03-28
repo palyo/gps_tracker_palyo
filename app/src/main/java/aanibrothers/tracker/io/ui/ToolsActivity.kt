@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io.ui
 
+import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityToolsBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.isLocationEnabled
@@ -29,7 +30,7 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
             val allGranted = permissions.values.all { it }
             if (!allGranted) {
                 pendingAction = null
-                Toast.makeText(this, "Location permissions required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_location_permissions_required), Toast.LENGTH_SHORT).show()
                 incrementPermissionsDeniedCount("PERMISSION_LOCATION")
             } else {
                 pendingAction?.invoke()

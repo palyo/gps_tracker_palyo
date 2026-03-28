@@ -1,6 +1,7 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivitySettingsBinding
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.module.ConsentManager
@@ -19,13 +20,14 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
     override fun ActivitySettingsBinding.initListeners() {
         buttonLanguage.setOnClickListener { go(AppLanguageActivity::class.java, listOf(IS_SETTINGS to true), finish = true) }
         buttonShare.setOnClickListener {
-            val app = getString(aanibrothers.tracker.io.R.string.app_name)
+            val app = getString(R.string.app_name)
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(
-                    "android.intent.extra.TEXT", "$app\n\nOpen this Link on Play Store\n\nhttps://play.google.com/store/apps/details?id=${packageName}"
+                    Intent.EXTRA_TEXT,
+                    getString(R.string.message_share_app, app, packageName)
                 )
-                startActivity(Intent.createChooser(this, "Share Application"))
+                startActivity(Intent.createChooser(this, getString(R.string.chooser_share_app)))
             }
         }
         buttonPrivacy.setOnClickListener {

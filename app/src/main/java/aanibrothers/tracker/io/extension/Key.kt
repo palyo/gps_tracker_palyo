@@ -61,3 +61,4 @@ val VISIBILITY = mutableListOf(
 const val IS_SETTINGS = "is_settings"
 const val IS_LANGUAGE_ENABLED = "is_language_enabled"
 const val IS_INTRO_ENABLED = "is_intro_enabled"
+const val IS_SPLASH_AD_FAILED = "is_splash_ad_failed"

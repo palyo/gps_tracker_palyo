@@ -4,7 +4,8 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
-import aanibrothers.tracker.io.extension.SCREEN_PERMISSION
+import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
+import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.init
@@ -17,7 +18,6 @@ import android.os.Handler
 import android.util.Log
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
-import coder.apps.space.library.extension.hasPermissions
 import coder.apps.space.library.extension.isNetworkAvailable
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -67,11 +67,13 @@ class LauncherActivity :
 
                     override fun onAdDismissedFullScreenContent() {
                         mSplashInterstitialAd = null
+                        tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, false)
                         goNext()
                     }
 
                     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                         mSplashInterstitialAd = null
+                        tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, true)
                         goNext()
                     }
 
@@ -79,9 +81,11 @@ class LauncherActivity :
                     }
 
                     override fun onAdShowedFullScreenContent() {
+                        tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, false)
                     }
                 }
         } else {
+            tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, true)
             goNext()
         }
     }
@@ -92,7 +96,7 @@ class LauncherActivity :
             go(AppLanguageActivity::class.java, finish = true)
         } else if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
             go(OnboardingActivity::class.java, finish = true)
-        } else if (!hasPermissions(SCREEN_PERMISSION)) {
+        } else if (!hasRequiredAppPermissions()) {
             go(AppPermissionActivity::class.java, finish = true)
         } else {
             go(HomeActivity::class.java, finish = true)
@@ -121,6 +125,7 @@ class LauncherActivity :
                     Log.e("AdTiming", "SplashInter onAdFailedToLoad in $seconds seconds")
                     Log.e(TAG, "onAdFailedToLoad:SplashInter: ${adError.code} ${adError.message}")
                     mSplashInterstitialAd = null
+                    tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, true)
                 }
 
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
@@ -128,6 +133,7 @@ class LauncherActivity :
                     mSplashInterstitialAd = interstitialAd
                     Log.e("AdTiming", "SplashInter loaded in $seconds seconds")
                     Log.e(TAG, "onAdLoaded:SplashInter ")
+                    tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, false)
                 }
             })
     }

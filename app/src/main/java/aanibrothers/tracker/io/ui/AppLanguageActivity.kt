@@ -5,8 +5,10 @@ import aanibrothers.tracker.io.databinding.ActivityAppLanguageBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SETTINGS
-import aanibrothers.tracker.io.extension.SCREEN_PERMISSION
+import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
+import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.module.viewNativeMedium
+import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.ui.updates.AppPermissionActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import aanibrothers.tracker.io.ui.updates.OnboardingActivity
@@ -15,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import coder.apps.space.library.R
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
-import coder.apps.space.library.extension.hasPermissions
 import coder.apps.space.library.helper.currentLanguage
 import java.util.Locale
 
@@ -49,13 +50,23 @@ class AppLanguageActivity :
                 go(AppSettingsActivity::class.java, finish = true)
             } else {
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
-                if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
-                    go(OnboardingActivity::class.java, finish = true)
-                } else if (!hasPermissions(SCREEN_PERMISSION)) {
-                    go(AppPermissionActivity::class.java, finish = true)
-                    return@setOnClickListener
+                val continueFlow = {
+                    if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
+                        go(OnboardingActivity::class.java, finish = true)
+                    } else if (!hasRequiredAppPermissions()) {
+                        go(AppPermissionActivity::class.java, finish = true)
+                    } else {
+                        go(HomeActivity::class.java, finish = true)
+                    }
+                }
+
+                if (tinyDB?.getBoolean(IS_SPLASH_AD_FAILED, false) == true) {
+                    tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, false)
+                    viewInterAd {
+                        continueFlow()
+                    }
                 } else {
-                    go(HomeActivity::class.java, finish = true)
+                    continueFlow()
                 }
             }
         }
