@@ -96,7 +96,7 @@ class CompassActivity : BaseActivity<ActivityCompassBinding>(
         }
 
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

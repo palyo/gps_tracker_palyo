@@ -38,8 +38,8 @@ class PostCallNativeAds(var context: Context) {
             idNativeAds1 = "ca-app-pub-3940256099942544/2247696110"
             idNativeAds2 = "ca-app-pub-3940256099942544/2247696110"
         } else {
-            idNativeAds1 = "ca-app-pub-4852962457779682/8067119551"
-            idNativeAds2 = "ca-app-pub-4852962457779682/8067119551"
+            idNativeAds1 = "ca-app-pub-4852962457779682/4420084208"
+            idNativeAds2 = "ca-app-pub-4852962457779682/4420084208"
         }
     }
 

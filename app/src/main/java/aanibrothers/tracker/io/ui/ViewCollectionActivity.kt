@@ -20,26 +20,51 @@ import coder.apps.space.library.base.*
 import coder.apps.space.library.extension.*
 import kotlinx.coroutines.*
 import java.io.*
+import java.util.Locale
 
 class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(ActivityViewCollectionBinding::inflate) {
     private var fileAdapter: FilePagerAdapter? = null
     private var filesList: MutableList<File>? = mutableListOf()
     private var currentPos = 0
     private var isFullScreenView = false
+    private var initialFilePath: String? = null
+    private var targetDirectory: File? = null
     override fun ActivityViewCollectionBinding.initExtra() {
+        initialFilePath = intent?.getStringExtra(EXTRA_FILE_PATH)
+        val dirPath = intent?.getStringExtra(EXTRA_DIR)
+        targetDirectory = when {
+            !dirPath.isNullOrBlank() -> File(dirPath)
+            !initialFilePath.isNullOrBlank() -> File(initialFilePath!!).parentFile
+            else -> File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                getString(R.string.folder_gps_camera)
+            )
+        }
         setupAdapter()
         fetchData()
     }
 
     private fun fetchData() {
         CoroutineScope(Dispatchers.IO).launch {
-            filesList = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                getString(R.string.folder_gps_camera)
-            ).listFiles()?.toMutableList() ?: mutableListOf()
+            val directory = targetDirectory
+                ?.takeIf { it.exists() && it.isDirectory }
+                ?: File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                    getString(R.string.folder_gps_camera)
+                )
+            filesList = directory.listFiles { file ->
+                file.isFile && isImageFile(file)
+            }?.toMutableList() ?: mutableListOf()
             filesList?.sortByDescending { it.lastModified() }
             launch(Dispatchers.Main) {
+                val targetPath = initialFilePath
+                if (!targetPath.isNullOrBlank()) {
+                    val index = filesList?.indexOfFirst { it.absolutePath == targetPath } ?: -1
+                    if (index >= 0) currentPos = index
+                }
+                fileAdapter?.items?.clear()
                 fileAdapter?.addAll(filesList)
+                binding?.viewPager?.setCurrentItem(currentPos, false)
             }
         }
     }
@@ -60,7 +85,7 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
             super.onPageSelected(position)
             currentPos = position
             val file = filesList?.get(position)
-            binding?.toolbar?.title = file?.nameWithoutExtension
+            binding?.toolbar?.title = ""
         }
     }
 
@@ -147,7 +172,9 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
     }
 
     override fun ActivityViewCollectionBinding.initView() {
-        currentPos = intent?.getIntExtra("position", 0) ?: 0
+        if (initialFilePath.isNullOrBlank()) {
+            currentPos = intent?.getIntExtra("position", 0) ?: 0
+        }
         showSystemUi()
         window?.apply {
             statusBarColor = Color.TRANSPARENT
@@ -162,5 +189,15 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
         onBackPressedDispatcher.addCallback {
             finish()
         }
+    }
+
+    private fun isImageFile(file: File): Boolean {
+        val name = file.name.lowercase(Locale.getDefault())
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".webp")
+    }
+
+    companion object {
+        const val EXTRA_DIR = "extra_dir"
+        const val EXTRA_FILE_PATH = "extra_file_path"
     }
 }

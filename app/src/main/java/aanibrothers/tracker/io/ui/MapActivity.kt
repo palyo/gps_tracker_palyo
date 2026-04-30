@@ -16,7 +16,7 @@ import aanibrothers.tracker.io.extension.viewMapMarkerDetailsSheet
 import aanibrothers.tracker.io.extension.viewMapStylingSheet
 import aanibrothers.tracker.io.extension.viewMapVisibilitySheet
 import aanibrothers.tracker.io.extension.viewPinGuideSheet
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewInterAd
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -338,7 +338,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
         }
 
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

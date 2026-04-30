@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:elevation="@dimen/_10sdp"
+        android:padding="8dp"
+        android:src="@drawable/ic_navigation_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@android:color/black" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/submit_button"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingTop="48dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="24dp">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/illustration_image"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="@dimen/_100sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:adjustViewBounds="true"
+                app:lottie_autoPlay="true"
+                app:lottie_rawRes="@raw/feedback"
+                app:lottie_repeatCount="100"
+                app:lottie_repeatMode="reverse" />
+
+            <TextView
+                android:id="@+id/title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Send Us Some Feedback!"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/description_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_14sdp"
+                android:gravity="center"
+                android:text="found a bug? have a suggestion? fill out the form\nbelow and we'll take a look!"
+                android:textColor="#616161"
+                android:textSize="@dimen/_10ssp" />
+
+            <!-- Category Chips/Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <!-- Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:id="@+id/txt_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="Crashes &amp; Bugs"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txt_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="Suggestions"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txt_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="UI"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity=""
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:id="@+id/txt_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="Performance"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txt_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="Feature"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txt_6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_bg_rounded"
+                        android:backgroundTint="@color/ic_navigation_selector"
+                        android:gravity="center"
+                        android:minHeight="0dp"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="Others"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Feedback Input Field Hint -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Enter Your Feedback Here!(Min 6 Characters)"
+                android:textColor="#616161"
+                android:textSize="14sp" />
+
+            <!-- Placeholder for the actual multi-line input field -->
+            <EditText
+                android:id="@+id/feedback_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_rounded_corner_grey_stroke"
+                android:gravity="top"
+                android:hint="Type your feedback here..."
+                android:inputType="textMultiLine"
+                android:minHeight="180dp"
+                android:padding="8dp"
+                android:textColor="@android:color/black"
+                android:textColorHint="#BDBDBD" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit_button"
+        android:layout_width="match_parent"
+        style="@style/MaterialButtonAccent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_20sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="SUBMIT"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

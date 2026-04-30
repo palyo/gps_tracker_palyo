@@ -13,72 +13,28 @@ var Context.appOpenCount: Int
         TinyDB(this).putInt("appOpenCount", value)
     }
 
-var Context.currentAdLevel: Int
-    get() = TinyDB(this).getInt("currentAdLevel", 0)
-    set(value) {
-        TinyDB(this).putInt("currentAdLevel", value)
-    }
-
-fun Activity.init(callback: () -> Unit) {
-    val apiService = ApiClient(this).client?.create(ApiService::class.java)
-    val call = apiService?.getConfig("52_gpsmap/ad_manager.json")
-    call?.enqueue(object : Callback<ConfigJson> {
-        override fun onResponse(call: Call<ConfigJson>, response: Response<ConfigJson>) {
-            if (response.isSuccessful) {
-                response.body()?.let { habitJson ->
-                    setAppJson(habitJson)
-                    callback.invoke()
-                }
-            } else {
-                val recorderJson = appJson()
-                recorderJson?.let { initAds(it) }
-                callback.invoke()
-            }
-        }
-
-        override fun onFailure(call: Call<ConfigJson>, t: Throwable) {
-            val recorderJson = appJson()
-            recorderJson?.let { initAds(it) }
-            callback.invoke()
-        }
-    })
+fun getPolicyLink(): String {
+    return "https://sites.google.com/view/gpsmap-byaanibrothersinfotech/home"
 }
 
-fun Activity.setAppJson(appJson: ConfigJson) {
-    TinyDB(this).putObject("appJson", appJson)
-    initAds(appJson)
+fun getAdmobNativeId(): String {
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/2247696110" else "ca-app-pub-4852962457779682/7424288358"
 }
 
-fun Context.appJson(): ConfigJson? {
-    return TinyDB(this).getObject("appJson", ConfigJson::class.java)
+fun getAdmobInterId(): String {
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-4852962457779682/2228484186"
 }
 
-fun Context.getPolicyLink(): String {
-    return appJson()?.policyUrl ?: "https://privacy-and-policy-online.blogspot.com/2021/10/privacy-policy.html"
+fun getAdmobBannerId(): String {
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741" else "ca-app-pub-4852962457779682/9160041852"
 }
 
-fun Activity.initAds(appJson: ConfigJson) {
-    registerAppId(if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544~3347511713" else appJson.appId ?: "ca-app-pub-3940256099942544~3347511713")
+fun getAdmobBannerMRECId(): String {
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-4852962457779682/7450062871"
 }
 
-fun Context.getAdmobNativeId(): String {
-    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/2247696110" else appJson()?.nativeID ?: ""
-}
-
-fun Context.getAdmobInterId(): String {
-    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else appJson()?.interID ?: ""
-}
-
-fun Context.getAdmobBannerId(): String {
-    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741" else appJson()?.bannerID ?: ""
-}
-
-fun Context.getAdmobBannerMRECId(): String {
-    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else appJson()?.bannerMREC ?: "ca-app-pub-3940256099942544/6300978111"
-}
-
-fun Context.getAdmobOpenId(): String {
-    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9257395921" else appJson()?.openID ?: ""
+fun getAdmobOpenId(): String {
+    return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9257395921" else "ca-app-pub-4852962457779682/9453090865"
 }
 
 fun Activity.registerAppId(appId: String) {

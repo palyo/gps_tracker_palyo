@@ -28,3 +28,9 @@ fun Window.updateStatusBarIcons(isLight: Boolean) {
         decorView.requestApplyInsets()
     }
 }
+
+var Context.lastRatePromptDay: String
+    get() = TinyDB(this).getString("lastRatePromptDay", "")?:""
+    set(value) {
+        TinyDB(this).putString("lastRatePromptDay", value)
+    }

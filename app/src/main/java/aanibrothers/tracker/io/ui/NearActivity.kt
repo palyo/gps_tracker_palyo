@@ -46,7 +46,7 @@ class NearActivity : BaseActivity<ActivityNearBinding>(ActivityNearBinding::infl
         }
 
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

@@ -260,7 +260,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
             insets
         }
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

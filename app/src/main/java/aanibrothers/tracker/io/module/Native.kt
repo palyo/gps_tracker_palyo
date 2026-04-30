@@ -2,6 +2,7 @@ package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.databinding.AdUnifiedBannerBinding
 import aanibrothers.tracker.io.databinding.AdUnifiedMediumBinding
+import aanibrothers.tracker.io.databinding.AdUnifiedSmallBinding
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -77,11 +78,70 @@ fun Activity.viewNativeMedium(container: AdsView) {
     }
 }
 
+fun Activity.viewNativeSmall(container: AdsView) {
+    if (nativeAd != null) {
+        populateAdViewSmall(nativeAd, container = container)
+        preloadNative()
+    } else {
+        loadNative(object : OnNativeLoad {
+            override fun onLoad(nativeAd: NativeAd) {
+                populateAdViewSmall(nativeAd, container = container)
+                preloadNative()
+            }
+
+            override fun onFail() {
+            }
+        })
+    }
+}
+
 fun Context.populateAdViewMedium(unifiedNativeAd: NativeAd?, container: AdsView) {
     val layoutInflater: LayoutInflater = LayoutInflater.from(this)
     val binding = AdUnifiedMediumBinding.inflate(layoutInflater)
     binding.unified.iconView = binding.adAppIcon
     binding.unified.mediaView = binding.adMedia
+    binding.unified.headlineView = binding.adHeadline
+    binding.unified.bodyView = binding.adBody
+    binding.unified.callToActionView = binding.adCallToAction
+
+    binding.unified.starRatingView = binding.adStars
+    unifiedNativeAd?.starRating.let {
+        if (it != null && it > 0.0) (binding.unified.starRatingView as RatingBar?)?.rating = it.toFloat() else (binding.unified.starRatingView as RatingBar?)?.rating = 0.0f
+    }
+    (binding.unified.headlineView as TextView?)?.text = unifiedNativeAd?.headline
+    if (unifiedNativeAd?.body == null) {
+        binding.unified.bodyView?.visibility = View.INVISIBLE
+    } else {
+        binding.unified.bodyView?.visibility = View.VISIBLE
+        (binding.unified.bodyView as TextView?)?.text = unifiedNativeAd.body
+    }
+    if (unifiedNativeAd?.callToAction == null) {
+        binding.unified.callToActionView?.visibility = View.INVISIBLE
+    } else {
+        binding.unified.callToActionView?.visibility = View.VISIBLE
+        (binding.unified.callToActionView as TextView?)?.text = unifiedNativeAd.callToAction
+    }
+    if (unifiedNativeAd?.icon == null) {
+        binding.unified.iconView?.visibility = View.GONE
+    } else {
+        (binding.unified.iconView as ImageView?)?.setImageDrawable(unifiedNativeAd.icon?.drawable)
+        binding.unified.iconView?.visibility = View.VISIBLE
+    }
+    try {
+        if (unifiedNativeAd != null) {
+            binding.unified.setNativeAd(unifiedNativeAd)
+        }
+    } catch (e2: Exception) {
+        e2.printStackTrace()
+    }
+    container.removeAllViews()
+    container.addView(binding.root)
+}
+
+fun Context.populateAdViewSmall(unifiedNativeAd: NativeAd?, container: AdsView) {
+    val layoutInflater: LayoutInflater = LayoutInflater.from(this)
+    val binding = AdUnifiedSmallBinding.inflate(layoutInflater)
+    binding.unified.iconView = binding.adAppIcon
     binding.unified.headlineView = binding.adHeadline
     binding.unified.bodyView = binding.adBody
     binding.unified.callToActionView = binding.adCallToAction

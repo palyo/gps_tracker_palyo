@@ -25,26 +25,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text_app"
-            style="@style/TextExtraBold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="GPS"
-            android:textColor="#13194B"
-            android:textSize="@dimen/_22ssp"
-            app:layout_constraintBottom_toBottomOf="@id/icon_app"
-            app:layout_constraintEnd_toStartOf="@id/icon_app"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/icon_app"
             android:layout_width="@dimen/_100sdp"
             android:layout_height="@dimen/_100sdp"
             android:layout_marginStart="@dimen/_8sdp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/text_app"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_app_icon" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -52,11 +40,12 @@
             style="@style/TextExtraBold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:text="Camera Map"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:text="GPS Camera"
             android:textColor="#13194B"
             android:textSize="@dimen/_22ssp"
-            app:layout_constraintStart_toStartOf="@id/text_app"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/icon_app" />
 
         <com.google.android.material.textview.MaterialTextView

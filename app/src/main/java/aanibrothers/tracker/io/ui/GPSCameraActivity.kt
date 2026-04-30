@@ -4,7 +4,7 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityGpsCameraBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.findAddressFromLatLng
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeBanner
 import android.Manifest
 import android.annotation.SuppressLint
@@ -412,7 +412,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
         updateNavigationBarColor(R.color.colorTransparent)
 
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

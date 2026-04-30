@@ -2,7 +2,6 @@ package aanibrothers.tracker.io.module
 
 import android.app.*
 import android.content.*
-import android.os.*
 import android.util.Log
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.*
@@ -67,18 +66,6 @@ private fun Activity.displayInter(listener: ((result: Boolean) -> Unit)? = null)
 
             }
         }
-    }
-}
-
-
-fun Activity.viewInterAdWithLogic(listener: ((result: Boolean) -> Unit)? = null) {
-    currentAdLevel++
-    if (currentAdLevel % 2 == 0) {
-        viewInterAd {
-            listener?.invoke(true)
-        }
-    } else {
-        listener?.invoke(true)
     }
 }
 

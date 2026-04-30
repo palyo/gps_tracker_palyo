@@ -28,7 +28,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tracker"
+        tools:replace="android:label"
         tools:targetApi="UPSIDE_DOWN_CAKE">
+        <activity
+            android:name=".ui.updates.PromptActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Space.Prompt" />
         <activity
             android:name=".ui.updates.AppPermissionActivity"
             android:exported="false" />
@@ -53,12 +58,14 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"
+            android:value="ca-app-pub-4852962457779682~5605383182"
             tools:replace="android:value" />
         <meta-data
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="false" />
-
+        <activity
+            android:name=".ui.updates.FeedbackActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.LauncherActivity"
             android:exported="true"

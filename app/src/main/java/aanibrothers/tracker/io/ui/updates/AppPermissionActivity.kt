@@ -8,6 +8,7 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
@@ -158,6 +159,9 @@ class AppPermissionActivity :
         handlerSettingOverLay?.startPollingImeSettings()
         App.isOpenInter = true
         startActivity(intent)
+        Handler(mainLooper).postDelayed({
+            startActivity(Intent(this, PromptActivity::class.java))
+        }, 300L)
     }
 
     private fun openAppSettings() {

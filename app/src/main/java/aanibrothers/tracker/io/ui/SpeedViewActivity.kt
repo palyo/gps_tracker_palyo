@@ -3,7 +3,7 @@ package aanibrothers.tracker.io.ui
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
-import aanibrothers.tracker.io.module.viewInterAdWithLogic
+import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeBanner
 import android.Manifest
 import android.animation.*
@@ -12,7 +12,6 @@ import android.graphics.*
 import android.graphics.drawable.*
 import android.location.*
 import android.os.*
-import android.view.*
 import android.widget.*
 import androidx.activity.*
 import androidx.activity.result.contract.*
@@ -148,7 +147,7 @@ class SpeedViewActivity : BaseActivity<ActivitySpeedViewBinding>(ActivitySpeedVi
         }
 
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

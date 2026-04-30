@@ -3,16 +3,23 @@ package aanibrothers.tracker.io.ui.updates
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
+import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
+import aanibrothers.tracker.io.extension.lastRatePromptDay
 import aanibrothers.tracker.io.extension.viewPermission
+import aanibrothers.tracker.io.helper.InAppReviewListener
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
+import aanibrothers.tracker.io.helper.launchInAppReviewFlow
+import aanibrothers.tracker.io.helper.viewRateDialog
 import aanibrothers.tracker.io.locations.LocationPreference
 import aanibrothers.tracker.io.model.CaptureMode
 import aanibrothers.tracker.io.model.LocationMode
 import aanibrothers.tracker.io.model.OverlayState
 import aanibrothers.tracker.io.model.OverlayTemplate
 import aanibrothers.tracker.io.module.AppOpenManager
+import aanibrothers.tracker.io.module.viewNativeSmall
 import aanibrothers.tracker.io.ui.AppSettingsActivity
 import aanibrothers.tracker.io.ui.ToolsActivity
+import aanibrothers.tracker.io.ui.ViewCollectionActivity
 import aanibrothers.tracker.io.widgets.FocusView
 import android.Manifest
 import android.animation.Animator
@@ -46,6 +53,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.Surface
@@ -80,6 +88,7 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
@@ -91,6 +100,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import coder.apps.space.library.base.BaseActivity
+import coder.apps.space.library.extension.applyDialogConfig
 import coder.apps.space.library.extension.beInvisible
 import coder.apps.space.library.extension.beVisible
 import coder.apps.space.library.extension.color
@@ -101,6 +111,7 @@ import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.goResult
 import coder.apps.space.library.extension.hasPermission
 import coder.apps.space.library.extension.statusBarHeight
+import coder.apps.space.library.helper.TinyDB
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -120,6 +131,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -132,10 +144,9 @@ import java.util.Locale
 import java.util.TimeZone
 
 class HomeActivity : BaseActivity<ActivityHomeBinding>(
-    ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = true
+    ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false
 ) {
-
-    private var doubleBackToExitPressedOnce = false
+    private var exitSheetDialog: BottomSheetDialog? = null
     private val PERMISSION_REQUEST_CODE = 100
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -193,6 +204,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         appOpenManager = AppOpenManager()
         requestPermissions()
         updateCameraPermissionUi()
+        handleRate()
     }
 
     private var googleMap: GoogleMap? = null
@@ -832,10 +844,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 if (isFocusManual) {
                     val adjustedX = event.x - focusView.width / 2f
                     val adjustedY = event.y - focusView.height / 2f
-                    focusView.x =
-                        adjustedX.coerceIn(0f, previewView.width - focusView.width.toFloat())
-                    focusView.y =
-                        adjustedY.coerceIn(0f, previewView.height - focusView.height.toFloat())
+                    val maxX = (previewView.width - focusView.width).toFloat().coerceAtLeast(0f)
+                    val maxY = (previewView.height - focusView.height).toFloat().coerceAtLeast(0f)
+                    focusView.x = adjustedX.coerceIn(0f, maxX)
+                    focusView.y = adjustedY.coerceIn(0f, maxY)
                     showFocusIconFor3Seconds()
                 }
             }
@@ -1030,11 +1042,16 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 handleCaptureError()
                 return
             }
-            val finalBitmap = if (isPortraitMode && capturedBitmap.width > capturedBitmap.height) {
-                rotateBitmap(capturedBitmap)
-            } else {
-                capturedBitmap
+            var workingBitmap = capturedBitmap
+            workingBitmap =
+                replaceBitmap(workingBitmap, applyExifOrientation(photoFile, workingBitmap))
+            if (!isBackCameraSelected) {
+                workingBitmap = replaceBitmap(workingBitmap, flipBitmapHorizontal(workingBitmap))
             }
+            if (isPortraitMode && workingBitmap.width > workingBitmap.height) {
+                workingBitmap = replaceBitmap(workingBitmap, rotateBitmap(workingBitmap))
+            }
+            val finalBitmap = workingBitmap
 
             val mapFragment = getActiveMapFragment()
             mapFragment?.getMapAsync { googleMap ->
@@ -1096,8 +1113,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
                         val saveSuccess = saveCombinedBitmap(combinedBitmap, photoFile)
                         combinedBitmap.recycle()
-                        if (finalBitmap != capturedBitmap) finalBitmap.recycle()
-                        capturedBitmap.recycle()
+                        finalBitmap.recycle()
 
                         runOnUiThread {
                             hideProgressAnimations()
@@ -1116,8 +1132,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         }
                     } catch (e: Exception) {
                         val fallbackSuccess = saveCombinedBitmap(finalBitmap, photoFile)
-                        if (finalBitmap != capturedBitmap) finalBitmap.recycle()
-                        capturedBitmap.recycle()
+                        finalBitmap.recycle()
 
                         runOnUiThread {
                             hideProgressAnimations()
@@ -1172,6 +1187,74 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             source, 0, 0, source.width, source.height, matrix, true
         )
         return rotatedBitmap
+    }
+
+    private fun applyExifOrientation(photoFile: File, source: Bitmap): Bitmap {
+        val exif = ExifInterface(photoFile.absolutePath)
+        val orientation = exif.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+        val matrix = Matrix()
+        var hasTransform = false
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> {
+                matrix.postRotate(90F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_ROTATE_180 -> {
+                matrix.postRotate(180F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_ROTATE_270 -> {
+                matrix.postRotate(270F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> {
+                matrix.postScale(-1F, 1F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                matrix.postScale(1F, -1F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.postRotate(90F)
+                matrix.postScale(-1F, 1F)
+                hasTransform = true
+            }
+
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.postRotate(270F)
+                matrix.postScale(-1F, 1F)
+                hasTransform = true
+            }
+
+            else -> Unit
+        }
+
+        return if (!hasTransform) {
+            source
+        } else {
+            Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+        }
+    }
+
+    private fun flipBitmapHorizontal(source: Bitmap): Bitmap {
+        val matrix = Matrix().apply { postScale(-1F, 1F) }
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    private fun replaceBitmap(current: Bitmap, next: Bitmap): Bitmap {
+        if (next !== current) {
+            current.recycle()
+        }
+        return next
     }
 
     private fun ActivityHomeBinding.createParentOverlayBitmap(): Bitmap {
@@ -1245,6 +1328,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                             getString(R.string.message_overlay_video_saved),
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                        lastCapturedFile = outputFile
+                                        binding?.imageCaptured?.let { preview ->
+                                            Glide.with(this@HomeActivity).load(outputFile).into(preview)
+                                        }
                                     }
                                 },
                                 onError = { e ->
@@ -1260,6 +1347,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                             ),
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                        lastCapturedFile = inputFile
+                                        binding?.imageCaptured?.let { preview ->
+                                            Glide.with(this@HomeActivity).load(inputFile).into(preview)
+                                        }
                                     }
                                 })
                         }
@@ -1460,6 +1551,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 getAddress(location.latitude, location.longitude) { address ->
                     val unknownLocation = getString(R.string.label_unknown_location)
                     val parts = mutableListOf<String>()
+                    address.featureName?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
+                    address.premises?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
                     address.subThoroughfare?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
                     address.thoroughfare?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
                     address.subLocality?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
@@ -1469,6 +1562,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     address.countryName?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
 
                     val fullAddress = parts.joinToString(", ")
+
+                    val isShort =
+                        address.getAddressLine(0).length < 12
+
+                    if (isShort) {
+                        Log.e("isShort", "updateLocationUI: $fullAddress" )
+                        displayCurrentLocation()
+                        return@getAddress
+                    }
                     textAddress.text = if (address.getAddressLine(0).isEmpty()) {
                         fullAddress
                     } else {
@@ -1789,14 +1891,28 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         imageCaptured.setOnClickListener {
             lastCapturedFile?.let { file ->
                 if (file.exists()) {
-                    val uri = FileProvider.getUriForFile(
-                        this@HomeActivity, "${applicationContext.packageName}.provider", file
-                    )
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(uri, "image/*")
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    val extension = file.extension.lowercase(Locale.getDefault())
+                    val isVideo = extension in setOf("mp4", "mkv", "3gp", "webm")
+                    if (isVideo) {
+                        val uri = FileProvider.getUriForFile(
+                            this@HomeActivity, "${applicationContext.packageName}.provider", file
+                        )
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, "video/*")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(
+                            Intent.createChooser(
+                                intent,
+                                getString(R.string.chooser_open_video)
+                            )
+                        )
+                    } else {
+                        val intent = Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
+                            putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
+                        }
+                        startActivity(intent)
                     }
-                    startActivity(intent)
                 } else {
                     Toast.makeText(
                         this@HomeActivity,
@@ -1859,6 +1975,35 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+    private fun handleRate() {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        if (lastRatePromptDay == today) {
+            return
+        }
+
+        if (!TinyDB(this@HomeActivity).getBoolean("isRated", false)) {
+            lastRatePromptDay = today
+            viewRateDialog {
+                if (it) {
+                    launchInAppReviewFlow(object : InAppReviewListener {
+                        override fun onComplete() {
+                            TinyDB(this@HomeActivity).putBoolean("isRated", true)
+                        }
+
+                        override fun onFailed() {
+                            Log.e("TAG", "reviewFailed: ")
+                        }
+                    })
+                } else {
+                    Intent(this@HomeActivity, FeedbackActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                }
+            }
+        }
+    }
+
+
     private fun toggleVideoRecording() {
         if (isRecording) {
             binding?.actionChangeCamera?.disable()
@@ -1869,29 +2014,58 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+    private fun showExitSheet() {
+        if (isFinishing || exitSheetDialog?.isShowing == true) return
+
+        val dialog =
+            BottomSheetDialog(
+                this,
+                coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme
+            )
+        val sheetBinding = LayoutSheetExitBinding.inflate(layoutInflater)
+        dialog.setContentView(sheetBinding.root)
+        dialog.window?.apply {
+            applyDialogConfig()
+        }
+
+        sheetBinding.actionPositive.setOnClickListener {
+            finishAffinity()
+        }
+
+        viewNativeSmall(sheetBinding.adNative)
+
+        dialog.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+                finishAffinity()
+                true
+            } else {
+                false
+            }
+        }
+
+        dialog.setOnDismissListener {
+            if (exitSheetDialog === dialog) {
+                exitSheetDialog = null
+            }
+        }
+
+        exitSheetDialog = dialog
+        if (!isFinishing) dialog.show()
+    }
+
     override fun ActivityHomeBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
         layoutTopController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, 0)
             insets
         }
         onBackPressedDispatcher.addCallback {
-            if (doubleBackToExitPressedOnce) {
+            if (exitSheetDialog?.isShowing == true) {
                 finishAffinity()
                 return@addCallback
             }
-
-            doubleBackToExitPressedOnce = true
-            Toast.makeText(
-                this@HomeActivity,
-                getString(R.string.toast_press_back_again),
-                Toast.LENGTH_SHORT
-            )
-                .show()
-            Handler(Looper.getMainLooper()).postDelayed(Runnable {
-                doubleBackToExitPressedOnce = false
-            }, 2000)
+            showExitSheet()
         }
     }
 }

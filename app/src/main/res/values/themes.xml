@@ -38,7 +38,7 @@
 
     <style name="TextAppearance.Space.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
         <item name="fontFamily">@font/semi_bold</item>
-        <item name="android:textSize">@dimen/_12ssp</item>
+        <item name="android:textSize">@dimen/_16ssp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:fontFamily">@font/semi_bold</item>
         <item name="android:gravity">center_vertical</item>

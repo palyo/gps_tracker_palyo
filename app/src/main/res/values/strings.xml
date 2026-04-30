@@ -144,6 +144,7 @@
     <string name="message_share_app">%1$s\n\nOpen this Link on Play Store\n\nhttps://play.google.com/store/apps/details?id=%2$s</string>
     <string name="chooser_share_app">Share Application</string>
     <string name="chooser_share_files">Share</string>
+    <string name="chooser_open_video">Open with</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_longitude">Longitude</string>
     <string name="chooser_share_location">Share location via</string>
@@ -191,6 +192,9 @@
     <string name="menu_area_calculator_body">Measure and calculate area effortlessly on the map with precision and ease</string>
     <string name="empty_locations_title">No locations yet</string>
     <string name="empty_locations_body">Tap the + button in the bottom right to add a new location.</string>
+    <string name="exit_sheet_title">Exit app?</string>
+    <string name="exit_sheet_body">Press back again or tap the button below to exit.</string>
+    <string name="exit_sheet_action_exit">Tap again to exit</string>
     <string name="near_category_food_drink">Food &amp; Drink</string>
     <string name="near_place_restaurant">Restaurant</string>
     <string name="near_place_bars">Bars</string>

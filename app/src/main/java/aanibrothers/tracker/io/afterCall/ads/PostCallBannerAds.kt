@@ -33,8 +33,8 @@ class PostCallBannerAds {
             idBannerAds1 = "ca-app-pub-3940256099942544/6300978111"
             idBannerAds2 = "ca-app-pub-3940256099942544/6300978111"
         } else {
-            idBannerAds1 = "ca-app-pub-4852962457779682/6269854553"
-            idBannerAds2 = "ca-app-pub-4852962457779682/8241411773"
+            idBannerAds1 = "ca-app-pub-4852962457779682/6798835537"
+            idBannerAds2 = "ca-app-pub-4852962457779682/8004105999"
         }
         if (frameLayout != null && view != null) {
             frameLayout.visibility = View.VISIBLE

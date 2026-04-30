@@ -201,7 +201,7 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
             insets
         }
         onBackPressedDispatcher.addCallback {
-            viewInterAdWithLogic {
+            viewInterAd {
                 finish()
             }
         }

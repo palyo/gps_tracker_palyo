@@ -1,6 +1,9 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.databinding.ActivityTemplatesBinding
+import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewNativeBanner
+import aanibrothers.tracker.io.module.viewNativeSmall
 import androidx.activity.addCallback
 import coder.apps.space.library.base.BaseActivity
 
@@ -8,6 +11,7 @@ class TemplatesActivity :
     BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
     override fun ActivityTemplatesBinding.initExtra() {
         updateSelection()
+        viewNativeSmall(adNative)
     }
 
     override fun ActivityTemplatesBinding.initListeners() {

@@ -8,7 +8,6 @@ import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
-import aanibrothers.tracker.io.module.init
 import aanibrothers.tracker.io.module.loadInterAd
 import aanibrothers.tracker.io.module.preloadNative
 import aanibrothers.tracker.io.ui.updates.AppPermissionActivity
@@ -35,7 +34,7 @@ class LauncherActivity :
     var mSplashInterstitialAd: InterstitialAd? = null
 
     override fun ActivityLauncherBinding.initView() {
-        init { requestConsentForm() }
+        requestConsentForm()
         updateStatusBarColor(R.color.colorTransparent)
     }
 

@@ -74,7 +74,7 @@
                 <TextView
                     android:id="@+id/text_address"
                     style="@style/TextSemiBold"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/_0sdp"
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:gravity="center_vertical"
@@ -85,6 +85,7 @@
                     app:layout_constraintBottom_toTopOf="@+id/text_latitude"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintVertical_chainStyle="packed" />
 
                 <TextView

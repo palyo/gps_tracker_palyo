@@ -6,6 +6,7 @@ import aanibrothers.tracker.io.databinding.ActivityLocationsBinding
 import aanibrothers.tracker.io.locations.LocationPreference
 import aanibrothers.tracker.io.locations.LocationRepository
 import aanibrothers.tracker.io.locations.LocationsAdapter
+import aanibrothers.tracker.io.module.viewBanner
 import aanibrothers.tracker.io.ui.dialog.AddCustomLocation
 import android.Manifest
 import android.annotation.SuppressLint
@@ -61,6 +62,7 @@ class LocationsActivity :
                 updateLocationSelection()
             }
         }
+        viewBanner(adNative)
     }
 
     fun ActivityLocationsBinding.updateLocationSelection() {
