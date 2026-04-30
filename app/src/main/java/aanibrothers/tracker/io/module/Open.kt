@@ -9,26 +9,17 @@ import android.view.*
 import androidx.core.graphics.drawable.toDrawable
 
 fun Context.viewAppOpen(isWait: Boolean = false, isDialogShown: Boolean = false, listener: (() -> Unit)?) {
-    if (appOpenManager == null) {
+    val manager = appOpenManager
+    if (manager == null) {
         listener?.invoke()
         return
     }
-    appOpenManager?.showAdIfAvailable(isWait = isWait, isDialogShown = isDialogShown) {
-        if (it) {
-            listener?.invoke()
-        } else {
-            if (!AppOpenManager.isShowingAd) {
-                if (App.currentActivity != null) {
-                    AppOpenManager.isShowingAd = false
-                    appOpenManager?.loadOpen()
-                    listener?.invoke()
-                } else {
-                    listener?.invoke()
-                }
-            } else {
-                listener?.invoke()
-            }
-        }
+    manager.showAdIfAvailable(isWait = isWait, isDialogShown = isDialogShown) {
+        // Whether the ad showed or not, hand control back to the caller.
+        // Manager handles its own next-load triggering on dismiss/fail —
+        // no longer chain another loadOpen() here, which used to cause
+        // multiple parallel load requests.
+        listener?.invoke()
     }
 }
 

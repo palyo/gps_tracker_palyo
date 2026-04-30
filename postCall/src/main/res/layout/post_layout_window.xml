@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loutMain"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/loutCallPopup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="@dimen/_52dp"
+            android:layout_height="@dimen/_52dp"
+            android:background="@drawable/post_bg_caller_white"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="@dimen/_36dp"
+                android:layout_height="@dimen/_36dp"
+                android:layout_margin="@dimen/_6dp"
+                android:src="@drawable/post_ic_profile_caller" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ic_app_icon"
+            android:layout_width="@dimen/_52dp"
+            android:layout_height="@dimen/_52dp"
+            android:layout_marginVertical="@dimen/_6dp"
+            android:layout_marginTop="@dimen/_6dp"
+            android:layout_marginBottom="@dimen/_6dp"
+            android:src="@mipmap/ic_launcher_round" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/post_color_primary"
+            app:cardCornerRadius="@dimen/_10dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="@dimen/_52dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_8dp"
+                android:layout_marginTop="@dimen/_8dp"
+                android:layout_marginBottom="@dimen/_8dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/icCalendar"
+                    android:layout_width="@dimen/_36dp"
+                    android:layout_height="@dimen/_36dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/_8dp"
+                    android:src="@drawable/post_ic_calendar_caller" />
+
+                <ImageView
+                    android:id="@+id/icMessage"
+                    android:layout_width="@dimen/_36dp"
+                    android:layout_height="@dimen/_36dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/_8dp"
+                    android:src="@drawable/post_ic_message_caller" />
+
+                <ImageView
+                    android:id="@+id/icNotification"
+                    android:layout_width="@dimen/_36dp"
+                    android:layout_height="@dimen/_36dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/_8dp"
+                    android:src="@drawable/post_ic_notification_caller"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/icMute"
+                    android:layout_width="@dimen/_36dp"
+                    android:layout_height="@dimen/_36dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/_8dp"
+                    android:src="@drawable/post_ic_mute_caller" />
+
+                <ImageView
+                    android:id="@+id/icSoundMute"
+                    android:layout_width="@dimen/_34dp"
+                    android:layout_height="@dimen/_36dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/_8dp"
+                    android:src="@drawable/post_ic_voice_mute_caller" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loutMessageMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/post_color_primary"
+        android:elevation="@dimen/_12dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/post_color_primary">
+
+            <ImageView
+                android:id="@+id/icClose"
+                android:layout_width="@dimen/_36dp"
+                android:layout_height="@dimen/_36dp"
+                android:padding="@dimen/_8dp"
+                android:paddingStart="@dimen/_2dp"
+                android:src="@drawable/post_ic_back"
+                app:tint="@color/post_color_white" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/quick_response_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/_8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </LinearLayout>
+</FrameLayout>

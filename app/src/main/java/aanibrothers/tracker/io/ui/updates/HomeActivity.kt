@@ -204,7 +204,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         appOpenManager = AppOpenManager()
         requestPermissions()
         updateCameraPermissionUi()
-        handleRate()
+
     }
 
     private var googleMap: GoogleMap? = null
@@ -1975,35 +1975,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
-    private fun handleRate() {
-        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
-        if (lastRatePromptDay == today) {
-            return
-        }
-
-        if (!TinyDB(this@HomeActivity).getBoolean("isRated", false)) {
-            lastRatePromptDay = today
-            viewRateDialog {
-                if (it) {
-                    launchInAppReviewFlow(object : InAppReviewListener {
-                        override fun onComplete() {
-                            TinyDB(this@HomeActivity).putBoolean("isRated", true)
-                        }
-
-                        override fun onFailed() {
-                            Log.e("TAG", "reviewFailed: ")
-                        }
-                    })
-                } else {
-                    Intent(this@HomeActivity, FeedbackActivity::class.java).apply {
-                        startActivity(this)
-                    }
-                }
-            }
-        }
-    }
-
-
     private fun toggleVideoRecording() {
         if (isRecording) {
             binding?.actionChangeCamera?.disable()
@@ -2012,6 +1983,53 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             binding?.actionChangeCamera?.enable()
             startVideoRecording()
         }
+    }
+
+    /**
+     * Back-press flow: show the rate dialog first, then chain into the exit
+     * sheet regardless of how the rate dialog ended.
+     *
+     *  - Positive rating  -> launch in-app review, then on complete/fail show exit sheet
+     *  - Negative rating  -> open FeedbackActivity (user navigates away — no exit sheet)
+     *  - Cancel / dismiss -> show exit sheet directly
+     *
+     * `proceedShown` guards against showing the exit sheet twice in case
+     * multiple callbacks fire.
+     */
+    private fun showRateThenExit() {
+        var proceedShown = false
+        val proceedToExit = {
+            if (!proceedShown && !isFinishing && !isDestroyed) {
+                proceedShown = true
+                showExitSheet()
+            }
+        }
+        viewRateDialog(
+            listener = { positive ->
+                if (positive) {
+                    launchInAppReviewFlow(object : InAppReviewListener {
+                        override fun onComplete() {
+                            TinyDB(this@HomeActivity).putBoolean("isRated", true)
+                            proceedToExit()
+                        }
+
+                        override fun onFailed() {
+                            proceedToExit()
+                        }
+                    })
+                } else {
+                    // User left ≤3 stars — send them to feedback. They navigate
+                    // away from Home, so don't queue an exit sheet behind them.
+                    Intent(this@HomeActivity, FeedbackActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                }
+            },
+            onDismiss = {
+                // Cancel button / back press / outside-dismiss without rating.
+                proceedToExit()
+            }
+        )
     }
 
     private fun showExitSheet() {
@@ -2065,7 +2083,14 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 finishAffinity()
                 return@addCallback
             }
-            showExitSheet()
+            // Show rate dialog first if the user hasn't rated yet. Whatever
+            // outcome they pick — rate, skip, or dismiss — the exit sheet is
+            // shown afterwards.
+            if (!TinyDB(this@HomeActivity).getBoolean("isRated", false)) {
+                showRateThenExit()
+            } else {
+                showExitSheet()
+            }
         }
     }
 }

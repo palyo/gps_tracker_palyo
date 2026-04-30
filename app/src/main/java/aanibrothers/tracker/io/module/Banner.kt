@@ -4,6 +4,8 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.AdUnifiedBannerLoadingBinding
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
@@ -18,7 +20,17 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 
+// Bounded retry. The previous implementation called viewBanner(container)
+// recursively on every no-fill — an infinite ad-request storm that triggers
+// the AdMob "below quality threshold" filter.
+private const val MAX_BANNER_RETRIES = 1
+private const val BANNER_RETRY_DELAY_MS = 30_000L
+
 fun Activity.viewBanner(container: ViewGroup) {
+    viewBannerInternal(container, attempt = 0)
+}
+
+private fun Activity.viewBannerInternal(container: ViewGroup, attempt: Int) {
     if (container.isNotEmpty()) container.removeAllViews()
     val adSize = getAdSize()
     val height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (adSize.height + 2).toFloat(), resources.displayMetrics).toInt()
@@ -37,7 +49,14 @@ fun Activity.viewBanner(container: ViewGroup) {
     adView.adListener = object : AdListener() {
         override fun onAdFailedToLoad(loadAdError: LoadAdError) {
             super.onAdFailedToLoad(loadAdError)
-            viewBanner(container)
+            Log.e(TAG, "Banner failed (attempt $attempt): ${loadAdError.code} ${loadAdError.message}")
+            if (attempt >= MAX_BANNER_RETRIES) return
+            if (isFinishing || isDestroyed) return
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (!isFinishing && !isDestroyed) {
+                    viewBannerInternal(container, attempt + 1)
+                }
+            }, BANNER_RETRY_DELAY_MS)
         }
 
         override fun onAdLoaded() {

@@ -1,11 +1,8 @@
 package aanibrothers.tracker.io.module
 
 import aanibrothers.tracker.io.*
-import android.app.*
 import android.content.*
-import android.content.pm.*
 import coder.apps.space.library.helper.*
-import retrofit2.*
 
 var Context.appOpenCount: Int
     get() = TinyDB(this).getInt("appOpenCount", 0)
@@ -37,11 +34,6 @@ fun getAdmobOpenId(): String {
     return if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9257395921" else "ca-app-pub-4852962457779682/9453090865"
 }
 
-fun Activity.registerAppId(appId: String) {
-    try {
-        val ai: ApplicationInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-        ai.metaData.putString("com.google.android.gms.ads.APPLICATION_ID", appId)
-    } catch (e: PackageManager.NameNotFoundException) {
-    } catch (e: NullPointerException) {
-    }
-}
+// registerAppId() was removed. AdMob APPLICATION_ID must come from the
+// AndroidManifest — the SDK reads it once at MobileAds.initialize() and never
+// re-reads it, so trying to overwrite it at runtime did nothing in production.

@@ -15,9 +15,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
-
     <application
         android:name=".App"
         android:allowBackup="false"
@@ -58,8 +55,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-4852962457779682~5605383182"
-            tools:replace="android:value" />
+            android:value="ca-app-pub-4852962457779682~5605383182" />
         <meta-data
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="false" />
@@ -123,66 +119,6 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
-        <activity
-            android:name=".afterCall.ui.activity.PostCallActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:taskAffinity=".PostCallActivity"
-            android:theme="@style/Theme.SlideAnimWindow"
-            android:turnScreenOn="true"
-            android:windowSoftInputMode="adjustPan" />
-
-        <receiver
-            android:name=".afterCall.receiver.CallReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter android:priority="1000">
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".afterCall.receiver.BootReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".afterCall.service.MyJobService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".afterCall.service.ForegroundService"
-            android:enabled="true"
-            android:exported="true"
-            android:foregroundServiceType="phoneCall" />
-
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false">
-            <meta-data
-                android:name="aanibrothers.tracker.io.afterCall.appStartup.WebViewInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="aanibrothers.tracker.io.afterCall.appStartup.MobileAdsInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="aanibrothers.tracker.io.afterCall.appStartup.PostCallInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup" />
-        </provider>
     </application>
 
 </manifest>

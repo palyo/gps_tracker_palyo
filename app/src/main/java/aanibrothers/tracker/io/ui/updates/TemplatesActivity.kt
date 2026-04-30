@@ -1,8 +1,6 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.databinding.ActivityTemplatesBinding
-import aanibrothers.tracker.io.module.viewBanner
-import aanibrothers.tracker.io.module.viewNativeBanner
 import aanibrothers.tracker.io.module.viewNativeSmall
 import androidx.activity.addCallback
 import coder.apps.space.library.base.BaseActivity

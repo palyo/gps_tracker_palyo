@@ -41,9 +41,13 @@ fun getIconSub() = arrayOf(
     R.drawable.img_s5,
 )
 
-fun Activity.viewRateDialog(listener: (Boolean) -> Unit) {
+fun Activity.viewRateDialog(
+    listener: (Boolean) -> Unit,
+    onDismiss: (() -> Unit)? = null,
+) {
     firebaseASOEvent("rate_view")
     var isRating = false
+    var ratedInvoked = false
     val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
     val bindDialog: LayoutSheetRateBinding = LayoutSheetRateBinding.inflate(layoutInflater)
     dialog.setContentView(bindDialog.root)
@@ -77,6 +81,7 @@ fun Activity.viewRateDialog(listener: (Boolean) -> Unit) {
         buttonReview.setOnClickListener {
             firebaseASOEvent("rate_view_click_rate")
             if (isRating) {
+                ratedInvoked = true
                 dialog.dismiss()
                 listener.invoke(ratingBar.rating >= 4F)
             } else {
@@ -86,6 +91,12 @@ fun Activity.viewRateDialog(listener: (Boolean) -> Unit) {
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
+    }
+    // Fires only when the dialog ends WITHOUT a rating outcome (cancel button,
+    // back press, system dismiss). When `listener` was already invoked via
+    // buttonReview, this is suppressed to avoid double-handling.
+    dialog.setOnDismissListener {
+        if (!ratedInvoked) onDismiss?.invoke()
     }
     if (!isFinishing && !isDestroyed) {
         dialog.show()

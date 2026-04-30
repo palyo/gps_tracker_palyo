@@ -12,6 +12,13 @@ class AppOpenManager {
         var openIds = listOf<String>()
         private val TAG = "AppOpenManager"
         var isShowingAd = false
+
+        // Frequency cap for App Open ads. Without this, every return-from-
+        // background (including bouncing in/out of permission dialogs,
+        // intents, etc.) would show one — the abusive pattern that tanks
+        // the AdMob quality score.
+        private const val MIN_APP_OPEN_INTERVAL_MS = 4 * 60_000L  // 4 minutes
+        private var lastShownAt = 0L
     }
 
     private var appOpenAd: AppOpenAd? = null
@@ -48,6 +55,16 @@ class AppOpenManager {
     fun showAdIfAvailable(isWait: Boolean, isDialogShown: Boolean = false, listener: ((result: Boolean) -> Unit)?) {
         this.listeners = listener
         this.dialogShow = isDialogShown
+
+        // Frequency cap — quietly skip if shown within MIN_APP_OPEN_INTERVAL_MS.
+        if (lastShownAt != 0L &&
+            System.currentTimeMillis() - lastShownAt < MIN_APP_OPEN_INTERVAL_MS
+        ) {
+            listeners?.invoke(true)
+            listeners = null
+            return
+        }
+
         if (!isShowingAd && isAdAvailable()) {
             if (dialogShow) {
                 val currentActivity = App.currentActivity
@@ -67,8 +84,11 @@ class AppOpenManager {
                     listeners?.invoke(false)
                     appOpenAd = null
                     isShowingAd = false
+                    lastShownAt = System.currentTimeMillis()
                     listeners = null
-                    initAd()
+                    // Don't eagerly reload here — let the next foreground
+                    // event trigger a fresh load. Eager reload after every
+                    // dismiss inflates request count without impressions.
                 }
 
                 override fun onAdFailedToShowFullScreenContent(adError: AdError) {
@@ -78,6 +98,7 @@ class AppOpenManager {
 
                 override fun onAdShowedFullScreenContent() {
                     isShowingAd = true
+                    lastShownAt = System.currentTimeMillis()
                 }
             }
             appOpenAd?.fullScreenContentCallback = fullScreenContentCallback

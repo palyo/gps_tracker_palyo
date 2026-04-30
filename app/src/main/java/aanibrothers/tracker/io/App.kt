@@ -1,6 +1,6 @@
 package aanibrothers.tracker.io
 
-import aanibrothers.tracker.io.afterCall.PostCallApplication
+import aanibrothers.tracker.io.afterCall.PostDataFragment
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewAppOpen
@@ -15,10 +15,11 @@ import android.os.Bundle
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.multidex.MultiDexApplication
 import coder.apps.space.library.extension.THEME
 import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
+import com.post.call.info.PostCallApplication
+import com.post.call.info.PostCallConfig
 
 class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
     companion object {
@@ -35,12 +36,18 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         var appOpenManager: AppOpenManager? = null
         var currentActivity: Activity? = null
         var classes: MutableList<Class<*>> = mutableListOf()
+
+        // Don't fire AppOpen on the very first foreground (cold start) — that
+        // collides with whatever the launcher is doing and triggers the
+        // "ad before user interaction" policy. Only fire on warm starts.
+        private var isFirstForeground = true
     }
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         appContext = applicationContext
+        PostCallConfig.dataFragmentClass = PostDataFragment::class.java
         registerActivityLifecycleCallbacks(this)
         createNotificationChannel()
         TinyDB(this).putInt(THEME, 1)
@@ -50,18 +57,32 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
                 LauncherActivity::class.java,
             )
         )
-        registerActivityLifecycleCallbacks(this)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
-                if (!isOpenInter && (applicationContext?.appOpenCount ?: 0) >= 2) {
-                    if (isShowOpenAdsOnStart(currentActivity?.javaClass?.name ?: "")) {
-                        viewAppOpen(listener = null, isWait = false)
-                    }
+                // Skip the first onStart of the process — that's the cold
+                // start path, handled by LauncherActivity's own consent flow.
+                if (isFirstForeground) {
+                    isFirstForeground = false
+                    applicationContext?.let { it.appOpenCount = it.appOpenCount + 1 }
+                    return
                 }
 
-                if (currentActivity != null) {
-                    if (isOpenInter) isOpenInter = false
+                applicationContext?.let { it.appOpenCount = it.appOpenCount + 1 }
+
+                // Skip if the app is currently in the middle of showing /
+                // returning from an interstitial — avoids stacked full-screen ads.
+                if (isOpenInter) {
+                    isOpenInter = false
+                    return
+                }
+
+                // Wait until the user has opened the app a couple of times
+                // before showing AppOpen at all (gentler onboarding).
+                if ((applicationContext?.appOpenCount ?: 0) < 3) return
+
+                if (isShowOpenAdsOnStart(currentActivity?.javaClass?.name ?: "")) {
+                    viewAppOpen(listener = null, isWait = false)
                 }
             }
         })

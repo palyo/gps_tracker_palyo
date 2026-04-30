@@ -13,6 +13,7 @@ import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.beVisibleIf
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.launchUrl
+import com.post.call.info.utils.Config
 
 class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettingsBinding::inflate) {
     override fun ActivitySettingsBinding.initExtra() {}
@@ -45,7 +46,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
 
         switchCall.setOnCheckedChangeListener { button, isChecked ->
             if (button.isPressed) {
-                tinyDB?.getBoolean("ShowAfterCall", isChecked)
+                Config(this@AppSettingsActivity).enablePostCallScreen = isChecked
             }
         }
     }
@@ -57,7 +58,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
 
     override fun onResume() {
         super.onResume()
-        binding?.switchCall?.isChecked = tinyDB?.getBoolean("ShowAfterCall", true) == true
+        binding?.switchCall?.isChecked = Config(this@AppSettingsActivity).enablePostCallScreen
 
     }
 }

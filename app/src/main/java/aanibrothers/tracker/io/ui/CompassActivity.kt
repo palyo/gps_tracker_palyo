@@ -81,7 +81,9 @@ class CompassActivity : BaseActivity<ActivityCompassBinding>(
     override fun ActivityCompassBinding.initExtra() {
         if (hasPermissions(LOCATION_PERMISSION)) {
             startUpdates()
-            viewBanner(adNative)
+            // Use the same ad type as the post-permission path to avoid two
+            // different ad widgets being inflated into the same container.
+            viewNativeBanner(adNative)
         } else {
             locationPermissionLauncher.launch(LOCATION_PERMISSION)
         }

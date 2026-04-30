@@ -123,22 +123,31 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
 
     override fun ActivityViewCollectionBinding.initListeners() {
         buttonShare.setOnClickListener {
-            shareFile(mutableListOf<File>().apply {
-                filesList?.get(currentPos)?.let { media -> add(media) }
-            })
+            // Guard against empty list / out-of-range currentPos. The previous
+            // `filesList?.get(currentPos)` only handled null, not bounds, and
+            // crashed with IndexOutOfBoundsException when the list was empty.
+            val list = filesList
+            if (list.isNullOrEmpty()) {
+                "buttonShare".log("filesList is null or empty")
+                return@setOnClickListener
+            }
+            if (currentPos !in list.indices) {
+                "buttonShare".log("Invalid index: $currentPos, size: ${list.size}")
+                return@setOnClickListener
+            }
+            shareFile(mutableListOf<File>().apply { add(list[currentPos]) })
         }
         buttonDelete.setOnClickListener {
-            actionTrashFile(mutableListOf<File>().apply {
-                filesList?.let { list ->
-                    if (currentPos in list.indices) {
-                        actionTrashFile(mutableListOf<File>().apply {
-                            add(list[currentPos])
-                        })
-                    } else {
-                        "actionTrashFile".log("Invalid index: $currentPos, size: ${list.size}")
-                    }
-                } ?: "actionTrashFile".log("filesList is null")
-            })
+            val list = filesList
+            if (list.isNullOrEmpty()) {
+                "actionTrashFile".log("filesList is null or empty")
+                return@setOnClickListener
+            }
+            if (currentPos !in list.indices) {
+                "actionTrashFile".log("Invalid index: $currentPos, size: ${list.size}")
+                return@setOnClickListener
+            }
+            actionTrashFile(mutableListOf<File>().apply { add(list[currentPos]) })
         }
     }
 

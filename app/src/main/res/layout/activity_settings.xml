@@ -64,7 +64,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 android:background="@color/colorCardBackground"
                 app:layout_constraintTop_toTopOf="parent">
@@ -92,7 +91,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center_vertical"
                     android:checked="true"
-                    android:clickable="false"
                     android:layout_marginEnd="@dimen/_8sdp"
                     android:gravity="center_vertical"
                     app:layout_constraintBottom_toBottomOf="parent"

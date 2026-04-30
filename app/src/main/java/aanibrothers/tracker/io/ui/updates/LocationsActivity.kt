@@ -11,6 +11,7 @@ import aanibrothers.tracker.io.ui.dialog.AddCustomLocation
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.Locale
 
 class LocationsActivity :
@@ -139,7 +141,11 @@ class LocationsActivity :
 
     private fun setLocationData(latitude: Double, longitude: Double) {
         val geocoder = Geocoder(this, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        val addresses: List<Address>? = try {
+            geocoder.getFromLocation(latitude, longitude, 1)
+        } catch (_: IOException) {
+            null
+        }
 
         val addressText = if (!addresses.isNullOrEmpty()) {
             val address = addresses[0]

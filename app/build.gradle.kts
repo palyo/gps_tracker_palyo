@@ -18,8 +18,8 @@ android {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.5"
+        versionCode = 13
+        versionName = "1.6"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
+    implementation(project(":postCall"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
