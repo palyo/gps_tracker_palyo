@@ -107,13 +107,13 @@
     <string name="button_buy_now">अभी खरीदें</string>
     <string name="button_restore">पुनर्स्थापित करें</string>
 
-    <string name="app_name_splash">GPS Map\nTrack GPS &amp; Maps</string>
+    <string name="app_name_splash">GPS Camera\nTrack GPS &amp; Maps</string>
     <string name="title_onboarding1">Capture Photos with GPS Details</string>
     <string name="body_onboarding1">Automatically add location, date, time, and map view to every photo you take.</string>
     <string name="title_onboarding2">Rename Your Location</string>
     <string name="body_onboarding2">Change the location name to match your memory or purpose.</string>
     <string name="title_onboarding3">Record Videos with GPS Location</string>
-    <string name="body_onboarding3">Capture videos with live GPS map, address, latitude, longitude, date &amp; time.</string>
+    <string name="body_onboarding3">Capture videos with live GPS Camera, address, latitude, longitude, date &amp; time.</string>
     <string name="title_camera_location">Camera &amp; Location Access Required</string>
     <string name="body_camera_location">To capture photos with embedded GPS data, allow camera and location permissions.</string>
     <string name="title_camera_location_storage">Camera, Location &amp; Storage Access Required</string>

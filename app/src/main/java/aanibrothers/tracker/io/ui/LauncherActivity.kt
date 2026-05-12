@@ -8,6 +8,7 @@ import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
+import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.loadInterAd
@@ -173,7 +174,7 @@ class LauncherActivity :
                 go(AppLanguageActivity::class.java, finish = true)
             tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true ->
                 go(OnboardingActivity::class.java, finish = true)
-            !hasAllNewPermissions() ->
+            !hasAllNewPermissions() || !isLocationEnabled() ->
                 go(PermissionActivity::class.java, finish = true)
             else ->
                 go(HomeActivity::class.java, finish = true)

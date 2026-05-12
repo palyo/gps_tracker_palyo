@@ -3,6 +3,8 @@ package aanibrothers.tracker.io.ui.updates
 import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.databinding.ActivityPermissionBinding
 import aanibrothers.tracker.io.databinding.LayoutDialogPermissionSettingsBinding
+import aanibrothers.tracker.io.databinding.LoactionPermissionDialogBinding
+import aanibrothers.tracker.io.databinding.SheetMapVisibilityStyleBinding
 import aanibrothers.tracker.io.extension.CAMERA_PERMISSION
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.STORAGE_PERMISSION
@@ -10,19 +12,25 @@ import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.hasCameraPermissions
 import aanibrothers.tracker.io.extension.hasLocationPermissions
 import aanibrothers.tracker.io.extension.hasStoragePermissions
+import aanibrothers.tracker.io.extension.isGrantedOverlay
+import aanibrothers.tracker.io.extension.isLocationEnabled
+import aanibrothers.tracker.io.helper.HandleSettingPreview
 import aanibrothers.tracker.io.module.getPolicyLink
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
 import android.content.Intent
 import android.net.Uri
+import android.os.Message
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import coder.apps.space.library.base.BaseActivity
+import coder.apps.space.library.extension.applyDialogConfig
 import coder.apps.space.library.extension.beGone
 import coder.apps.space.library.extension.beVisible
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.launchUrl
+import coder.apps.space.library.helper.LeakGuardHandlerWrapper
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class PermissionActivity :
@@ -30,6 +38,7 @@ class PermissionActivity :
 
     private val maxDeniedCount = 2
     private var settingsDialog: BottomSheetDialog? = null
+    private var handlerSettingOverLay: HandleSettingPreview? = null
 
     private val permissionKeyMap = mapOf(
         "storage" to STORAGE_PERMISSION,
@@ -56,6 +65,7 @@ class PermissionActivity :
         }
 
     override fun ActivityPermissionBinding.initView() {
+        handlerSettingOverLay = HandleSettingPreview(this@PermissionActivity)
         refreshUi()
         viewNativeMedium(adNative)
     }
@@ -63,6 +73,12 @@ class PermissionActivity :
     override fun ActivityPermissionBinding.initExtra() {
 
     }
+    private val settingsActivityResultLauncherAnyWhereClick =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if(isLocationEnabled()){
+                binding?.btnAllowPermission?.performClick()
+            }
+        }
 
     override fun ActivityPermissionBinding.initListeners() {
         clPermissionStorage.setOnClickListener {
@@ -91,6 +107,21 @@ class PermissionActivity :
 
         btnAllowPermission.setOnClickListener {
             if (hasAllNewPermissions()) {
+                if(!isLocationEnabled()){
+                    val dialog =
+                        BottomSheetDialog(this@PermissionActivity, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
+                    val binding = LoactionPermissionDialogBinding.inflate(layoutInflater)
+                    dialog.setContentView(binding.root)
+                    binding.btnOpenSettings.setOnClickListener {
+                        dialog.dismiss()
+                        handlerSettingOverLay?.startPollingImeSettings()
+                        settingsActivityResultLauncherAnyWhereClick.launch(Intent("android.settings.LOCATION_SOURCE_SETTINGS"))
+                    }
+
+                    dialog.window?.apply { applyDialogConfig() }
+                    if (!isFinishing) dialog.show()
+                    return@setOnClickListener
+                }
                 viewInterAd {
                     go(HomeActivity::class.java, finish = true)
                 }
@@ -208,5 +239,36 @@ class PermissionActivity :
     private fun getDeniedCount(key: String): Int {
         return getSharedPreferences("permission_denials_new", MODE_PRIVATE)
             .getInt(key, 0)
+    }
+
+    class HandleSettingPreview internal constructor(activity: PermissionActivity) :
+        LeakGuardHandlerWrapper<PermissionActivity>(activity) {
+
+        fun cancelPollingImeSettings() {
+            removeMessages(0)
+        }
+
+        override fun handleMessage(message: Message) {
+            val ownerInstance = ownerInstance
+            if (ownerInstance != null && message.what == 0) {
+                if (ownerInstance.isLocationEnabled()) {
+                    ownerInstance.invokeSetupWizardOfThisIme()
+                } else {
+                    startPollingImeSettings()
+                }
+            }
+        }
+
+        fun startPollingImeSettings() {
+            sendMessageDelayed(obtainMessage(0), 200L)
+        }
+    }
+
+    fun invokeSetupWizardOfThisIme() {
+        handlerSettingOverLay?.cancelPollingImeSettings()
+        val intent = Intent()
+        intent.setClass(this@PermissionActivity, PermissionActivity::class.java)
+        intent.flags = 606076928
+        startActivity(intent)
     }
 }

@@ -15,7 +15,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
+            applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 29
         targetSdk = 35
         versionCode = 14
@@ -23,7 +23,7 @@ android {
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
-        setProperty("archivesBaseName", "GPS Map v$versionName")
+        setProperty("archivesBaseName", "GPS Camera v$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         resConfigs("en", "hi", "de", "fr", "ar", "ja", "es", "in", "af", "pt")

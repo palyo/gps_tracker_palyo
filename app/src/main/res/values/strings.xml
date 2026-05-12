@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name" translatable="false">GPS Map - Track GPS &amp; Maps</string>
-    <string name="app_name_splash" translatable="false">GPS Map\nTrack GPS &amp; Maps</string>
-    <string name="app_name_manifest" translatable="false">#GPS Map - Track GPS &amp; Maps</string>
+    <string name="app_name" translatable="false">GPS Camera - Track GPS &amp; Maps</string>
+    <string name="app_name_splash" translatable="false">GPS Camera\nTrack GPS &amp; Maps</string>
+    <string name="app_name_manifest" translatable="false">#GPS Camera - Track GPS &amp; Maps</string>
     <string name="message_policy" translatable="false">By clicking \'Agree &amp; Continue\' you accept and approve the <a href="https://privacy-and-policy-online.blogspot.com/2021/10/privacy-policy.html">Privacy Policy</a></string>
 
     <string name="text_hint_search">Search</string>
@@ -78,7 +78,7 @@
     <string name="title_onboarding2">Work Report Photos</string>
     <string name="body_onboarding2">Upload images with location to verify task completion and activity.</string>
     <string name="title_onboarding3">Record Videos with GPS Location</string>
-    <string name="body_onboarding3">Capture videos with live GPS map, address, latitude, longitude, date &amp; time.</string>
+    <string name="body_onboarding3">Capture videos with live GPS Camera, address, latitude, longitude, date &amp; time.</string>
 
     <string name="notification_permission_title">Stay Updated with Important Notifications</string>
     <string name="notification_permission_body">Enable notifications to receive important updates and reminders related to your budget and financial tracking.</string>
@@ -327,8 +327,13 @@
     <string name="allow_permission">Allow Permission</string>
     <string name="allow_permissions">Allow Permissions</string>
 
-    <string name="gps_map_camera_timestamp">GPS Map Camera - Timestamp</string>
+    <string name="gps_map_camera_timestamp">GPS Camera Camera - Timestamp</string>
     <string name="capture_photos_with_gps_location_date">Capture photos with GPS location, date.</string>
     <string name="image_on_map">Image on Map</string>
     <string name="reporting">Reporting</string>
+
+    <string name="location_permission_required_dialog">⚠️ Location Permission Required</string>
+    <string name="enable_location_services">1. Enable Location Services</string>
+    <string name="enable_location_services_content">2. Location services are required for this feature. Please enable them in settings</string>
+    <string name="open_location_settings">Open location settings</string>
 </resources>

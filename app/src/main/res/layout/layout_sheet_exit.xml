@@ -24,7 +24,7 @@
     <aanibrothers.tracker.io.module.AdsView
         android:id="@+id/ad_native"
         android:layout_width="@dimen/_0sdp"
-        android:layout_height="@dimen/native_135dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

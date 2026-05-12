@@ -5,6 +5,7 @@ import aanibrothers.tracker.io.databinding.ActivityOnboardingBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
+import aanibrothers.tracker.io.extension.isLocationEnabled
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -52,7 +53,7 @@ class OnboardingActivity :
             return
         }
         tinyDB?.putBoolean(IS_INTRO_ENABLED, false)
-        if (!hasAllNewPermissions()) {
+        if (!hasAllNewPermissions()|| !isLocationEnabled()) {
             go(PermissionActivity::class.java, finish = true)
             return
         }

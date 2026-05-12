@@ -487,8 +487,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             handleCallEndPermissions()
         }
 
-
-
         callEndPermissionDialog = dialog
         dialog.show()
     }

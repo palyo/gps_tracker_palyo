@@ -7,6 +7,7 @@ import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
+import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.updates.HomeActivity
@@ -53,7 +54,7 @@ class AppLanguageActivity :
                 val continueFlow = {
                     if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
                         go(OnboardingActivity::class.java, finish = true)
-                    } else if (!hasAllNewPermissions()) {
+                    } else if (!hasAllNewPermissions() || !isLocationEnabled()) {
                         go(PermissionActivity::class.java, finish = true)
                     } else {
                         go(HomeActivity::class.java, finish = true)

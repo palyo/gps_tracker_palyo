@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_8sdp"
             android:layout_marginVertical="@dimen/_12sdp"
-            android:backgroundTint="@color/colorBlack24"
+            android:background="@color/colorBlack24"
             android:clipToOutline="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
