@@ -14,7 +14,7 @@
           android:endY="75.349"
           android:type="linear">
         <item android:offset="0" android:color="#FF00C2D9"/>
-        <item android:offset="1" android:color="#FF1B9ECC"/>
+        <item android:offset="1" android:color="#FF42B0FD"/>
       </gradient>
     </aapt:attr>
   </path>
@@ -28,7 +28,7 @@
           android:endY="75.349"
           android:type="linear">
         <item android:offset="0" android:color="#FF00C2D9"/>
-        <item android:offset="1" android:color="#FF1B9ECC"/>
+        <item android:offset="1" android:color="#FF42B0FD"/>
       </gradient>
     </aapt:attr>
   </path>
@@ -43,7 +43,7 @@
           android:endY="75.349"
           android:type="linear">
         <item android:offset="0" android:color="#FF00C2D9"/>
-        <item android:offset="1" android:color="#FF1B9ECC"/>
+        <item android:offset="1" android:color="#FF42B0FD"/>
       </gradient>
     </aapt:attr>
   </path>

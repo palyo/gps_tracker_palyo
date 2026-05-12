@@ -6,8 +6,8 @@ import android.os.Message
 import android.provider.Settings
 import coder.apps.space.library.helper.LeakGuardHandlerWrapper
 
-class HandleSettingPreview internal constructor(activity: AppPermissionActivity) :
-        LeakGuardHandlerWrapper<AppPermissionActivity>(activity) {
+class HandleSettingPreview internal constructor(activity: HomeActivity) :
+        LeakGuardHandlerWrapper<HomeActivity>(activity) {
 
         fun cancelPollingImeSettings() {
             removeMessages(0)

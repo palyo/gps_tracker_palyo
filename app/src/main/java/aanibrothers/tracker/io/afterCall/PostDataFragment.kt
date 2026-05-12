@@ -32,30 +32,23 @@ class PostDataFragment : Fragment() {
 
 
     private fun PostCallDataFragmentBinding.initListener() {
-        actionHome.setOnClickListener {
+        clPermissionCamera.setOnClickListener {
             Intent(requireContext(), HomeActivity::class.java).apply {
                 putExtra("action", 0)
                 startActivity(this)
             }
             activity?.totalDead()
         }
-        actionTemplates.setOnClickListener {
+        clImageOnMap.setOnClickListener {
             Intent(requireContext(), HomeActivity::class.java).apply {
                 putExtra("action", 1)
                 startActivity(this)
             }
             activity?.totalDead()
         }
-        actionMapData.setOnClickListener {
+        clReporting.setOnClickListener {
             Intent(requireContext(), HomeActivity::class.java).apply {
                 putExtra("action", 2)
-                startActivity(this)
-            }
-            activity?.totalDead()
-        }
-        actionTools.setOnClickListener {
-            Intent(requireContext(), HomeActivity::class.java).apply {
-                putExtra("action",3)
                 startActivity(this)
             }
             activity?.totalDead()

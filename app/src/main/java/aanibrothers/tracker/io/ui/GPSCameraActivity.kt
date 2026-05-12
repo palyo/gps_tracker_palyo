@@ -409,7 +409,7 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
 
     override fun ActivityGpsCameraBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
 
         onBackPressedDispatcher.addCallback {
             viewInterAd {

@@ -6,12 +6,12 @@ import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
-import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
-import aanibrothers.tracker.io.module.viewNativeMedium
+import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.module.viewInterAd
-import aanibrothers.tracker.io.ui.updates.AppPermissionActivity
+import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import aanibrothers.tracker.io.ui.updates.OnboardingActivity
+import aanibrothers.tracker.io.ui.updates.PermissionActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.GridLayoutManager
 import coder.apps.space.library.R
@@ -26,7 +26,7 @@ class AppLanguageActivity :
     private var language: String = Locale.getDefault().language
     private var isChangeLanguage: Boolean = false
     override fun ActivityAppLanguageBinding.initExtra() {
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
         language = currentLanguage ?: Locale.getDefault().language
         initAdapter()
         viewNativeMedium(adNative)
@@ -53,8 +53,8 @@ class AppLanguageActivity :
                 val continueFlow = {
                     if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
                         go(OnboardingActivity::class.java, finish = true)
-                    } else if (!hasRequiredAppPermissions()) {
-                        go(AppPermissionActivity::class.java, finish = true)
+                    } else if (!hasAllNewPermissions()) {
+                        go(PermissionActivity::class.java, finish = true)
                     } else {
                         go(HomeActivity::class.java, finish = true)
                     }

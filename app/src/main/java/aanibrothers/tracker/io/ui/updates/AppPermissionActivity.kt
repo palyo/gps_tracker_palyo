@@ -21,7 +21,7 @@ import coder.apps.space.library.extension.hasPermissions
 class AppPermissionActivity :
     BaseActivity<ActivityAppPermissionBinding>(ActivityAppPermissionBinding::inflate) {
 
-    private var handlerSettingOverLay: HandleSettingPreview? = null
+//    private var handlerSettingOverLay: HandleSettingPreview? = null
     private val maxDeniedCount = 1
 
     private val phonePermissions = arrayOf(Manifest.permission.READ_PHONE_STATE)
@@ -75,7 +75,7 @@ class AppPermissionActivity :
     }
 
     override fun ActivityAppPermissionBinding.initExtra() {
-        handlerSettingOverLay = HandleSettingPreview(this@AppPermissionActivity)
+//        handlerSettingOverLay = HandleSettingPreview(this@AppPermissionActivity)
     }
 
     override fun ActivityAppPermissionBinding.initListeners() {
@@ -156,7 +156,7 @@ class AppPermissionActivity :
         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
             data = Uri.fromParts("package", packageName, null)
         }
-        handlerSettingOverLay?.startPollingImeSettings()
+//        handlerSettingOverLay?.startPollingImeSettings()
         App.isOpenInter = true
         startActivity(intent)
         Handler(mainLooper).postDelayed({
@@ -187,7 +187,7 @@ class AppPermissionActivity :
 
 
     fun invokeSetupWizardOfThisIme() {
-        handlerSettingOverLay?.cancelPollingImeSettings()
+//        handlerSettingOverLay?.cancelPollingImeSettings()
         val intent = Intent()
         intent.setClass(this@AppPermissionActivity, HomeActivity::class.java)
         intent.flags = 606076928

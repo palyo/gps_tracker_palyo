@@ -1,11 +1,19 @@
 package aanibrothers.tracker.io.ui.updates
 
+import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
+import aanibrothers.tracker.io.databinding.CallEndPermissionDialogBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
+import aanibrothers.tracker.io.extension.AFTER_CALL_PERMISSION
+import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
+import aanibrothers.tracker.io.extension.hasAfterCallPermissions
+import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
+import aanibrothers.tracker.io.extension.isGrantedOverlay
 import aanibrothers.tracker.io.extension.lastRatePromptDay
 import aanibrothers.tracker.io.extension.viewPermission
+import aanibrothers.tracker.io.helper.HandleSettingPreview
 import aanibrothers.tracker.io.helper.InAppReviewListener
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
 import aanibrothers.tracker.io.helper.launchInAppReviewFlow
@@ -147,6 +155,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false
 ) {
     private var exitSheetDialog: BottomSheetDialog? = null
+    private var handlerSettingOverLay: HandleSettingPreview? = null
+    private var callEndPermissionDialog: android.app.Dialog? = null
     private val PERMISSION_REQUEST_CODE = 100
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -181,6 +191,20 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
             restoreLocationModeFromPref()
+        }
+
+    private val afterCallPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (hasAfterCallPermissions() && !isGrantedOverlay()) {
+                requestOverlayPermission()
+            }
+        }
+
+    private val overlayPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if(!isGrantedOverlay()){
+                callEndPermissionDialog?.show()
+            }
         }
 
     private var locationMode = LocationMode.CURRENT
@@ -432,6 +456,66 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             }
         }
         binding?.updateCameraPermissionUi()
+
+    }
+
+    private fun maybeShowCallEndPermissionDialog() {
+        if (isFinishing || isDestroyed) return
+        if (callEndPermissionDialog?.isShowing == true) return
+        if (hasRequiredAppPermissions()) return
+        if (tinyDB?.getBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, false) == true) return
+
+        val dialogBinding = CallEndPermissionDialogBinding.inflate(layoutInflater)
+        val dialog = android.app.Dialog(this).apply {
+            requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+            setContentView(dialogBinding.root)
+            setCancelable(false)
+            window?.setBackgroundDrawableResource(android.R.color.transparent)
+        }
+
+        val displayMetrics = android.util.DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val padding = resources.getDimensionPixelSize(R.dimen.default_popup_padding)
+        dialog.window?.setLayout(
+            displayMetrics.widthPixels - (padding * 2),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        dialogBinding.btnGrantPermission.setOnClickListener {
+            tinyDB?.putBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, true)
+            dialog.dismiss()
+            handleCallEndPermissions()
+        }
+
+
+
+        callEndPermissionDialog = dialog
+        dialog.show()
+    }
+
+    private fun handleCallEndPermissions() {
+        when {
+            !hasAfterCallPermissions() ->
+                afterCallPermissionsLauncher.launch(AFTER_CALL_PERMISSION)
+            !isGrantedOverlay() -> requestOverlayPermission()
+        }
+    }
+
+    private fun requestOverlayPermission() {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        App.isOpenInter =true
+        handlerSettingOverLay?.startPollingImeSettings()
+        overlayPermissionLauncher.launch(intent)
+    }
+
+    fun invokeSetupWizardOfThisIme() {
+        handlerSettingOverLay?.cancelPollingImeSettings()
+        val intent = Intent()
+        intent.setClass(this@HomeActivity, HomeActivity::class.java)
+        intent.flags = 606076928
+        startActivity(intent)
     }
 
     override fun onPause() {
@@ -452,6 +536,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         orientationEventListener?.disable()
         stopLocationUpdates()
         timeHandler.removeCallbacks(timeRunnable)
+        callEndPermissionDialog?.dismiss()
+        callEndPermissionDialog = null
     }
 
     private fun setupOrientationListener() {
@@ -2092,5 +2178,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 showExitSheet()
             }
         }
+        handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
+        maybeShowCallEndPermissionDialog()
     }
 }

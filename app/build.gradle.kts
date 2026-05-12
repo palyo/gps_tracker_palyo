@@ -16,10 +16,10 @@ android {
 
     defaultConfig {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 35
-        versionCode = 13
-        versionName = "1.6"
+        versionCode = 14
+        versionName = "1.7"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -36,8 +36,6 @@ android {
     dataBinding.enable = true
     buildTypes {
         debug {
-            isMinifyEnabled = true
-            isDebuggable = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {

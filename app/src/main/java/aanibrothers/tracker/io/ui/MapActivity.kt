@@ -331,7 +331,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
 
     override fun ActivityMapBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
         layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets

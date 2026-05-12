@@ -45,9 +45,9 @@
                     android:layout_height="?attr/actionBarSize"
                     android:layout_gravity="end"
                     android:paddingHorizontal="@dimen/_0sdp"
-                    app:icon="@drawable/ic_button_checked"
+                    app:icon="@drawable/ic_done"
                     app:iconPadding="@dimen/_0sdp"
-                    app:iconSize="@dimen/_28sdp"
+                    app:iconSize="@dimen/_24sdp"
                     app:iconTint="@null" />
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
@@ -71,8 +71,9 @@
     <aanibrothers.tracker.io.module.AdsView
         android:id="@+id/ad_native"
         android:layout_width="@dimen/_0sdp"
-        android:layout_height="@dimen/native_255dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        app:shimmer_preview_layout="@layout/ad_unified_medium_loading"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

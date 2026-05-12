@@ -2,7 +2,8 @@
 
     <style name="Theme.Tracker" parent="Theme.Space">
         <item name="android:statusBarColor">@color/colorBackground</item>
-        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorBlack</item>
+        <item name="android:windowLightNavigationBar">false</item>
         <item name="titleTextColor">#FFFFFF</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:ignore="NewApi">true</item>
@@ -37,18 +38,18 @@
     </style>
 
     <style name="TextAppearance.Space.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
-        <item name="fontFamily">@font/semi_bold</item>
+        <item name="fontFamily">@font/font_bold</item>
         <item name="android:textSize">@dimen/_16ssp</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:fontFamily">@font/semi_bold</item>
+        <item name="android:fontFamily">@font/font_bold</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="TextAppearance.Space.SubTitleSmall" parent="TextAppearance.Material3.TitleSmall">
-        <item name="fontFamily">@font/regular</item>
+        <item name="fontFamily">@font/font_regular</item>
         <item name="android:textSize">@dimen/_8ssp</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:fontFamily">@font/font_regular</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 
@@ -65,5 +66,8 @@
         <item name="android:activityCloseEnterAnimation">@anim/post_none</item>
         <item name="android:activityCloseExitAnimation">@anim/post_slide_to_bottom</item>
     </style>
-
+    <style name="gnt_RatingBar" parent="@android:style/Widget.Material.RatingBar.Small">
+        <item name="colorControlActivated">#1d6deb</item>
+        <item name="colorControlNormal">@color/gnt_gray</item>
+    </style>
 </resources>

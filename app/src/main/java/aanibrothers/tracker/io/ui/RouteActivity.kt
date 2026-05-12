@@ -254,7 +254,7 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
 
     override fun ActivityRoutesBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
         layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets

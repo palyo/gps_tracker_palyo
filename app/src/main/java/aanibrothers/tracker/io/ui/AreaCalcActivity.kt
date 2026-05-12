@@ -195,7 +195,7 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
 
     override fun ActivityAreaCalcBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
-        updateNavigationBarColor(R.color.colorTransparent)
+        updateNavigationBarColor(R.color.colorBlack)
         layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
             v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
             insets

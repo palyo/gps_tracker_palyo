@@ -98,13 +98,13 @@ fun Activity.viewNativeSmall(container: AdsView) {
 fun Context.populateAdViewMedium(unifiedNativeAd: NativeAd?, container: AdsView) {
     val layoutInflater: LayoutInflater = LayoutInflater.from(this)
     val binding = AdUnifiedMediumBinding.inflate(layoutInflater)
-    binding.unified.iconView = binding.adAppIcon
-    binding.unified.mediaView = binding.adMedia
-    binding.unified.headlineView = binding.adHeadline
-    binding.unified.bodyView = binding.adBody
-    binding.unified.callToActionView = binding.adCallToAction
+    binding.unified.iconView = binding.icon
+    binding.unified.mediaView = binding.mediaView
+    binding.unified.headlineView = binding.primary
+    binding.unified.bodyView = binding.body
+    binding.unified.callToActionView = binding.cta
 
-    binding.unified.starRatingView = binding.adStars
+    binding.unified.starRatingView = binding.ratingBar
     unifiedNativeAd?.starRating.let {
         if (it != null && it > 0.0) (binding.unified.starRatingView as RatingBar?)?.rating = it.toFloat() else (binding.unified.starRatingView as RatingBar?)?.rating = 0.0f
     }

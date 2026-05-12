@@ -20,6 +20,7 @@ import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
 import com.post.call.info.PostCallApplication
 import com.post.call.info.PostCallConfig
+import com.post.call.info.ui.activity.PostCallActivity
 
 class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
     companion object {
@@ -55,6 +56,7 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         setAvoidMultipleClass(
             mutableListOf(
                 LauncherActivity::class.java,
+                PostCallActivity::class.java,
             )
         )
 

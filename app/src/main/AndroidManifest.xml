@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -33,6 +37,9 @@
             android:theme="@style/Theme.Space.Prompt" />
         <activity
             android:name=".ui.updates.AppPermissionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.updates.PermissionActivity"
             android:exported="false" />
         <activity
             android:name=".ui.updates.OnboardingActivity"

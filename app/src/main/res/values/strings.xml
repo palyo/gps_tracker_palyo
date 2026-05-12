@@ -75,8 +75,8 @@
 
     <string name="title_onboarding1">Capture Photos with GPS Details</string>
     <string name="body_onboarding1">Automatically add location, date, time, and map view to every photo you take.</string>
-    <string name="title_onboarding2">Rename Your Location</string>
-    <string name="body_onboarding2">Change the location name to match your memory or purpose.</string>
+    <string name="title_onboarding2">Work Report Photos</string>
+    <string name="body_onboarding2">Upload images with location to verify task completion and activity.</string>
     <string name="title_onboarding3">Record Videos with GPS Location</string>
     <string name="body_onboarding3">Capture videos with live GPS map, address, latitude, longitude, date &amp; time.</string>
 
@@ -315,4 +315,20 @@
     <string name="quick_reply_4">Can’t talk now. Call me later.</string>
     <string name="private_number">Private Number</string>
     <string name="label_duration">Duration</string>
+
+    <string name="by_continuing_i_agree_to_the_privacy_policy">By continuing, I agree to the</string>
+    <string name="allow_the_following_permission_to_help_the_app_new">Allow the following permission to help the app:</string>
+    <string name="quick_access_after_call">Quick Access After Call</string>
+    <string name="quick_capture_with_location_anytime_nanywhere">Quick capture with location · Anytime,\nanywhere</string>
+    <string name="capture_location_proof_instantly">Capture location proof instantly</string>
+    <string name="you_can_turn_this_off_anytime_in_settings">You can turn this off anytime in settings.</string>
+    <string name="works_right_after_every_call">Works right after every call</string>
+    <string name="save_time_with_quick_access">Save time with quick access</string>
+    <string name="allow_permission">Allow Permission</string>
+    <string name="allow_permissions">Allow Permissions</string>
+
+    <string name="gps_map_camera_timestamp">GPS Map Camera - Timestamp</string>
+    <string name="capture_photos_with_gps_location_date">Capture photos with GPS location, date.</string>
+    <string name="image_on_map">Image on Map</string>
+    <string name="reporting">Reporting</string>
 </resources>

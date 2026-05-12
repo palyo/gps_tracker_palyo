@@ -7,13 +7,13 @@
     <color name="colorBackgroundEnd">#88FFFFFF</color>
     <color name="colorSecondaryBackground">#EDEDED</color>
 
-    <color name="colorAccent">#1B9ECC</color>
-    <color name="colorAccent80">#CC1B9ECC</color>
-    <color name="colorAccent64">#A31B9ECC</color>
-    <color name="colorAccent50">#801B9ECC</color>
-    <color name="colorAccent34">#571B9ECC</color>
-    <color name="colorAccent12">#1F1B9ECC</color>
-    <color name="colorAccent8">#141B9ECC</color>
+    <color name="colorAccent">#42B0FD</color>
+    <color name="colorAccent80">#CC42B0FD</color>
+    <color name="colorAccent64">#A342B0FD</color>
+    <color name="colorAccent50">#8042B0FD</color>
+    <color name="colorAccent34">#5742B0FD</color>
+    <color name="colorAccent12">#1F42B0FD</color>
+    <color name="colorAccent8">#1442B0FD</color>
     <color name="colorAccentTool">#FFFFFF</color>
 
     <color name="colorInverseText">#FFFFFF</color>
@@ -47,4 +47,19 @@
     <color name="colorGreen">#008538</color>
     <color name="colorRedShade">#FFF3F3</color>
     <color name="colorGreenShade">#F5FFF8</color>
+
+    <color name="gnt_ad_green">#3a6728</color>
+    <color name="gnt_ads">#f2f2f2</color>
+    <color name="gnt_bg">#f5f5f5</color>
+    <color name="gnt_black">#000000</color>
+    <color name="gnt_blue">#2196f3</color>
+    <color name="gnt_border">#bfbfbf</color>
+    <color name="gnt_gray">#808080</color>
+    <color name="gnt_green">#00ff00</color>
+    <color name="gnt_mainbg">#79e0e0e0</color>
+    <color name="gnt_outline">#e0e0e0</color>
+    <color name="gnt_red">#ff0000</color>
+    <color name="gnt_test_background_color">#00f4f4f4</color>
+    <color name="gnt_test_background_color_2">#00a3a3a3</color>
+    <color name="gnt_white">#ffffff</color>
 </resources>

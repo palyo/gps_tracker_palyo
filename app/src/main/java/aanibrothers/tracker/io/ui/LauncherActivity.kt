@@ -1,19 +1,20 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.BuildConfig
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
-import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
+import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.loadInterAd
 import aanibrothers.tracker.io.module.preloadNative
-import aanibrothers.tracker.io.ui.updates.AppPermissionActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import aanibrothers.tracker.io.ui.updates.OnboardingActivity
+import aanibrothers.tracker.io.ui.updates.PermissionActivity
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -38,7 +39,7 @@ class LauncherActivity :
     private var mSplashInterstitialAd: InterstitialAd? = null
 
     // Hardcoded splash interstitial unit (preserved from your original code).
-    private val SPLASH_INTER_UNIT = "ca-app-pub-4852962457779682/2927637589"
+    private val SPLASH_INTER_UNIT = if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-4852962457779682/2927637589"
 
     // Hard ceiling on how long we'll keep the splash visible while waiting
     // for the ad to load. After this, we proceed without the ad.
@@ -172,8 +173,8 @@ class LauncherActivity :
                 go(AppLanguageActivity::class.java, finish = true)
             tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true ->
                 go(OnboardingActivity::class.java, finish = true)
-            !hasRequiredAppPermissions() ->
-                go(AppPermissionActivity::class.java, finish = true)
+            !hasAllNewPermissions() ->
+                go(PermissionActivity::class.java, finish = true)
             else ->
                 go(HomeActivity::class.java, finish = true)
         }
@@ -182,9 +183,6 @@ class LauncherActivity :
     override fun ActivityLauncherBinding.initListeners() {}
 
     override fun ActivityLauncherBinding.initExtra() {
-        // Splash interstitial is now loaded AFTER consent inside
-        // loadSplashInterstitial(). Loading here would fire an ad request
-        // before consent, violating GDPR / Google's policy.
     }
 
     override fun onDestroy() {

@@ -114,7 +114,7 @@
     <!--Colors-->
 
     <color name="post_color_white">#FFFFFF</color>
-    <color name="post_color_primary">#1B9ECC</color>
+    <color name="post_color_primary">#42B0FD</color>
     <color name="post_color_text">#141414</color>
     <color name="post_color_shimmer">#EBEBEB</color>
     <color name="post_ads_bg_color">#d8d8d8</color>

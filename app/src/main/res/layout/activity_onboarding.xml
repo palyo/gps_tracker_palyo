@@ -29,6 +29,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_bottom"
         android:layout_width="@dimen/_0sdp"
+
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:background="@color/colorTransparent"
         android:paddingHorizontal="@dimen/_24sdp"
