@@ -1,5 +1,8 @@
 package aanibrothers.tracker.io.module
 
+import aanibrothers.tracker.io.analytics.AdPlacement
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import android.app.*
 import android.content.*
 import android.util.Log
@@ -40,6 +43,13 @@ fun Context.loadInterAd(listener: ((result: Boolean) -> Unit)? = null) {
                 Log.e(TAG, "onAdFailedToLoad:Inter: ${adError.code} ${adError.message}")
                 isLoadingAd = false
                 admobInterstitialAd = null
+                Analytics.log(
+                    AnalyticsEvent.AdFailedToLoad(
+                        placement = AdPlacement.UNKNOWN,
+                        format = "interstitial",
+                        errorCode = adError.code
+                    )
+                )
                 listener?.invoke(true)
             }
 
@@ -92,11 +102,28 @@ private fun Activity.displayInter(listener: ((result: Boolean) -> Unit)? = null)
 }
 
 fun Activity.viewInterAd(listener: ((result: Boolean) -> Unit)? = null) {
+    viewInterAd(placement = AdPlacement.UNKNOWN, listener = listener)
+}
+
+/**
+ * Placement-aware overload. Prefer this at call sites so AdMob revenue can be
+ * broken down by screen in the Firebase / BigQuery dashboards.
+ *
+ * Emits:
+ *   - ad_capped              when frequency cap suppressed a show
+ *   - ad_impression_custom   when an interstitial actually displayed
+ */
+fun Activity.viewInterAd(
+    placement: String,
+    listener: ((result: Boolean) -> Unit)? = null
+) {
     if (isWithinFrequencyCap()) {
+        Analytics.log(AnalyticsEvent.AdCapped(placement = placement))
         listener?.invoke(true)
         return
     }
     if (admobInterstitialAd != null) {
+        Analytics.log(AnalyticsEvent.AdImpression(placement = placement, format = "interstitial"))
         displayInter(listener)
     } else if (!isLoadingAd) {
         listener?.invoke(true)

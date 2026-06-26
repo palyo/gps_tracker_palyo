@@ -1,6 +1,12 @@
 package aanibrothers.tracker.io
 
 import aanibrothers.tracker.io.afterCall.PostDataFragment
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.CaptureCounter
+import aanibrothers.tracker.io.analytics.UserProp
+import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
+import aanibrothers.tracker.io.extension.hasAllNewPermissions
+import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewAppOpen
@@ -12,9 +18,12 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.google.android.gms.maps.MapsInitializer
 import coder.apps.space.library.extension.THEME
 import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
@@ -53,6 +62,31 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         createNotificationChannel()
         TinyDB(this).putInt(THEME, 1)
         themeToggleMode()
+        // Pre-warm the heavy SDKs HomeActivity needs so they aren't blocking
+        // its critical path on cold start. ProcessCameraProvider.getInstance()
+        // returns a singleton future — calling it here starts CameraX init
+        // ~1-2s before HomeActivity ever asks for it. MapsInitializer does
+        // the same for the Google Maps renderer (the 3 SupportMapFragments
+        // in activity_home.xml otherwise pay that cost during inflate).
+        try {
+            ProcessCameraProvider.getInstance(this)
+            MapsInitializer.initialize(this, MapsInitializer.Renderer.LATEST) { /* no-op */ }
+        } catch (t: Throwable) {
+            Log.w("App", "SDK pre-warm failed: ${t.message}")
+        }
+        // Analytics: initialize once, then push the state-derived user
+        // properties so the first session_start (auto) is correctly tagged.
+        Analytics.init(this)
+        val tinyDb = TinyDB(this)
+        Analytics.setProperty(UserProp.PREFERRED_TEMPLATE, tinyDb.getString("template", "default"))
+        Analytics.setProperty(UserProp.PREFERRED_DIRECTORY, tinyDb.getString("directory", "default"))
+        Analytics.setProperty(UserProp.HAS_BASE_PERMS, hasAllNewPermissions().toString())
+        Analytics.setProperty(UserProp.HAS_AFTER_CALL_PERMS, hasRequiredAppPermissions().toString())
+        Analytics.setProperty(
+            UserProp.HAS_SEEN_CALL_END_DIALOG,
+            tinyDb.getBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, false).toString()
+        )
+        CaptureCounter.reportCurrent(this)
         setAvoidMultipleClass(
             mutableListOf(
                 LauncherActivity::class.java,

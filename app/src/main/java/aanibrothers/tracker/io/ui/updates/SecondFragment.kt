@@ -28,7 +28,10 @@ class SecondFragment : Fragment() {
             (activity as? OnboardingActivity)?.goToNext()
         }
 
-        activity?.viewNativeMedium(binding.adNative)
+        activity?.viewNativeMedium(
+            binding.adNative,
+            placement = aanibrothers.tracker.io.analytics.AdPlacement.ONBOARDING_P2
+        )
     }
 
     override fun onDestroyView() {

@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityOnboardingBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
@@ -27,6 +29,8 @@ class OnboardingActivity :
 
     private fun ActivityOnboardingBinding.setupPager() {
         viewPager.adapter = OnboardingPagerAdapter(supportFragmentManager)
+        // Emit page_viewed for the initial page (ViewPager's listener only fires on changes).
+        Analytics.log(AnalyticsEvent.OnboardingPageViewed(pageIndex = 1))
 
         viewPager.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(
@@ -38,6 +42,7 @@ class OnboardingActivity :
 
             override fun onPageSelected(position: Int) {
                 updateTabs()
+                Analytics.log(AnalyticsEvent.OnboardingPageViewed(pageIndex = position + 1))
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -53,6 +58,7 @@ class OnboardingActivity :
             return
         }
         tinyDB?.putBoolean(IS_INTRO_ENABLED, false)
+        Analytics.log(AnalyticsEvent.OnboardingCompleted)
         if (!hasAllNewPermissions()|| !isLocationEnabled()) {
             go(PermissionActivity::class.java, finish = true)
             return

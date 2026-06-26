@@ -1,14 +1,18 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.BuildConfig
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
+import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.loadInterAd
@@ -49,6 +53,7 @@ class LauncherActivity :
     override fun ActivityLauncherBinding.initView() {
         // Order: gather consent -> init MobileAds -> load splash interstitial
         // -> show it -> goNext. No ad request runs before consent is granted.
+        Analytics.log(AnalyticsEvent.LanguageView)
         requestConsentForm()
         updateStatusBarColor(R.color.colorTransparent)
     }
@@ -168,6 +173,7 @@ class LauncherActivity :
     private fun goNext(int: Int) {
         Log.e(TAG, "goNext: $int" )
         loadInterAd()
+        appOpenManager = AppOpenManager()
         if (hasNavigated.getAndSet(true)) return
         when {
             tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true ->

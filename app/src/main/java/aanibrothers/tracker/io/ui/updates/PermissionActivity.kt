@@ -1,6 +1,9 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.App
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
+import aanibrothers.tracker.io.analytics.UserProp
 import aanibrothers.tracker.io.databinding.ActivityPermissionBinding
 import aanibrothers.tracker.io.databinding.LayoutDialogPermissionSettingsBinding
 import aanibrothers.tracker.io.databinding.LoactionPermissionDialogBinding
@@ -49,13 +52,23 @@ class PermissionActivity :
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             result.forEach { (perm, granted) ->
-                if (!granted) {
-                    val key = permissionKeyMap.entries.firstOrNull { it.value.contains(perm) }?.key
-                    if (key != null) incrementDeniedCount(key)
+                val key = permissionKeyMap.entries.firstOrNull { it.value.contains(perm) }?.key
+                    ?: return@forEach
+                if (granted) {
+                    Analytics.log(AnalyticsEvent.PermissionGranted(permissionType = key))
+                } else {
+                    incrementDeniedCount(key)
+                    Analytics.log(
+                        AnalyticsEvent.PermissionDenied(
+                            permissionType = key,
+                            denialCount = getDeniedCount(key)
+                        )
+                    )
                 }
             }
             refreshUi()
             if (hasAllNewPermissions()) {
+                Analytics.setProperty(UserProp.HAS_BASE_PERMS, "true")
                 binding?.btnAllowPermission?.performClick()
                 return@registerForActivityResult
             }
@@ -67,7 +80,7 @@ class PermissionActivity :
     override fun ActivityPermissionBinding.initView() {
         handlerSettingOverLay = HandleSettingPreview(this@PermissionActivity)
         refreshUi()
-        viewNativeMedium(adNative)
+        viewNativeMedium(adNative, placement = aanibrothers.tracker.io.analytics.AdPlacement.PERMISSION)
     }
 
     override fun ActivityPermissionBinding.initExtra() {
@@ -122,7 +135,8 @@ class PermissionActivity :
                     if (!isFinishing) dialog.show()
                     return@setOnClickListener
                 }
-                viewInterAd {
+                Analytics.log(AnalyticsEvent.PermissionFlowCompleted(set = "base_3"))
+                viewInterAd(placement = aanibrothers.tracker.io.analytics.AdPlacement.PERM_CONTINUE) {
                     go(HomeActivity::class.java, finish = true)
                 }
             }
@@ -177,8 +191,17 @@ class PermissionActivity :
 
         val deniedCount = getDeniedCount(key)
         if (deniedCount <= maxDeniedCount) {
+            Analytics.log(
+                AnalyticsEvent.PermissionRequested(permissionType = key, attempt = deniedCount + 1)
+            )
             requestPermissionsLauncher.launch(permissions)
         } else {
+            Analytics.log(
+                AnalyticsEvent.PermissionSettingsOpened(
+                    permissionType = key,
+                    surface = "perm_activity"
+                )
+            )
             showSettingsDialog()
         }
     }

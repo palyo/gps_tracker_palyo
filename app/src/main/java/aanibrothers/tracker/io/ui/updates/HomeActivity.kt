@@ -4,8 +4,12 @@ import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
+import aanibrothers.tracker.io.analytics.CaptureCounter
 import aanibrothers.tracker.io.databinding.CallEndPermissionDialogBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
+import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.extension.AFTER_CALL_PERMISSION
 import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
 import aanibrothers.tracker.io.extension.hasAfterCallPermissions
@@ -158,8 +162,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private var handlerSettingOverLay: HandleSettingPreview? = null
     private var callEndPermissionDialog: android.app.Dialog? = null
     private val PERMISSION_REQUEST_CODE = 100
+    private var hasLoggedHomeShown = false
     private var cameraProvider: ProcessCameraProvider? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var fusedLocationClient: FusedLocationProviderClient?=null
 
     private var captureMode = CaptureMode.PHOTO
     private lateinit var videoCapture: VideoCapture<Recorder>
@@ -202,7 +207,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private val overlayPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if(!isGrantedOverlay()){
+            if (!isGrantedOverlay()) {
                 callEndPermissionDialog?.show()
             }
         }
@@ -217,17 +222,30 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun ActivityHomeBinding.initExtra() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         isPortraitMode = true
-
-        initializeComponents()
-        setupOrientationListener()
-        setupFocusView()
-        setupTab()
-        setupMapSnapshot()
-        displayCurrentLocation()
-        setupTimeDisplay()
-        appOpenManager = AppOpenManager()
-        requestPermissions()
-        updateCameraPermissionUi()
+        if(hasRequiredAppPermissions()){
+            initializeComponents()
+            setupOrientationListener()
+            setupFocusView()
+            setupTab()
+            setupMapSnapshot()
+            displayCurrentLocation()
+            setupTimeDisplay()
+            requestPermissions()
+            updateCameraPermissionUi()
+        }else{
+            Handler(mainLooper).postDelayed({
+                initializeComponents()
+                setupOrientationListener()
+                setupFocusView()
+                setupTab()
+                setupMapSnapshot()
+                displayCurrentLocation()
+                setupTimeDisplay()
+                requestPermissions()
+                updateCameraPermissionUi()
+            },2000)
+            maybeShowCallEndPermissionDialog()
+        }
 
     }
 
@@ -235,11 +253,33 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private val lastMapSnapshot = java.util.concurrent.atomic.AtomicReference<Bitmap?>()
 
     private fun getActiveMapFragment(): SupportMapFragment? {
-        return when (tinyDB?.getString("template", "default")) {
-            "classic" -> supportFragmentManager.findFragmentById(R.id.map_fragment_classic) as? SupportMapFragment
-            "squarise" -> supportFragmentManager.findFragmentById(R.id.map_fragment_squarise) as? SupportMapFragment
-            else -> supportFragmentManager.findFragmentById(R.id.map_fragment) as? SupportMapFragment
+        // Map fragment containers are empty FrameLayouts in the XML.
+        // We install a SupportMapFragment into the active template's
+        // container lazily on first access — this keeps the heavy Google
+        // Maps SDK out of the activity's inflate critical path (otherwise
+        // each <fragment> tag blocked the main thread ~95ms in
+        // ENABLE_FEATURES during onCreateView).
+        val containerId = when (tinyDB?.getString("template", "default")) {
+            "classic" -> R.id.map_fragment_classic
+            "squarise" -> R.id.map_fragment_squarise
+            else -> R.id.map_fragment
         }
+        val tag = "map_fragment_$containerId"
+
+        supportFragmentManager.findFragmentByTag(tag)?.let {
+            return it as? SupportMapFragment
+        }
+
+        val fragment = SupportMapFragment.newInstance()
+        try {
+            supportFragmentManager.beginTransaction()
+                .replace(containerId, fragment, tag)
+                .commitNowAllowingStateLoss()
+        } catch (t: Throwable) {
+            Log.w(HomeActivity::class.java.simpleName, "Map fragment install failed", t)
+            return null
+        }
+        return fragment
     }
 
     private fun setupMapSnapshot() {
@@ -302,6 +342,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     captureMode = if (tab.position == 0) CaptureMode.PHOTO else CaptureMode.VIDEO
+                    Analytics.log(
+                        AnalyticsEvent.CaptureModeChanged(mode = captureMode.name.lowercase())
+                    )
                     updateCaptureUI()
                     if (captureMode == CaptureMode.VIDEO && !hasPermission(Manifest.permission.RECORD_AUDIO)) {
                         showAudioPermissionDialog()
@@ -431,9 +474,12 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     override fun onStart() {
         super.onStart()
-        orientationEventListener?.enable()
-        binding?.updateCameraPermissionUi()
-        restoreLocationModeFromPref()
+        Handler(mainLooper).postDelayed({
+            orientationEventListener?.enable()
+            binding?.updateCameraPermissionUi()
+            restoreLocationModeFromPref()
+        },1000)
+
     }
 
     override fun onStop() {
@@ -445,18 +491,23 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     override fun onResume() {
         super.onResume()
-        allowMapSnapshot = true
-        restoreUIState()
-        checkGooglePlayServices()
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        binding?.apply {
-            getLatestCapturedFile()?.let { latestFile ->
-                lastCapturedFile = latestFile
-                Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
-            }
+        if (!hasLoggedHomeShown) {
+            hasLoggedHomeShown = true
+            Analytics.log(AnalyticsEvent.HomeShown(isFirstSession = appOpenCount <= 1))
         }
-        binding?.updateCameraPermissionUi()
-
+        Handler(mainLooper).postDelayed({
+            allowMapSnapshot = true
+            restoreUIState()
+            checkGooglePlayServices()
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            binding?.apply {
+                getLatestCapturedFile()?.let { latestFile ->
+                    lastCapturedFile = latestFile
+                    Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
+                }
+            }
+            binding?.updateCameraPermissionUi()
+        },1000)
     }
 
     private fun maybeShowCallEndPermissionDialog() {
@@ -465,6 +516,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         if (hasRequiredAppPermissions()) return
         if (tinyDB?.getBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, false) == true) return
 
+        handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
         val dialogBinding = CallEndPermissionDialogBinding.inflate(layoutInflater)
         val dialog = android.app.Dialog(this).apply {
             requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
@@ -483,18 +535,21 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
         dialogBinding.btnGrantPermission.setOnClickListener {
             tinyDB?.putBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, true)
+            Analytics.log(AnalyticsEvent.CallEndDialogAction(action = "grant"))
             dialog.dismiss()
             handleCallEndPermissions()
         }
 
         callEndPermissionDialog = dialog
         dialog.show()
+        Analytics.log(AnalyticsEvent.CallEndDialogShown)
     }
 
     private fun handleCallEndPermissions() {
         when {
             !hasAfterCallPermissions() ->
                 afterCallPermissionsLauncher.launch(AFTER_CALL_PERMISSION)
+
             !isGrantedOverlay() -> requestOverlayPermission()
         }
     }
@@ -503,7 +558,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
             data = Uri.fromParts("package", packageName, null)
         }
-        App.isOpenInter =true
+        App.isOpenInter = true
         handlerSettingOverLay?.startPollingImeSettings()
         overlayPermissionLauncher.launch(intent)
     }
@@ -603,10 +658,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     @SuppressLint("SetTextI18n")
     private fun initializeComponents() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this@HomeActivity)
-        cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
-        }, ContextCompat.getMainExecutor(this))
+        // Preview frames bind asynchronously in startCamera(). Observe the
+        // stream state so the loading overlay disappears the moment the
+        // first frame draws — otherwise the SurfaceView shows a black hole
+        // through the activity background for 3–5s on cold start.
+        binding?.previewView?.previewStreamState?.observe(this) { state ->
+            if (state == androidx.camera.view.PreviewView.StreamState.STREAMING) {
+                binding?.previewLoadingOverlay?.visibility = View.GONE
+            }
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         binding?.apply {
@@ -793,6 +853,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun ActivityHomeBinding.startCamera() {
+        // Show the loading overlay until the first preview frame arrives;
+        // the previewStreamState observer in initializeComponents() hides
+        // it once StreamState.STREAMING is reported.
+        previewLoadingOverlay.visibility = View.VISIBLE
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this@HomeActivity)
 
         cameraProviderFuture.addListener({
@@ -1051,6 +1116,22 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             progressBarAnimation.playAnimation()
         }
 
+        val template = tinyDB?.getString("template", "default") ?: "default"
+        val locModeStr = locationMode.name.lowercase()
+        val timerSeconds = when (actionTimer.text) {
+            getString(R.string.action_timer_3sec) -> 3
+            getString(R.string.action_timer_5sec) -> 5
+            else -> 0
+        }
+        Analytics.log(
+            AnalyticsEvent.CaptureAttempted(
+                mode = "photo",
+                template = template,
+                locationMode = locModeStr,
+                hasTimer = timerSeconds
+            )
+        )
+
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this@HomeActivity),
@@ -1059,10 +1140,24 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     val options = BitmapFactory.Options()
                     options.inJustDecodeBounds = true
                     BitmapFactory.decodeFile(photoFile.absolutePath, options)
+                    Analytics.log(
+                        AnalyticsEvent.CaptureSucceeded(
+                            mode = "photo",
+                            template = template,
+                            fileSizeKb = photoFile.length() / 1024
+                        )
+                    )
+                    CaptureCounter.bumpAndReport(this@HomeActivity)
                     processAndSaveImageWithOverlays(photoFile)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
+                    Analytics.log(
+                        AnalyticsEvent.CaptureFailed(
+                            mode = "photo",
+                            reason = exception.imageCaptureError.toString()
+                        )
+                    )
                     runOnUiThread {
                         hideProgressAnimations()
                         Toast.makeText(
@@ -1414,7 +1509,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                         ).show()
                                         lastCapturedFile = outputFile
                                         binding?.imageCaptured?.let { preview ->
-                                            Glide.with(this@HomeActivity).load(outputFile).into(preview)
+                                            Glide.with(this@HomeActivity).load(outputFile)
+                                                .into(preview)
                                         }
                                     }
                                 },
@@ -1433,7 +1529,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                         ).show()
                                         lastCapturedFile = inputFile
                                         binding?.imageCaptured?.let { preview ->
-                                            Glide.with(this@HomeActivity).load(inputFile).into(preview)
+                                            Glide.with(this@HomeActivity).load(inputFile)
+                                                .into(preview)
                                         }
                                     }
                                 })
@@ -1465,7 +1562,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun updateOverlayTextValues() {
         try {
             if (hasLocationPermission()) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
                     location?.let { loc ->
                         getSelectedLocation(loc)?.let {
                             updateLocationUI(it)
@@ -1528,7 +1625,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             return
         }
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             if (location != null) {
                 updateLocationUI(location)
             }
@@ -1544,7 +1641,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun updateMapMarker(googleMap: GoogleMap) {
         if (!hasLocationPermission()) return
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             location?.let { loc ->
                 val selectedLoc = getSelectedLocation(loc) ?: return@let
                 val latLng = LatLng(selectedLoc.latitude, selectedLoc.longitude)
@@ -1651,7 +1748,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         address.getAddressLine(0).length < 12
 
                     if (isShort) {
-                        Log.e("isShort", "updateLocationUI: $fullAddress" )
+                        Log.e("isShort", "updateLocationUI: $fullAddress")
                         displayCurrentLocation()
                         return@getAddress
                     }
@@ -1704,14 +1801,14 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         if (!hasLocationPermission()) return
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 15000)
             .setWaitForAccurateLocation(false).setMinUpdateIntervalMillis(10000).build()
-        fusedLocationClient.requestLocationUpdates(
+        fusedLocationClient?.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper()
-        ).addOnCompleteListener { _ -> }
+        )?.addOnCompleteListener { _ -> }
     }
 
     private fun stopLocationUpdates() {
         try {
-            fusedLocationClient.removeLocationUpdates(locationCallback)
+            fusedLocationClient?.removeLocationUpdates(locationCallback)
         } catch (e: Exception) {
         }
     }
@@ -1910,15 +2007,19 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         adminArea = unknownValue
                         countryName = unknownValue
                     }
-                    callback(address)
+                    // Geocoder callbacks fire on a background thread on
+                    // Tiramisu+. The callback below touches Views, so hop
+                    // back to the main thread first.
+                    runOnUiThread { callback(address) }
                 }
 
                 override fun onError(errorMessage: String?) {
-                    callback(Address(Locale.getDefault()).apply {
+                    val fallback = Address(Locale.getDefault()).apply {
                         locality = unknownValue
                         adminArea = unknownValue
                         countryName = unknownValue
-                    })
+                    }
+                    runOnUiThread { callback(fallback) }
                 }
             })
         } else {
@@ -1992,9 +2093,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                             )
                         )
                     } else {
-                        val intent = Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
-                            putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
-                        }
+                        val intent =
+                            Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
+                                putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
+                            }
                         startActivity(intent)
                     }
                 } else {
@@ -2176,7 +2278,5 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 showExitSheet()
             }
         }
-        handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
-        maybeShowCallEndPermissionDialog()
     }
 }

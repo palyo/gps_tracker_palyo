@@ -111,7 +111,7 @@
     <string name="button_buy_now">Comprar ahora</string>
     <string name="button_restore">Restaurar</string>
 
-    <string name="app_name_splash">GPS Camera\nTrack GPS &amp; Maps</string>
+    <string name="app_name_splash">Track GPS &amp; Maps</string>
     <string name="title_onboarding1">Capture Photos with GPS Details</string>
     <string name="body_onboarding1">Automatically add location, date, time, and map view to every photo you take.</string>
     <string name="title_onboarding2">Rename Your Location</string>

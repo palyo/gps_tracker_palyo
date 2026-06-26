@@ -1,5 +1,8 @@
 package aanibrothers.tracker.io.module
 
+import aanibrothers.tracker.io.analytics.AdPlacement
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.AdUnifiedBannerBinding
 import aanibrothers.tracker.io.databinding.AdUnifiedMediumBinding
 import aanibrothers.tracker.io.databinding.AdUnifiedSmallBinding
@@ -44,52 +47,106 @@ fun Activity.preloadNative() {
     }
 }
 
-fun Activity.viewNativeBanner(container: AdsView) {
+fun Activity.viewNativeBanner(container: AdsView) =
+    viewNativeBanner(container = container, placement = AdPlacement.UNKNOWN)
+
+fun Activity.viewNativeMedium(container: AdsView) =
+    viewNativeMedium(container = container, placement = AdPlacement.UNKNOWN)
+
+fun Activity.viewNativeSmall(container: AdsView) =
+    viewNativeSmall(container = container, placement = AdPlacement.UNKNOWN)
+
+/**
+ * Placement-aware overloads — prefer these at call sites so AdMob revenue
+ * dashboards can break down impressions by screen.
+ *
+ * Each overload emits ad_impression_custom the moment populateAdView* runs.
+ * If the native cache was hot, that's a synchronous impression. If we had to
+ * load fresh, the event fires inside onLoad — still on the main thread, still
+ * after the ad view is populated.
+ */
+fun Activity.viewNativeBanner(container: AdsView, placement: String) {
+    val emit = {
+        Analytics.log(AnalyticsEvent.AdImpression(placement = placement, format = "native_banner"))
+    }
     if (nativeAd != null) {
         populateAdViewBanner(nativeAd, container = container)
+        emit()
         preloadNative()
     } else {
         loadNative(object : OnNativeLoad {
             override fun onLoad(nativeAd: NativeAd) {
                 populateAdViewBanner(nativeAd, container = container)
+                emit()
                 preloadNative()
             }
 
             override fun onFail() {
+                Analytics.log(
+                    AnalyticsEvent.AdFailedToLoad(
+                        placement = placement,
+                        format = "native_banner",
+                        errorCode = -1
+                    )
+                )
             }
         })
     }
 }
 
-fun Activity.viewNativeMedium(container: AdsView) {
+fun Activity.viewNativeMedium(container: AdsView, placement: String) {
+    val emit = {
+        Analytics.log(AnalyticsEvent.AdImpression(placement = placement, format = "native_medium"))
+    }
     if (nativeAd != null) {
         populateAdViewMedium(nativeAd, container = container)
+        emit()
         preloadNative()
     } else {
         loadNative(object : OnNativeLoad {
             override fun onLoad(nativeAd: NativeAd) {
                 populateAdViewMedium(nativeAd, container = container)
+                emit()
                 preloadNative()
             }
 
             override fun onFail() {
+                Analytics.log(
+                    AnalyticsEvent.AdFailedToLoad(
+                        placement = placement,
+                        format = "native_medium",
+                        errorCode = -1
+                    )
+                )
             }
         })
     }
 }
 
-fun Activity.viewNativeSmall(container: AdsView) {
+fun Activity.viewNativeSmall(container: AdsView, placement: String) {
+    val emit = {
+        Analytics.log(AnalyticsEvent.AdImpression(placement = placement, format = "native_small"))
+    }
     if (nativeAd != null) {
         populateAdViewSmall(nativeAd, container = container)
+        emit()
         preloadNative()
     } else {
         loadNative(object : OnNativeLoad {
             override fun onLoad(nativeAd: NativeAd) {
                 populateAdViewSmall(nativeAd, container = container)
+                emit()
                 preloadNative()
             }
 
             override fun onFail() {
+                Analytics.log(
+                    AnalyticsEvent.AdFailedToLoad(
+                        placement = placement,
+                        format = "native_small",
+                        errorCode = -1
+                    )
+                )
             }
         })
     }

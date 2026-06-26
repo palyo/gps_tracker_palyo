@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.adapter.LanguageAdapter
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityAppLanguageBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
@@ -30,7 +32,7 @@ class AppLanguageActivity :
         updateNavigationBarColor(R.color.colorBlack)
         language = currentLanguage ?: Locale.getDefault().language
         initAdapter()
-        viewNativeMedium(adNative)
+        viewNativeMedium(adNative, placement = aanibrothers.tracker.io.analytics.AdPlacement.LANGUAGE)
     }
 
     private fun ActivityAppLanguageBinding.initAdapter() {
@@ -48,8 +50,10 @@ class AppLanguageActivity :
             currentLanguage = language
             val fromSettings = intent?.getBooleanExtra(IS_SETTINGS, false)
             if (fromSettings == true) {
+                Analytics.log(AnalyticsEvent.LanguageSelected(langCode = language, source = "settings"))
                 go(AppSettingsActivity::class.java, finish = true)
             } else {
+                Analytics.log(AnalyticsEvent.LanguageSelected(langCode = language, source = "first_launch"))
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
                 val continueFlow = {
                     if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {

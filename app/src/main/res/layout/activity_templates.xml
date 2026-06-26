@@ -739,7 +739,7 @@
     <aanibrothers.tracker.io.module.AdsView
         android:id="@+id/ad_native"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/native_small"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
