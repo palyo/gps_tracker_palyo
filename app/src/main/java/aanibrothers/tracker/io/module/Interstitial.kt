@@ -6,8 +6,12 @@ import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import android.app.*
 import android.content.*
 import android.util.Log
-import com.google.android.gms.ads.*
-import com.google.android.gms.ads.interstitial.*
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
 
 const val TAG = "ADMOB_TAG"
 private var admobInterstitialAd: InterstitialAd? = null
@@ -32,11 +36,10 @@ fun Context.loadInterAd(listener: ((result: Boolean) -> Unit)? = null) {
         return
     }
     isLoadingAd = true
-    val adRequest = AdRequest.Builder().build()
     val start = System.currentTimeMillis()
     InterstitialAd.load(
-        this, adUnitId, adRequest,
-        object : InterstitialAdLoadCallback() {
+        AdRequest.Builder(adUnitId).build(),
+        object : AdLoadCallback<InterstitialAd> {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 val seconds = (System.currentTimeMillis() - start) / 1000.0
                 Log.e("AdTiming", "Inter onAdFailedToLoad in $seconds seconds")
@@ -47,16 +50,16 @@ fun Context.loadInterAd(listener: ((result: Boolean) -> Unit)? = null) {
                     AnalyticsEvent.AdFailedToLoad(
                         placement = AdPlacement.UNKNOWN,
                         format = "interstitial",
-                        errorCode = adError.code
+                        errorCode = adError.code.ordinal
                     )
                 )
                 listener?.invoke(true)
             }
 
-            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+            override fun onAdLoaded(ad: InterstitialAd) {
                 val seconds = (System.currentTimeMillis() - start) / 1000.0
                 isLoadingAd = false
-                admobInterstitialAd = interstitialAd
+                admobInterstitialAd = ad
                 Log.e("AdTiming", "Inter loaded in $seconds seconds")
                 Log.e(TAG, "onAdLoaded:Inter ")
                 listener?.invoke(false)
@@ -73,7 +76,7 @@ private fun Activity.displayInter(listener: ((result: Boolean) -> Unit)? = null)
         listener?.invoke(true)
         return
     }
-    ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+    ad.adEventCallback = object : InterstitialAdEventCallback {
         override fun onAdClicked() {}
 
         override fun onAdDismissedFullScreenContent() {
@@ -86,7 +89,7 @@ private fun Activity.displayInter(listener: ((result: Boolean) -> Unit)? = null)
             // requests with low impression-to-request ratios.
         }
 
-        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+        override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
             admobInterstitialAd = null
             listener?.invoke(true)
             loadInterAd()

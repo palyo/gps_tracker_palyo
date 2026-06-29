@@ -50,9 +50,17 @@ class FilePagerAdapter(val context: Activity?) : RecyclerView.Adapter<FilePagerA
                 if (!this@context.isDestroyed && !this@context.isFinishing) {
                     media?.let { media ->
                         imageMedia.apply {
-                            Glide.with(this@context.applicationContext).load(media.path).transition(DrawableTransitionOptions.withCrossFade()).apply(
-                                RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)
-                            ).into(this)
+                            // Downsample to the view bounds (fitCenter) instead of
+                            // decoding the full-resolution photo — a GPS camera shot
+                            // is multiple MB and decoding it whole caused a 3-4s
+                            // black screen. A 10% thumbnail shows almost instantly,
+                            // then the sharp image crossfades in.
+                            Glide.with(this@context.applicationContext)
+                                .load(media.path)
+                                .thumbnail(0.1f)
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .apply(RequestOptions().fitCenter().skipMemoryCache(false))
+                                .into(this)
                         }
                     }
 

@@ -319,6 +319,34 @@
 # For mediation
 -keepattributes *Annotation*
 
+# ---- GMA Next-Gen SDK (com.google.android.libraries.ads.mobile.sdk) ----
+-keep class com.google.android.libraries.ads.mobile.sdk.** { *; }
+-keep interface com.google.android.libraries.ads.mobile.sdk.** { *; }
+-dontwarn com.google.android.libraries.ads.mobile.sdk.**
+# The SDK's internal runtime package (relocated/obfuscated inside the AAR).
+-keep class ads_mobile_sdk.** { *; }
+-dontwarn ads_mobile_sdk.**
+
+# ---- Okio / OkHttp used internally by the Next-Gen SDK ----
+-keep class okio.** { *; }
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-dontwarn okhttp3.**
+
+# ---- Mediation network SDKs (reflection-loaded by the adapters) ----
+-keep class com.applovin.** { *; }
+-dontwarn com.applovin.**
+-keep class com.inmobi.** { *; }
+-dontwarn com.inmobi.**
+-keep class com.ironsource.** { *; }
+-dontwarn com.ironsource.**
+-keep class com.unity3d.** { *; }
+-dontwarn com.unity3d.**
+-keep class com.vungle.** { *; }
+-dontwarn com.vungle.**
+-keep class com.facebook.ads.** { *; }
+-dontwarn com.facebook.ads.**
+
 # Other required classes for Google Play Services
 # Read more at http://developer.android.com/google/play-services/setup.html
 -keep class * extends java.util.ListResourceBundle {

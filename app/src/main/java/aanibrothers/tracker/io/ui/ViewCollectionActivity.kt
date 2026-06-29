@@ -52,6 +52,19 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
     }
 
     private fun fetchData() {
+        // Show the just-opened file immediately so the viewer isn't blank while
+        // the full directory is scanned on a background thread (the scan can take
+        // a noticeable moment when the folder has many photos).
+        val initial = initialFilePath
+        if (!initial.isNullOrBlank()) {
+            val initialFile = File(initial)
+            if (initialFile.exists()) {
+                currentPos = 0
+                fileAdapter?.items?.clear()
+                fileAdapter?.addAll(mutableListOf(initialFile))
+                binding?.viewPager?.setCurrentItem(0, false)
+            }
+        }
         CoroutineScope(Dispatchers.IO).launch {
             val directory = targetDirectory
                 ?.takeIf { it.exists() && it.isDirectory }
@@ -59,16 +72,17 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
                     getString(R.string.folder_gps_camera)
                 )
-            filesList = directory.listFiles { file ->
+            val scanned = directory.listFiles { file ->
                 file.isFile && isImageFile(file)
             }?.toMutableList() ?: mutableListOf()
-            filesList?.sortByDescending { it.lastModified() }
+            scanned.sortByDescending { it.lastModified() }
+            filesList = scanned
             launch(Dispatchers.Main) {
                 val targetPath = initialFilePath
-                if (!targetPath.isNullOrBlank()) {
-                    val index = filesList?.indexOfFirst { it.absolutePath == targetPath } ?: -1
-                    if (index >= 0) currentPos = index
-                }
+                val index = if (!targetPath.isNullOrBlank()) {
+                    scanned.indexOfFirst { it.absolutePath == targetPath }
+                } else -1
+                currentPos = if (index >= 0) index else 0
                 fileAdapter?.items?.clear()
                 fileAdapter?.addAll(filesList)
                 binding?.viewPager?.setCurrentItem(currentPos, false)
@@ -91,7 +105,6 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             currentPos = position
-            val file = filesList?.get(position)
             binding?.toolbar?.title = ""
         }
     }

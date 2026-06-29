@@ -3,8 +3,12 @@ package aanibrothers.tracker.io.module
 import aanibrothers.tracker.io.*
 import android.app.*
 import android.os.*
-import com.google.android.gms.ads.*
-import com.google.android.gms.ads.appopen.*
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import java.util.*
 
 class AppOpenManager {
@@ -22,7 +26,7 @@ class AppOpenManager {
     }
 
     private var appOpenAd: AppOpenAd? = null
-    private var loadCallback: AppOpenAd.AppOpenAdLoadCallback? = null
+    private var loadCallback: AdLoadCallback<AppOpenAd>? = null
     private var loadTime: Long = 0
     private var listeners: ((result: Boolean) -> Unit)? = null
     private var isLoading = false
@@ -79,7 +83,7 @@ class AppOpenManager {
                     }
                 }
             }
-            val fullScreenContentCallback = object : FullScreenContentCallback() {
+            val adEventCallback = object : AppOpenAdEventCallback {
                 override fun onAdDismissedFullScreenContent() {
                     listeners?.invoke(false)
                     appOpenAd = null
@@ -91,7 +95,7 @@ class AppOpenManager {
                     // dismiss inflates request count without impressions.
                 }
 
-                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     listeners?.invoke(true)
                     listeners = null
                 }
@@ -101,7 +105,7 @@ class AppOpenManager {
                     lastShownAt = System.currentTimeMillis()
                 }
             }
-            appOpenAd?.fullScreenContentCallback = fullScreenContentCallback
+            appOpenAd?.adEventCallback = adEventCallback
             isLoaded = false
             App.currentActivity?.let {
                 appOpenAd?.show(it)
@@ -178,9 +182,8 @@ class AppOpenManager {
             return
         }
 
-        loadCallback = object : AppOpenAd.AppOpenAdLoadCallback() {
+        loadCallback = object : AdLoadCallback<AppOpenAd> {
             override fun onAdLoaded(ad: AppOpenAd) {
-                super.onAdLoaded(ad)
                 isLoading = false
                 isFailed = false
                 appOpenAd = ad
@@ -191,8 +194,7 @@ class AppOpenManager {
                 }
             }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                super.onAdFailedToLoad(loadAdError)
+            override fun onAdFailedToLoad(adError: LoadAdError) {
                 isFailed = true
                 isLoading = false
                 if (dialogShow) {
@@ -205,11 +207,9 @@ class AppOpenManager {
                 listeners = null
             }
         }
-        val request = getAdRequest()
         try {
-            App.getAppContext().let {
-                AppOpenAd.load(it, admobId ?: "", request, loadCallback as AppOpenAd.AppOpenAdLoadCallback)
-            }
+            val request = AdRequest.Builder(admobId ?: "").build()
+            AppOpenAd.load(request, loadCallback as AdLoadCallback<AppOpenAd>)
         } catch (ex: Exception) {
             isFailed = true
             isLoading = false
@@ -223,10 +223,6 @@ class AppOpenManager {
         }
         isLoading = true
         isFailed = false
-    }
-
-    private fun getAdRequest(): AdRequest {
-        return AdRequest.Builder().build()
     }
 
     private fun wasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {

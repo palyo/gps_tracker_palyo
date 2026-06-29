@@ -130,7 +130,13 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
     }
 
     fun isShowOpenAdsOnStart(classname: String): Boolean {
-        if (classname == "com.google.android.gms.ads.AdActivity" || AppOpenManager.isShowingAd) {
+        // Don't fire an App Open ad while a full-screen ad (interstitial /
+        // rewarded) is showing. The Next-Gen SDK renders these in its own
+        // AdActivity; the legacy class name is kept too for safety.
+        if (classname == "com.google.android.libraries.ads.mobile.sdk.common.AdActivity" ||
+            classname == "com.google.android.gms.ads.AdActivity" ||
+            AppOpenManager.isShowingAd
+        ) {
             return false
         }
         for (aClass in classes) {

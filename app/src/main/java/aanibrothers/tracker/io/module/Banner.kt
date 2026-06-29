@@ -14,11 +14,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isNotEmpty
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.banner.AdView
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 
 // Bounded retry. The previous implementation called viewBanner(container)
 // recursively on every no-fill — an infinite ad-request storm that triggers
@@ -41,15 +42,22 @@ private fun Activity.viewBannerInternal(container: ViewGroup, attempt: Int) {
     params.height = height
     container.layoutParams = params
     container.addView(view.root)
-    val adView = AdView(this)
-    adView.setAdSize(adSize)
-    val adId = getAdmobBannerId()
-    adView.adUnitId = adId
 
-    adView.adListener = object : AdListener() {
-        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-            super.onAdFailedToLoad(loadAdError)
-            Log.e(TAG, "Banner failed (attempt $attempt): ${loadAdError.code} ${loadAdError.message}")
+    val adId = getAdmobBannerId()
+    val adView = AdView(this)
+    val adRequest = BannerAdRequest.Builder(adId, adSize).build()
+    adView.loadAd(adRequest, object : AdLoadCallback<BannerAd> {
+        override fun onAdLoaded(ad: BannerAd) {
+            // Next-Gen load callbacks fire on a background thread; touch the
+            // view hierarchy only on the UI thread.
+            container.post {
+                if (container.isNotEmpty()) container.removeAllViews()
+                container.addView(adView)
+            }
+        }
+
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+            Log.e(TAG, "Banner failed (attempt $attempt): ${adError.code} ${adError.message}")
             if (attempt >= MAX_BANNER_RETRIES) return
             if (isFinishing || isDestroyed) return
             Handler(Looper.getMainLooper()).postDelayed({
@@ -58,14 +66,7 @@ private fun Activity.viewBannerInternal(container: ViewGroup, attempt: Int) {
                 }
             }, BANNER_RETRY_DELAY_MS)
         }
-
-        override fun onAdLoaded() {
-            super.onAdLoaded()
-            if (container.isNotEmpty()) container.removeAllViews()
-            container.addView(adView)
-        }
-    }
-    adView.loadAd(AdRequest.Builder().build())
+    })
 }
 
 private fun Activity.getAdSize(): AdSize {
@@ -80,25 +81,23 @@ private fun Activity.getAdSize(): AdSize {
 
 
 fun Context.viewMRECBanner(viewGroup: AdsView) {
-    val mAdView = AdView(this)
-    mAdView.adUnitId = getAdmobBannerMRECId()
-    mAdView.setAdSize(AdSize.MEDIUM_RECTANGLE)
-    mAdView.adListener = object : AdListener() {
-        override fun onAdLoaded() {
-            super.onAdLoaded()
-            viewGroup.removeAllViews()
-            val layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                gravity = Gravity.CENTER
+    val adView = AdView(this)
+    val adRequest = BannerAdRequest.Builder(getAdmobBannerMRECId(), AdSize.MEDIUM_RECTANGLE).build()
+    adView.loadAd(adRequest, object : AdLoadCallback<BannerAd> {
+        override fun onAdLoaded(ad: BannerAd) {
+            viewGroup.post {
+                viewGroup.removeAllViews()
+                val layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    gravity = Gravity.CENTER
+                }
+                viewGroup.addView(adView, layoutParams)
             }
-            viewGroup.addView(mAdView, layoutParams)
         }
 
-        override fun onAdFailedToLoad(p0: LoadAdError) {
-            super.onAdFailedToLoad(p0)
-            Log.e(TAG, "onAdFailedToLoad:MRECBanner ${p0.message}")
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+            Log.e(TAG, "onAdFailedToLoad:MRECBanner ${adError.message}")
         }
-    }
-    mAdView.loadAd(AdRequest.Builder().build())
+    })
 }

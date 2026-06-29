@@ -68,8 +68,20 @@ android {
     }
     configurations {
         implementation {
-            exclude(group = "com.squareup.okio", module = "okio")
+            exclude(group = "com.google.android.gms", module = "play-services-ads")
+            exclude(group = "com.google.android.gms", module = "play-services-ads-lite")
         }
+    }
+}
+
+// A mediation adapter transitively pulls kotlin-stdlib 2.3.0, which is newer
+// than this project's Kotlin (2.1.0) and breaks KSP metadata parsing. Pin the
+// stdlib to the compiler's version.
+configurations.configureEach {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0")
     }
 }
 
@@ -130,6 +142,8 @@ dependencies {
     implementation("com.google.android.libraries.places:places:3.2.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("com.squareup.okio:okio-jvm:3.9.1")
     implementation("androidx.window:window:1.1.0")
 
     implementation(platform(libs.firebase.bom))
@@ -140,15 +154,17 @@ dependencies {
 
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
-    implementation("com.google.android.gms:play-services-ads:24.8.0")
 
-    implementation("com.google.ads.mediation:applovin:13.5.1.0")
-    implementation("com.google.ads.mediation:inmobi:10.8.8.1")
-    implementation("com.google.ads.mediation:ironsource:9.1.0.0")
-    implementation("com.google.ads.mediation:vungle:7.6.1.0")
-    implementation("com.google.ads.mediation:facebook:6.21.0.0")
-    implementation("com.unity3d.ads:unity-ads:4.16.4")
-    implementation("com.google.ads.mediation:unity:4.16.4.0")
+    implementation("com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.2.1")
+
+    implementation("com.google.ads.mediation:applovin:13.6.2.0")
+    implementation("com.google.ads.mediation:inmobi:11.3.0.0")
+    implementation("com.google.ads.mediation:ironsource:9.4.3.0")
+    implementation("com.google.ads.mediation:vungle:7.7.4.2")
+    implementation("com.google.ads.mediation:facebook:6.21.0.3")
+    implementation("com.unity3d.ads:unity-ads:4.18.1")
+    implementation("com.google.ads.mediation:unity:4.18.1.0")
+
     implementation("com.github.ome450901:SimpleRatingBar:1.5.1")
     implementation("com.google.android.play:review-ktx:2.0.2")
 }

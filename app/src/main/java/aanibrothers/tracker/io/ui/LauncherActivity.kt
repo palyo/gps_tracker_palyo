@@ -33,13 +33,17 @@ import android.util.Log
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.isNetworkAvailable
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.java
 
@@ -53,6 +57,10 @@ class LauncherActivity :
 
     // Hardcoded splash interstitial unit (preserved from your original code).
     private val SPLASH_INTER_UNIT = if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-4852962457779682/2927637589"
+
+    // AdMob app ID. The Next-Gen SDK requires it explicitly in InitializationConfig
+    // (the legacy SDK read it from the AndroidManifest meta-data automatically).
+    private val ADMOB_APP_ID = "ca-app-pub-4852962457779682~5605383182"
 
     // Hard ceiling on how long we'll keep the splash visible while waiting
     // for the ad to load. After this, we proceed without the ad.
@@ -87,9 +95,17 @@ class LauncherActivity :
     private fun initializeMobileAdsSdk() {
         if (isMobileAdsInitializeCalled.getAndSet(true)) return
         try {
-            MobileAds.initialize(this) {
-                preloadNative()
-                loadSplashInterstitial()
+            // Next-Gen SDK init MUST run off the main thread (it can ANR otherwise).
+            CoroutineScope(Dispatchers.IO).launch {
+                MobileAds.initialize(
+                    this@LauncherActivity,
+                    InitializationConfig.Builder(ADMOB_APP_ID).build()
+                ) {
+                    runOnUiThread {
+                        preloadNative()
+                        loadSplashInterstitial()
+                    }
+                }
             }
         } catch (_: Exception) {
             goNext(2)
@@ -115,18 +131,16 @@ class LauncherActivity :
         }, SPLASH_INTER_TIMEOUT_MS)
 
         InterstitialAd.load(
-            this,
-            SPLASH_INTER_UNIT,
-            AdRequest.Builder().build(),
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+            AdRequest.Builder(SPLASH_INTER_UNIT).build(),
+            object : AdLoadCallback<InterstitialAd> {
+                override fun onAdLoaded(ad: InterstitialAd) {
                     if (hasNavigated.get() || isFinishing || isDestroyed) {
                         // Already moved on (timeout fired) -> drop the ad,
                         // don't show after we've left the splash.
                         App.isOpenInter = false
                         return
                     }
-                    mSplashInterstitialAd = interstitialAd
+                    mSplashInterstitialAd = ad
                     Log.e(TAG, "onAdLoaded:SplashInter")
                     showSplashInterstitial()
                 }
@@ -149,7 +163,7 @@ class LauncherActivity :
             goNext(5)
             return
         }
-        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+        ad.adEventCallback = object : InterstitialAdEventCallback {
             override fun onAdClicked() {}
 
             override fun onAdDismissedFullScreenContent() {
@@ -162,7 +176,7 @@ class LauncherActivity :
                 goNext(6)
             }
 
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                 mSplashInterstitialAd = null
                 tinyDB?.putBoolean(IS_SPLASH_AD_FAILED, true)
                 App.isOpenInter = false

@@ -151,6 +151,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private val PERMISSION_REQUEST_CODE = 100
     private var hasLoggedHomeShown = false
     private var cameraProvider: ProcessCameraProvider? = null
+    // True once the camera use-cases are bound. CameraX is bound to this
+    // activity's lifecycle, so it auto-pauses/resumes — we must NOT rebind (or
+    // re-show the loader) on every onStart/onResume, only bind once.
+    private var isCameraBound = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
 
     private var captureMode = CaptureMode.PHOTO
@@ -497,8 +501,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         super.onDestroy()
         orientationEventListener?.disable()
         stopLocationUpdates()
-        timeHandler.removeCallbacks(timeRunnable)
-
+        // timeRunnable is lateinit (set in setupTimeDisplay). On an early
+        // relaunch/config-change, onDestroy can run before it's assigned.
+        if (::timeRunnable.isInitialized) timeHandler.removeCallbacks(timeRunnable)
     }
 
     private fun setupOrientationListener() {
@@ -745,6 +750,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 }
             )
             cameraProvider?.unbindAll()
+            isCameraBound = false
             stopLocationUpdates()
             return
         }
@@ -761,6 +767,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun ActivityHomeBinding.startCamera() {
+        // Already bound — CameraX resumes the preview itself on lifecycle
+        // start/resume, so don't rebind or flash the loader again.
+        if (isCameraBound) return
+
         // Show the loading overlay until the first preview frame arrives;
         // the previewStreamState observer in initializeComponents() hides
         // it once StreamState.STREAMING is reported.
@@ -801,6 +811,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 cameraProvider.bindToLifecycle(
                     this@HomeActivity, cameraSelector, preview, imageCapture, videoCapture
                 )
+                this@HomeActivity.cameraProvider = cameraProvider
+                isCameraBound = true
                 setupCameraControls(cameraProvider, cameraSelector)
 
             } catch (exc: Exception) {
@@ -1659,30 +1671,23 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
                     val fullAddress = parts.joinToString(", ")
 
-                    val isShort =
-                        address.getAddressLine(0).length < 12
+                    // getAddressLine(0) can be null (e.g. geocoder error / no
+                    // formatted line) — guard against it to avoid NPEs.
+                    val line0 = address.getAddressLine(0)
+                    val isShort = (line0?.length ?: 0) < 12
 
                     if (isShort) {
                         Log.e("isShort", "updateLocationUI: $fullAddress")
                         displayCurrentLocation()
                         return@getAddress
                     }
-                    textAddress.text = if (address.getAddressLine(0).isEmpty()) {
-                        fullAddress
-                    } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
-                    }
+                    val displayAddress = line0?.takeIf { it.isNotBlank() }
+                        ?: fullAddress.takeIf { it.isNotBlank() }
+                        ?: unknownLocation
+                    textAddress.text = displayAddress
                     updateOverlayState(location, fullAddress)
-                    textAddressClassic.text = if (address.getAddressLine(0).isEmpty()) {
-                        fullAddress
-                    } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
-                    }
-                    textAddressSquarise.text = if (address.getAddressLine(0).isEmpty()) {
-                        fullAddress
-                    } else {
-                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
-                    }
+                    textAddressClassic.text = displayAddress
+                    textAddressSquarise.text = displayAddress
                 }
 
                 textLatitudeValue.text = String.format("%.6f", location.latitude)
@@ -1723,7 +1728,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     private fun stopLocationUpdates() {
         try {
-            fusedLocationClient?.removeLocationUpdates(locationCallback)
+            // locationCallback is lateinit (set in initializeComponents); guard
+            // against teardown running before it's assigned.
+            if (::locationCallback.isInitialized) {
+                fusedLocationClient?.removeLocationUpdates(locationCallback)
+            }
         } catch (e: Exception) {
         }
     }
