@@ -1,23 +1,12 @@
 package aanibrothers.tracker.io.ui.updates
 
-import aanibrothers.tracker.io.App
-import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.databinding.ActivityHomeBinding
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.analytics.CaptureCounter
-import aanibrothers.tracker.io.databinding.CallEndPermissionDialogBinding
+import aanibrothers.tracker.io.databinding.ActivityHomeBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
-import aanibrothers.tracker.io.module.appOpenCount
-import aanibrothers.tracker.io.extension.AFTER_CALL_PERMISSION
-import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
-import aanibrothers.tracker.io.extension.hasAfterCallPermissions
-import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
-import aanibrothers.tracker.io.extension.isGrantedOverlay
-import aanibrothers.tracker.io.extension.lastRatePromptDay
 import aanibrothers.tracker.io.extension.viewPermission
-import aanibrothers.tracker.io.helper.HandleSettingPreview
 import aanibrothers.tracker.io.helper.InAppReviewListener
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
 import aanibrothers.tracker.io.helper.launchInAppReviewFlow
@@ -27,7 +16,7 @@ import aanibrothers.tracker.io.model.CaptureMode
 import aanibrothers.tracker.io.model.LocationMode
 import aanibrothers.tracker.io.model.OverlayState
 import aanibrothers.tracker.io.model.OverlayTemplate
-import aanibrothers.tracker.io.module.AppOpenManager
+import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewNativeSmall
 import aanibrothers.tracker.io.ui.AppSettingsActivity
 import aanibrothers.tracker.io.ui.ToolsActivity
@@ -159,12 +148,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false
 ) {
     private var exitSheetDialog: BottomSheetDialog? = null
-    private var handlerSettingOverLay: HandleSettingPreview? = null
-    private var callEndPermissionDialog: android.app.Dialog? = null
     private val PERMISSION_REQUEST_CODE = 100
     private var hasLoggedHomeShown = false
     private var cameraProvider: ProcessCameraProvider? = null
-    private var fusedLocationClient: FusedLocationProviderClient?=null
+    private var fusedLocationClient: FusedLocationProviderClient? = null
 
     private var captureMode = CaptureMode.PHOTO
     private lateinit var videoCapture: VideoCapture<Recorder>
@@ -198,19 +185,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             restoreLocationModeFromPref()
         }
 
-    private val afterCallPermissionsLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (hasAfterCallPermissions() && !isGrantedOverlay()) {
-                requestOverlayPermission()
-            }
-        }
-
-    private val overlayPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (!isGrantedOverlay()) {
-                callEndPermissionDialog?.show()
-            }
-        }
 
     private var locationMode = LocationMode.CURRENT
     private var customLocation: Location? = null
@@ -222,30 +196,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun ActivityHomeBinding.initExtra() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         isPortraitMode = true
-        if(hasRequiredAppPermissions()){
-            initializeComponents()
-            setupOrientationListener()
-            setupFocusView()
-            setupTab()
-            setupMapSnapshot()
-            displayCurrentLocation()
-            setupTimeDisplay()
-            requestPermissions()
-            updateCameraPermissionUi()
-        }else{
-            Handler(mainLooper).postDelayed({
-                initializeComponents()
-                setupOrientationListener()
-                setupFocusView()
-                setupTab()
-                setupMapSnapshot()
-                displayCurrentLocation()
-                setupTimeDisplay()
-                requestPermissions()
-                updateCameraPermissionUi()
-            },2000)
-            maybeShowCallEndPermissionDialog()
-        }
+        initializeComponents()
+        setupOrientationListener()
+        setupFocusView()
+        setupTab()
+        setupMapSnapshot()
+        displayCurrentLocation()
+        setupTimeDisplay()
+        requestPermissions()
+        updateCameraPermissionUi()
 
     }
 
@@ -478,7 +437,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             orientationEventListener?.enable()
             binding?.updateCameraPermissionUi()
             restoreLocationModeFromPref()
-        },1000)
+        }, 1000)
 
     }
 
@@ -507,69 +466,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 }
             }
             binding?.updateCameraPermissionUi()
-        },1000)
+        }, 1000)
     }
 
-    private fun maybeShowCallEndPermissionDialog() {
-        if (isFinishing || isDestroyed) return
-        if (callEndPermissionDialog?.isShowing == true) return
-        if (hasRequiredAppPermissions()) return
-        if (tinyDB?.getBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, false) == true) return
-
-        handlerSettingOverLay = HandleSettingPreview(this@HomeActivity)
-        val dialogBinding = CallEndPermissionDialogBinding.inflate(layoutInflater)
-        val dialog = android.app.Dialog(this).apply {
-            requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
-            setContentView(dialogBinding.root)
-            setCancelable(false)
-            window?.setBackgroundDrawableResource(android.R.color.transparent)
-        }
-
-        val displayMetrics = android.util.DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val padding = resources.getDimensionPixelSize(R.dimen.default_popup_padding)
-        dialog.window?.setLayout(
-            displayMetrics.widthPixels - (padding * 2),
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        dialogBinding.btnGrantPermission.setOnClickListener {
-            tinyDB?.putBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, true)
-            Analytics.log(AnalyticsEvent.CallEndDialogAction(action = "grant"))
-            dialog.dismiss()
-            handleCallEndPermissions()
-        }
-
-        callEndPermissionDialog = dialog
-        dialog.show()
-        Analytics.log(AnalyticsEvent.CallEndDialogShown)
-    }
-
-    private fun handleCallEndPermissions() {
-        when {
-            !hasAfterCallPermissions() ->
-                afterCallPermissionsLauncher.launch(AFTER_CALL_PERMISSION)
-
-            !isGrantedOverlay() -> requestOverlayPermission()
-        }
-    }
-
-    private fun requestOverlayPermission() {
-        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-            data = Uri.fromParts("package", packageName, null)
-        }
-        App.isOpenInter = true
-        handlerSettingOverLay?.startPollingImeSettings()
-        overlayPermissionLauncher.launch(intent)
-    }
-
-    fun invokeSetupWizardOfThisIme() {
-        handlerSettingOverLay?.cancelPollingImeSettings()
-        val intent = Intent()
-        intent.setClass(this@HomeActivity, HomeActivity::class.java)
-        intent.flags = 606076928
-        startActivity(intent)
-    }
 
     override fun onPause() {
         super.onPause()
@@ -589,8 +488,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         orientationEventListener?.disable()
         stopLocationUpdates()
         timeHandler.removeCallbacks(timeRunnable)
-        callEndPermissionDialog?.dismiss()
-        callEndPermissionDialog = null
+
     }
 
     private fun setupOrientationListener() {

@@ -336,4 +336,13 @@
     <string name="enable_location_services">1. Enable Location Services</string>
     <string name="enable_location_services_content">2. Location services are required for this feature. Please enable them in settings</string>
     <string name="open_location_settings">Open location settings</string>
+
+
+    <string name="title_noti_lock_1">📍 Live Location Camera</string>
+    <string name="title_noti_lock_2">🚔 Traffic Evidence Camera</string>
+    <string name="title_noti_lock_3">🧹 Street Cleaning Proof</string>
+
+    <string name="des_noti_lock_1">Capture photos with GPS, date &amp; time stamp</string>
+    <string name="des_noti_lock_2">Capture traffic stops with GPS and timestamps</string>
+    <string name="des_noti_lock_3">Capture cleaning activities with GPS location</string>
 </resources>

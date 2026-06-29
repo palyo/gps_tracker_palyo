@@ -7,7 +7,6 @@ import aanibrothers.tracker.io.analytics.UserProp
 import aanibrothers.tracker.io.databinding.ActivityPermissionBinding
 import aanibrothers.tracker.io.databinding.LayoutDialogPermissionSettingsBinding
 import aanibrothers.tracker.io.databinding.LoactionPermissionDialogBinding
-import aanibrothers.tracker.io.databinding.SheetMapVisibilityStyleBinding
 import aanibrothers.tracker.io.extension.CAMERA_PERMISSION
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.STORAGE_PERMISSION
@@ -15,9 +14,7 @@ import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.hasCameraPermissions
 import aanibrothers.tracker.io.extension.hasLocationPermissions
 import aanibrothers.tracker.io.extension.hasStoragePermissions
-import aanibrothers.tracker.io.extension.isGrantedOverlay
 import aanibrothers.tracker.io.extension.isLocationEnabled
-import aanibrothers.tracker.io.helper.HandleSettingPreview
 import aanibrothers.tracker.io.module.getPolicyLink
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium

@@ -6,7 +6,6 @@ import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityOnboardingBinding
 import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
-import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -14,12 +13,13 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.go
-import com.ironsource.fa
 
 class OnboardingActivity :
-    BaseActivity<ActivityOnboardingBinding>(ActivityOnboardingBinding::inflate,
+    BaseActivity<ActivityOnboardingBinding>(
+        ActivityOnboardingBinding::inflate,
         isFullScreen = true,
-        isFullScreenIncludeNav = false) {
+        isFullScreenIncludeNav = false
+    ) {
 
     private val pageCount = 3
 
@@ -53,13 +53,13 @@ class OnboardingActivity :
 
     fun goToNext() {
         val viewPager = binding?.viewPager
-        if ((viewPager?.currentItem?:0) < pageCount - 1) {
-            viewPager?.currentItem = (viewPager.currentItem?:0) + 1
+        if ((viewPager?.currentItem ?: 0) < pageCount - 1) {
+            viewPager?.currentItem = (viewPager.currentItem ?: 0) + 1
             return
         }
         tinyDB?.putBoolean(IS_INTRO_ENABLED, false)
         Analytics.log(AnalyticsEvent.OnboardingCompleted)
-        if (!hasAllNewPermissions()|| !isLocationEnabled()) {
+        if (!hasAllNewPermissions() || !isLocationEnabled()) {
             go(PermissionActivity::class.java, finish = true)
             return
         }

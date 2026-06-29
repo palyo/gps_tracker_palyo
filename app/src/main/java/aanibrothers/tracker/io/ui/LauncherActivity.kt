@@ -17,9 +17,15 @@ import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.loadInterAd
 import aanibrothers.tracker.io.module.preloadNative
+import aanibrothers.tracker.io.more.ProbActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import aanibrothers.tracker.io.ui.updates.OnboardingActivity
 import aanibrothers.tracker.io.ui.updates.PermissionActivity
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -34,6 +40,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.jvm.java
 
 class LauncherActivity :
     BaseActivity<ActivityLauncherBinding>(ActivityLauncherBinding::inflate, isFullScreen = true) {
@@ -53,6 +60,7 @@ class LauncherActivity :
     override fun ActivityLauncherBinding.initView() {
         // Order: gather consent -> init MobileAds -> load splash interstitial
         // -> show it -> goNext. No ad request runs before consent is granted.
+        createDynamicShortcuts()
         Analytics.log(AnalyticsEvent.LanguageView)
         requestConsentForm()
         updateStatusBarColor(R.color.colorTransparent)
@@ -175,7 +183,10 @@ class LauncherActivity :
         loadInterAd()
         appOpenManager = AppOpenManager()
         if (hasNavigated.getAndSet(true)) return
+        val stringExtra = intent.getStringExtra("fromShortCut")?:""
         when {
+            stringExtra == "uninstall" ->
+                go(ProbActivity::class.java, finish = true)
             tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true ->
                 go(AppLanguageActivity::class.java, finish = true)
             tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true ->
@@ -198,5 +209,28 @@ class LauncherActivity :
             App.isOpenInter = false
         }
         super.onDestroy()
+    }
+
+    fun Activity.createDynamicShortcuts() {
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+
+        val scanShortcut =
+            ShortcutInfo.Builder(this, "shortcut_theme").setShortLabel("Camera").setLongLabel("Camera").setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_camera)).setIntent(
+                Intent(this, LauncherActivity::class.java).apply {
+                    putExtra("fromShortCut", "camera")
+                    action = Intent.ACTION_VIEW
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                }).build()
+
+        val searchUninstall =
+            ShortcutInfo.Builder(this, "shortcut_uninstall").setShortLabel("Uninstall").setLongLabel("Uninstall").setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_delete)).setIntent(
+                Intent(this, LauncherActivity::class.java).apply {
+                    putExtra("fromShortCut", "uninstall")
+                    action = Intent.ACTION_VIEW
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                }).build()
+
+        val listShortcuts = listOf(scanShortcut, searchUninstall)
+        shortcutManager.dynamicShortcuts = listShortcuts
     }
 }

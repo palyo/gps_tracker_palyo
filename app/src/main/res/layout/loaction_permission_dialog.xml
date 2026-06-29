@@ -37,7 +37,7 @@
         android:id="@+id/btnOpenSettings"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="@dimen/_8dp"
+        android:layout_marginTop="@dimen/_8sdp"
         android:text="@string/open_location_settings"
         android:textAllCaps="true"
         android:fontFamily="@font/font_regular"

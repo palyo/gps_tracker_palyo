@@ -70,4 +70,13 @@
         <item name="colorControlActivated">#1d6deb</item>
         <item name="colorControlNormal">@color/gnt_gray</item>
     </style>
+
+    <style name="Theme.Lockscreen" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
 </resources>

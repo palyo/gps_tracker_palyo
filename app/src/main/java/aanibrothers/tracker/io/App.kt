@@ -1,12 +1,10 @@
 package aanibrothers.tracker.io
 
-import aanibrothers.tracker.io.afterCall.PostDataFragment
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.CaptureCounter
 import aanibrothers.tracker.io.analytics.UserProp
 import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
-import aanibrothers.tracker.io.extension.hasRequiredAppPermissions
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewAppOpen
@@ -23,15 +21,12 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.gms.maps.MapsInitializer
 import coder.apps.space.library.extension.THEME
 import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
-import com.post.call.info.PostCallApplication
-import com.post.call.info.PostCallConfig
-import com.post.call.info.ui.activity.PostCallActivity
+import com.google.android.gms.maps.MapsInitializer
 
-class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
+class App : Application(), Application.ActivityLifecycleCallbacks {
     companion object {
 
         var isOpenInter = false
@@ -57,7 +52,6 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         super.onCreate()
         instance = this
         appContext = applicationContext
-        PostCallConfig.dataFragmentClass = PostDataFragment::class.java
         registerActivityLifecycleCallbacks(this)
         createNotificationChannel()
         TinyDB(this).putInt(THEME, 1)
@@ -79,9 +73,11 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         Analytics.init(this)
         val tinyDb = TinyDB(this)
         Analytics.setProperty(UserProp.PREFERRED_TEMPLATE, tinyDb.getString("template", "default"))
-        Analytics.setProperty(UserProp.PREFERRED_DIRECTORY, tinyDb.getString("directory", "default"))
+        Analytics.setProperty(
+            UserProp.PREFERRED_DIRECTORY,
+            tinyDb.getString("directory", "default")
+        )
         Analytics.setProperty(UserProp.HAS_BASE_PERMS, hasAllNewPermissions().toString())
-        Analytics.setProperty(UserProp.HAS_AFTER_CALL_PERMS, hasRequiredAppPermissions().toString())
         Analytics.setProperty(
             UserProp.HAS_SEEN_CALL_END_DIALOG,
             tinyDb.getBoolean(HAS_SEEN_CALL_END_PERMISSION_DIALOG, false).toString()
@@ -89,8 +85,7 @@ class App : PostCallApplication(), Application.ActivityLifecycleCallbacks {
         CaptureCounter.reportCurrent(this)
         setAvoidMultipleClass(
             mutableListOf(
-                LauncherActivity::class.java,
-                PostCallActivity::class.java,
+                LauncherActivity::class.java
             )
         )
 

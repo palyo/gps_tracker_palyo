@@ -13,7 +13,6 @@ import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.beVisibleIf
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.extension.launchUrl
-import com.post.call.info.utils.Config
 
 class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettingsBinding::inflate) {
     override fun ActivitySettingsBinding.initExtra() {}
@@ -43,12 +42,6 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
         buttonManageConsent.setOnClickListener {
             consentManager.showPrivacyOptionsForm(this@AppSettingsActivity) {}
         }
-
-        switchCall.setOnCheckedChangeListener { button, isChecked ->
-            if (button.isPressed) {
-                Config(this@AppSettingsActivity).enablePostCallScreen = isChecked
-            }
-        }
     }
 
     override fun ActivitySettingsBinding.initView() {
@@ -56,9 +49,4 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
         onBackPressedDispatcher.addCallback { go(HomeActivity::class.java, finishAll = true) }
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding?.switchCall?.isChecked = Config(this@AppSettingsActivity).enablePostCallScreen
-
-    }
 }

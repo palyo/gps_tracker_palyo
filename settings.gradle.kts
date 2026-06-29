@@ -28,4 +28,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Tracker.io"
 include(":app")
-include(":postCall")

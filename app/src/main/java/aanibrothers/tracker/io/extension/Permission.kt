@@ -13,11 +13,7 @@ val LOCATION_PERMISSION =
 
 val CAMERA_PERMISSION = arrayOf(Manifest.permission.CAMERA)
 
-val AFTER_CALL_PERMISSION = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.POST_NOTIFICATIONS)
-} else {
-    arrayOf(Manifest.permission.READ_PHONE_STATE)
-}
+
 
 val STORAGE_PERMISSION = if (Build.VERSION.SDK_INT >= 33) {
     arrayOf(
@@ -31,12 +27,6 @@ val STORAGE_PERMISSION = if (Build.VERSION.SDK_INT >= 33) {
     )
 }
 
-
-fun Context.hasAfterCallPermissions(): Boolean {
-    return AFTER_CALL_PERMISSION.all { permission ->
-        ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-    }
-}
 
 fun Context.hasStoragePermissions(): Boolean {
     return STORAGE_PERMISSION.all {
@@ -56,10 +46,6 @@ fun Context.hasCameraPermissions(): Boolean {
     }
 }
 
-
-fun Context.hasRequiredAppPermissions(): Boolean {
-    return hasAfterCallPermissions() && isGrantedOverlay()
-}
 
 fun Context.hasAllNewPermissions(): Boolean {
     return hasStoragePermissions() && hasLocationPermissions() && hasCameraPermissions()

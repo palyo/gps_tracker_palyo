@@ -15,11 +15,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-            applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
+        applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 29
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.7"
+        versionCode = 15
+        versionName = "1.8"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
-    implementation(project(":postCall"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
@@ -137,6 +136,7 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.messaging.ktx)
+    implementation("com.google.firebase:firebase-config-ktx")
 
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
