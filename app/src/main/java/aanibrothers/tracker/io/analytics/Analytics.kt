@@ -52,14 +52,15 @@ object Analytics {
  * (Param names are owned by each event's bundle() impl — they don't escape this file.)
  */
 object UserProp {
-    const val LANGUAGE_CODE = "language_code"
     const val PREFERRED_TEMPLATE = "preferred_template"
     const val PREFERRED_DIRECTORY = "preferred_directory"
     const val HAS_BASE_PERMS = "has_base_perms"
-    const val HAS_AFTER_CALL_PERMS = "has_after_call_perms"
     const val LIFETIME_CAPTURE_BUCKET = "lifetime_capture_bucket"
     const val USER_STAGE = "user_stage"
     const val HAS_SEEN_CALL_END_DIALOG = "has_seen_call_end_dialog"
+
+    /** Onboarding A/B variant: "on" = onboarding shown, "off" = skipped. */
+    const val INTRO_VARIANT = "intro_variant"
 }
 
 /**

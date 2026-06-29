@@ -7,14 +7,15 @@ import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
-import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
+import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.ConsentManager
 import aanibrothers.tracker.io.module.TAG
+import aanibrothers.tracker.io.module.RemoteConfigManager
 import aanibrothers.tracker.io.module.loadInterAd
 import aanibrothers.tracker.io.module.preloadNative
 import aanibrothers.tracker.io.more.ProbActivity
@@ -61,7 +62,7 @@ class LauncherActivity :
         // Order: gather consent -> init MobileAds -> load splash interstitial
         // -> show it -> goNext. No ad request runs before consent is granted.
         createDynamicShortcuts()
-        Analytics.log(AnalyticsEvent.LanguageView)
+        Analytics.log(AnalyticsEvent.SplashView)
         requestConsentForm()
         updateStatusBarColor(R.color.colorTransparent)
     }
@@ -183,18 +184,23 @@ class LauncherActivity :
         loadInterAd()
         appOpenManager = AppOpenManager()
         if (hasNavigated.getAndSet(true)) return
-        val stringExtra = intent.getStringExtra("fromShortCut")?:""
-        when {
-            stringExtra == "uninstall" ->
-                go(ProbActivity::class.java, finish = true)
-            tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true ->
-                go(AppLanguageActivity::class.java, finish = true)
-            tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true ->
-                go(OnboardingActivity::class.java, finish = true)
-            !hasAllNewPermissions() || !isLocationEnabled() ->
-                go(PermissionActivity::class.java, finish = true)
-            else ->
-                go(HomeActivity::class.java, finish = true)
+        // Wait for the Remote Config / A/B experiment value to be activated
+        // before deciding the route, so the onboarding variant is correct on
+        // the very first session. Falls back after a short timeout if offline.
+        RemoteConfigManager.whenReady {
+            val stringExtra = intent.getStringExtra("fromShortCut") ?: ""
+            when {
+                stringExtra == "uninstall" ->
+                    go(ProbActivity::class.java, finish = true)
+                tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true ->
+                    go(AppLanguageActivity::class.java, finish = true)
+                isOnboardingEnabled() ->
+                    go(OnboardingActivity::class.java, finish = true)
+                !hasAllNewPermissions() || !isLocationEnabled() ->
+                    go(PermissionActivity::class.java, finish = true)
+                else ->
+                    go(HomeActivity::class.java, finish = true)
+            }
         }
     }
 

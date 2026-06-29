@@ -1,11 +1,13 @@
 package aanibrothers.tracker.io
 
 import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.analytics.CaptureCounter
 import aanibrothers.tracker.io.analytics.UserProp
 import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.module.AppOpenManager
+import aanibrothers.tracker.io.module.RemoteConfigManager
 import aanibrothers.tracker.io.module.appOpenCount
 import aanibrothers.tracker.io.module.viewAppOpen
 import aanibrothers.tracker.io.ui.LauncherActivity
@@ -53,6 +55,9 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         instance = this
         appContext = applicationContext
         registerActivityLifecycleCallbacks(this)
+        // Fetch Remote Config early so flags (e.g. onboarding kill-switch) are
+        // refreshed before the launcher decides where to navigate.
+        RemoteConfigManager.init(this)
         createNotificationChannel()
         TinyDB(this).putInt(THEME, 1)
         themeToggleMode()
@@ -100,6 +105,11 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
                 }
 
                 applicationContext?.let { it.appOpenCount = it.appOpenCount + 1 }
+                Analytics.log(
+                    AnalyticsEvent.AppForegrounded(
+                        openCount = applicationContext?.appOpenCount ?: 0
+                    )
+                )
 
                 // Skip if the app is currently in the middle of showing /
                 // returning from an interstitial — avoids stacked full-screen ads.

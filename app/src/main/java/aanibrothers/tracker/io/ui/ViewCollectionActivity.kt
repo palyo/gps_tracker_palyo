@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.widgets.*
@@ -42,6 +44,11 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
         }
         setupAdapter()
         fetchData()
+        Analytics.log(
+            AnalyticsEvent.GalleryViewed(
+                source = if (!initialFilePath.isNullOrBlank()) "home_thumbnail" else "collection_button"
+            )
+        )
     }
 
     private fun fetchData() {
@@ -135,6 +142,9 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
                 "buttonShare".log("Invalid index: $currentPos, size: ${list.size}")
                 return@setOnClickListener
             }
+            Analytics.log(
+                AnalyticsEvent.MediaShared(type = "image", count = 1, source = "gallery")
+            )
             shareFile(mutableListOf<File>().apply { add(list[currentPos]) })
         }
         buttonDelete.setOnClickListener {
@@ -154,6 +164,7 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
     @SuppressLint("StringFormatInvalid")
     private fun actionTrashFile(selected: MutableList<File>) {
         viewTrashOrDeleteSheet {
+            Analytics.log(AnalyticsEvent.MediaDeleted(type = "image", source = "gallery"))
             CoroutineScope(Dispatchers.IO).launch {
                 selected.forEach { it.deleteRecursively() }
                 launch(Dispatchers.Main) {

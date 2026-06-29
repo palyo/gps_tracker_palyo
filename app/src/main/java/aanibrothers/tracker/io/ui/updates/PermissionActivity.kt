@@ -15,6 +15,7 @@ import aanibrothers.tracker.io.extension.hasCameraPermissions
 import aanibrothers.tracker.io.extension.hasLocationPermissions
 import aanibrothers.tracker.io.extension.hasStoragePermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
+import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.getPolicyLink
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
@@ -76,6 +77,7 @@ class PermissionActivity :
 
     override fun ActivityPermissionBinding.initView() {
         handlerSettingOverLay = HandleSettingPreview(this@PermissionActivity)
+        Analytics.log(AnalyticsEvent.PermissionView)
         refreshUi()
         viewNativeMedium(adNative, placement = aanibrothers.tracker.io.analytics.AdPlacement.PERMISSION)
     }
@@ -86,6 +88,7 @@ class PermissionActivity :
     private val settingsActivityResultLauncherAnyWhereClick =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(isLocationEnabled()){
+                Analytics.log(AnalyticsEvent.LocationServicesEnabled(surface = "permission"))
                 binding?.btnAllowPermission?.performClick()
             }
         }
@@ -129,11 +132,18 @@ class PermissionActivity :
                     }
 
                     dialog.window?.apply { applyDialogConfig() }
-                    if (!isFinishing) dialog.show()
+                    if (!isFinishing) {
+                        Analytics.log(AnalyticsEvent.LocationServicesPrompt(surface = "permission"))
+                        dialog.show()
+                    }
                     return@setOnClickListener
                 }
                 Analytics.log(AnalyticsEvent.PermissionFlowCompleted(set = "base_3"))
-                viewInterAd(placement = aanibrothers.tracker.io.analytics.AdPlacement.PERM_CONTINUE) {
+                if(isOnboardingEnabled()) {
+                    viewInterAd(placement = aanibrothers.tracker.io.analytics.AdPlacement.PERM_CONTINUE) {
+                        go(HomeActivity::class.java, finish = true)
+                    }
+                }else{
                     go(HomeActivity::class.java, finish = true)
                 }
             }

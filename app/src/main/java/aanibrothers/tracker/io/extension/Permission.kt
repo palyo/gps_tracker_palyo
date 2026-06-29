@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import coder.apps.space.library.helper.TinyDB
 
 
 val LOCATION_PERMISSION =
@@ -53,6 +54,17 @@ fun Context.hasAllNewPermissions(): Boolean {
 
 fun Context.isGrantedOverlay(): Boolean {
     return Settings.canDrawOverlays(this)
+}
+
+/**
+ * Whether the onboarding screen should be shown right now. True only when the
+ * Firebase Remote Config kill-switch ([IS_INTRO_REMOTE_ENABLED], cached) is on
+ * AND the user has not already completed onboarding ([IS_INTRO_ENABLED]).
+ */
+fun Context.isOnboardingEnabled(): Boolean {
+    val tinyDB = TinyDB(this)
+    return tinyDB.getBoolean(IS_INTRO_REMOTE_ENABLED, true) &&
+            tinyDB.getBoolean(IS_INTRO_ENABLED, true)
 }
 
 fun Context.isLocationEnabled(): Boolean {

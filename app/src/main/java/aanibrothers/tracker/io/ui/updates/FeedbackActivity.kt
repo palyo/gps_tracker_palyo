@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityFeedbackBinding
 import aanibrothers.tracker.io.extension.firebaseASOEvent
 import android.app.Activity
@@ -112,6 +114,7 @@ class FeedbackActivity : BaseActivity<ActivityFeedbackBinding>(ActivityFeedbackB
 
         try {
             TinyDB(this@FeedbackActivity).putBoolean("isRated", true)
+            Analytics.log(AnalyticsEvent.FeedbackSubmitted(category = selectedText))
             startActivity(Intent.createChooser(emailIntent, "Send feedback using"))
             finish()
         } catch (e: Exception) {

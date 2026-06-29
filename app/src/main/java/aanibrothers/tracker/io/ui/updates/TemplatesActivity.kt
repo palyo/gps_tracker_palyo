@@ -1,5 +1,7 @@
 package aanibrothers.tracker.io.ui.updates
 
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityTemplatesBinding
 import aanibrothers.tracker.io.module.viewNativeSmall
 import androidx.activity.addCallback
@@ -15,14 +17,17 @@ class TemplatesActivity :
     override fun ActivityTemplatesBinding.initListeners() {
         templateDefault.setOnClickListener {
             tinyDB?.putString("template", "default")
+            Analytics.log(AnalyticsEvent.TemplateChanged(template = "default"))
             updateSelection()
         }
         templateClassic.setOnClickListener {
             tinyDB?.putString("template", "classic")
+            Analytics.log(AnalyticsEvent.TemplateChanged(template = "classic"))
             updateSelection()
         }
         templateSquarise.setOnClickListener {
             tinyDB?.putString("template", "squarise")
+            Analytics.log(AnalyticsEvent.TemplateChanged(template = "squarise"))
             updateSelection()
         }
     }

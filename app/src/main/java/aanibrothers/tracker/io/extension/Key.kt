@@ -63,3 +63,11 @@ const val IS_LANGUAGE_ENABLED = "is_language_enabled"
 const val IS_INTRO_ENABLED = "is_intro_enabled"
 const val IS_SPLASH_AD_FAILED = "is_splash_ad_failed"
 const val HAS_SEEN_CALL_END_PERMISSION_DIALOG = "has_seen_call_end_permission_dialog"
+
+// Firebase Remote Config parameter name (create this key in the Firebase
+// console as a Boolean). When false, the onboarding screen is skipped.
+const val RC_KEY_INTRO_ENABLED = "intro_enabled"
+
+// Local cache of the remote value above, so it can be read synchronously at
+// navigation time. Defaults to true (show onboarding) until a fetch lands.
+const val IS_INTRO_REMOTE_ENABLED = "is_intro_remote_enabled"

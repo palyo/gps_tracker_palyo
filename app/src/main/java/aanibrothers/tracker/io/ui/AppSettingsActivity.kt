@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivitySettingsBinding
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.module.ConsentManager
@@ -20,6 +22,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
     override fun ActivitySettingsBinding.initListeners() {
         buttonLanguage.setOnClickListener { go(AppLanguageActivity::class.java, listOf(IS_SETTINGS to true), finish = true) }
         buttonShare.setOnClickListener {
+            Analytics.log(AnalyticsEvent.AppShared(source = "settings"))
             val app = getString(R.string.app_name)
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -31,6 +34,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
             }
         }
         buttonPrivacy.setOnClickListener {
+            Analytics.log(AnalyticsEvent.PrivacyPolicyOpened(source = "settings"))
             App.isOpenInter = true
             launchUrl(getPolicyLink())
         }
@@ -40,6 +44,7 @@ class AppSettingsActivity : BaseActivity<ActivitySettingsBinding>(ActivitySettin
         }
 
         buttonManageConsent.setOnClickListener {
+            Analytics.log(AnalyticsEvent.ConsentFormOpened)
             consentManager.showPrivacyOptionsForm(this@AppSettingsActivity) {}
         }
     }

@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
@@ -30,6 +32,7 @@ class NearActivity : BaseActivity<ActivityNearBinding>(ActivityNearBinding::infl
 
             layoutManager = gridLayoutManager
             adapter = NearLocationAdapter(this@NearActivity) {
+                Analytics.log(AnalyticsEvent.NearbyCategorySelected(category = it.title))
                 searchPlaceInGoogleMaps(it.title)
             }
         }

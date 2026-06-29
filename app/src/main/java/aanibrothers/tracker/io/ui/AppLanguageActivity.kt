@@ -4,12 +4,12 @@ import aanibrothers.tracker.io.adapter.LanguageAdapter
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityAppLanguageBinding
-import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
+import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.updates.HomeActivity
@@ -30,6 +30,7 @@ class AppLanguageActivity :
     private var isChangeLanguage: Boolean = false
     override fun ActivityAppLanguageBinding.initExtra() {
         updateNavigationBarColor(R.color.colorBlack)
+        Analytics.log(AnalyticsEvent.LanguageView)
         language = currentLanguage ?: Locale.getDefault().language
         initAdapter()
         viewNativeMedium(adNative, placement = aanibrothers.tracker.io.analytics.AdPlacement.LANGUAGE)
@@ -56,7 +57,7 @@ class AppLanguageActivity :
                 Analytics.log(AnalyticsEvent.LanguageSelected(langCode = language, source = "first_launch"))
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
                 val continueFlow = {
-                    if (tinyDB?.getBoolean(IS_INTRO_ENABLED, true) == true) {
+                    if (isOnboardingEnabled()) {
                         go(OnboardingActivity::class.java, finish = true)
                     } else if (!hasAllNewPermissions() || !isLocationEnabled()) {
                         go(PermissionActivity::class.java, finish = true)

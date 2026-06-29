@@ -196,16 +196,26 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun ActivityHomeBinding.initExtra() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         isPortraitMode = true
+        // Lightweight UI wiring only — keep onCreate cheap so the first frame
+        // (camera chrome + loading spinner) draws immediately.
         initializeComponents()
         setupOrientationListener()
         setupFocusView()
         setupTab()
-        setupMapSnapshot()
-        displayCurrentLocation()
         setupTimeDisplay()
-        requestPermissions()
-        updateCameraPermissionUi()
 
+        // Heavy SDK initialization (CameraX + Google Maps) is deferred until
+        // after the first frame paints. Running it synchronously here blocked
+        // the initial render, leaving a black window for 2-3s on the way in
+        // from PermissionActivity. Camera is started first so the Maps SDK
+        // install doesn't hold the main thread before the first camera frame.
+        val binding = this
+        root.post {
+            binding.updateCameraPermissionUi()
+            setupMapSnapshot()
+            displayCurrentLocation()
+            requestPermissions()
+        }
     }
 
     private var googleMap: GoogleMap? = null
@@ -809,11 +819,18 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ) {
         actionFlashMode.setOnClickListener {
             if (isBackCameraSelected) {
+                Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "flash", value = "toggle"))
                 handleFlashToggle(cameraProvider, cameraSelector)
             }
         }
 
         actionChangeCamera.setOnClickListener {
+            Analytics.log(
+                AnalyticsEvent.CameraSettingChanged(
+                    setting = "camera_flip",
+                    value = if (isBackCameraSelected) "front" else "back"
+                )
+            )
             toggleCamera(cameraProvider)
         }
     }
@@ -1956,13 +1973,18 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         var clickCount = 0
         restoreSoundState()
         actionFocusMode.setOnClickListener {
+            Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "focus", value = "toggle"))
             toggleFocusMode()
         }
         actionSound.setOnClickListener {
+            Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "sound", value = "toggle"))
             toggleSound()
         }
         actionTimer.setOnClickListener {
             clickCount++
+            Analytics.log(
+                AnalyticsEvent.CameraSettingChanged(setting = "timer", value = clickCount.toString())
+            )
             handleTimerClick(clickCount)
         }
         actionCapture.setOnClickListener {
@@ -2131,6 +2153,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
 
         sheetBinding.actionPositive.setOnClickListener {
+            Analytics.log(AnalyticsEvent.ExitSheetAction(action = "exit"))
             finishAffinity()
         }
 
@@ -2152,7 +2175,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
 
         exitSheetDialog = dialog
-        if (!isFinishing) dialog.show()
+        if (!isFinishing) {
+            Analytics.log(AnalyticsEvent.ExitSheetAction(action = "shown"))
+            dialog.show()
+        }
     }
 
     override fun ActivityHomeBinding.initView() {

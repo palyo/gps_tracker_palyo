@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.SuggestionLocationAdapter
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityMapBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.VISIBILITY
@@ -144,6 +146,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
             suggestionLocationAdapter = SuggestionLocationAdapter(this@MapActivity) {
                 hideKeyboard(editSearch)
                 cardSuggestedResult.beGone()
+                Analytics.log(AnalyticsEvent.MapMarkerAdded(source = "search"))
                 addMarker(LatLng(it.latitude, it.longitude), "")
                 moveToLocation(LatLng(it.latitude, it.longitude))
                 mapNavigate.beEnableIf(currentMarker != null)
@@ -164,6 +167,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
                         mapType = style
                         viewMapType = type
                         tinyDb.putString("map_style", type)
+                        Analytics.log(AnalyticsEvent.MapStyleChanged(style = type))
                         updateMapStyle()
                     },
                 ) { enable, action ->
@@ -177,6 +181,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
         }
 
         mapNavigate.setOnClickListener {
+            Analytics.log(AnalyticsEvent.MapSearchUsed(method = "text"))
             searchPlaceInGoogleMaps(editSearch.text.toString())
         }
         mapVoiceNavigation.beVisibleIf(
@@ -224,6 +229,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
 
     private fun startVoiceInput() {
         if (hasPermissions(arrayOf(Manifest.permission.RECORD_AUDIO))) {
+            Analytics.log(AnalyticsEvent.MapSearchUsed(method = "voice"))
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(
                     RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -411,10 +417,12 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
         markerManager = MarkerManager(map)
 
         googleMap?.setOnMapLongClickListener { latLng ->
+            Analytics.log(AnalyticsEvent.MapMarkerAdded(source = "long_press"))
             addMarker(latLng, "")
         }
 
         googleMap?.setOnPoiClickListener { poi ->
+            Analytics.log(AnalyticsEvent.MapMarkerAdded(source = "poi"))
             addMarker(poi.latLng, poi.name)
         }
         binding?.moveToCurrentLocation()

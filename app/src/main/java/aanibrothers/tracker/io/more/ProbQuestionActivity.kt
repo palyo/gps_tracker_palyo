@@ -1,10 +1,12 @@
 package aanibrothers.tracker.io.more
 
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityProbQuestionBinding
-import aanibrothers.tracker.io.extension.IS_INTRO_ENABLED
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
+import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.AppLanguageActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
@@ -62,6 +64,7 @@ class ProbQuestionActivity : AppCompatActivity() {
                 object : ProbAdapter.OnItemClickListener {
                     override fun onItemClicked(reason: String) {
                         selectedReason = reason
+                        Analytics.log(AnalyticsEvent.UninstallReasonSelected(reason = reason))
                         btnUninstall.isSelected = true
                         btnUninstall.isEnabled = true
                         reloadAd()
@@ -73,6 +76,12 @@ class ProbQuestionActivity : AppCompatActivity() {
     private fun initListener() {
         binding.apply {
             btnUninstall.setOnClickListener {
+                Analytics.log(
+                    AnalyticsEvent.UninstallFlowAction(
+                        screen = "reasons", button = "uninstall", action = "uninstall"
+                    )
+                )
+                Analytics.log(AnalyticsEvent.UninstallConfirmed)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = "package:${packageName}".toUri()
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -81,12 +90,27 @@ class ProbQuestionActivity : AppCompatActivity() {
                 finish()
             }
             btnBack.setOnClickListener {
+                Analytics.log(
+                    AnalyticsEvent.UninstallFlowAction(
+                        screen = "reasons", button = "back", action = "keep_app"
+                    )
+                )
                 goToHome()
             }
             btnCancel.setOnClickListener {
+                Analytics.log(
+                    AnalyticsEvent.UninstallFlowAction(
+                        screen = "reasons", button = "cancel", action = "keep_app"
+                    )
+                )
                 goToHome()
             }
             btnHome.setOnClickListener {
+                Analytics.log(
+                    AnalyticsEvent.UninstallFlowAction(
+                        screen = "reasons", button = "home", action = "keep_app"
+                    )
+                )
                 goToHome()
             }
         }
@@ -96,7 +120,7 @@ class ProbQuestionActivity : AppCompatActivity() {
         when {
             TinyDB(this).getBoolean(IS_LANGUAGE_ENABLED, true) ->
                 go(AppLanguageActivity::class.java, finish = true)
-            TinyDB(this).getBoolean(IS_INTRO_ENABLED, true) ->
+            isOnboardingEnabled() ->
                 go(OnboardingActivity::class.java, finish = true)
             !hasAllNewPermissions() || !isLocationEnabled() ->
                 go(PermissionActivity::class.java, finish = true)

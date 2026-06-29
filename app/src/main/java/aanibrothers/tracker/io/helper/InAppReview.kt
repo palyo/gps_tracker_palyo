@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.core.graphics.drawable.toDrawable
 import aanibrothers.tracker.io.BuildConfig
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.LayoutSheetRateBinding
 import aanibrothers.tracker.io.extension.firebaseASOEvent
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -46,6 +48,7 @@ fun Activity.viewRateDialog(
     onDismiss: (() -> Unit)? = null,
 ) {
     firebaseASOEvent("rate_view")
+    Analytics.log(AnalyticsEvent.RateDialogShown)
     var isRating = false
     var ratedInvoked = false
     val dialog = BottomSheetDialog(this, coder.apps.space.library.R.style.Theme_Space_BottomSheetDialogTheme)
@@ -77,11 +80,13 @@ fun Activity.viewRateDialog(
             firebaseASOEvent(
                 "rate_choose_star", mapOf("star" to ratingBar.rating.toInt())
             )
+            Analytics.log(AnalyticsEvent.RateStarSelected(star = ratingBar.rating.toInt()))
         }
         buttonReview.setOnClickListener {
             firebaseASOEvent("rate_view_click_rate")
             if (isRating) {
                 ratedInvoked = true
+                Analytics.log(AnalyticsEvent.RateDialogAction(action = "rate_${ratingBar.rating.toInt()}"))
                 dialog.dismiss()
                 listener.invoke(ratingBar.rating >= 4F)
             } else {
@@ -89,6 +94,7 @@ fun Activity.viewRateDialog(
             }
         }
         btnCancel.setOnClickListener {
+            Analytics.log(AnalyticsEvent.RateDialogAction(action = "cancel"))
             dialog.dismiss()
         }
     }
@@ -110,6 +116,7 @@ interface InAppReviewListener {
 }
 
 fun Activity.launchInAppReviewFlow(listener: InAppReviewListener?) {
+    Analytics.log(AnalyticsEvent.InAppReviewRequested)
     val reviewManager = if (BuildConfig.DEBUG) {
         FakeReviewManager(this)
     } else {

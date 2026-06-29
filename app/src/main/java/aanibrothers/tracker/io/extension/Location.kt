@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.extension
 
 import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 
 import android.content.*
 import android.location.*
@@ -76,6 +78,7 @@ fun calculateDistance(currentLatLng: LatLng, markerLatLng: LatLng): String {
 }
 
 fun Context.shareLocation(latLong: LatLng) {
+    Analytics.log(AnalyticsEvent.LocationShared(source = "map_marker"))
     val locationLink = "https://www.google.com/maps?q=${latLong.latitude},${latLong.longitude}"
     Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
@@ -85,6 +88,7 @@ fun Context.shareLocation(latLong: LatLng) {
 }
 
 fun Context.navigateLocation(currentLatLng: LatLng?, markerLatLng: LatLng?) {
+    Analytics.log(AnalyticsEvent.NavigationStarted(source = "map_marker"))
     val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${currentLatLng?.latitude},${currentLatLng?.longitude}&destination=${markerLatLng?.latitude},${markerLatLng?.longitude}")
     val intent = Intent(Intent.ACTION_VIEW, uri)
 
@@ -106,6 +110,7 @@ fun Context.navigateLocation(currentLatLng: LatLng?, markerLatLng: LatLng?) {
 }
 
 fun Context.navigateLocationByPlace(origin: String?, destination: String?) {
+    Analytics.log(AnalyticsEvent.RouteNavigationStarted)
     val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${Uri.encode(origin)}&destination=${Uri.encode(destination)}")
     val intent = Intent(Intent.ACTION_VIEW, uri)
     val packageName = "com.google.android.apps.maps"

@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityGpsCameraBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.findAddressFromLatLng
@@ -349,6 +351,15 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
 
     private fun ActivityGpsCameraBinding.takePhoto() {
         val imageCapture = imageCapture ?: return
+        Analytics.log(
+            AnalyticsEvent.CaptureAttempted(
+                mode = "photo",
+                template = "none",
+                locationMode = "current",
+                hasTimer = 0,
+                surface = "gps_camera"
+            )
+        )
         buttonCapture.disable()
         progressBar.beVisible()
         val outputDir = File(
@@ -368,6 +379,13 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     val errorMessage = exc.message ?: getString(R.string.label_unknown)
+                    Analytics.log(
+                        AnalyticsEvent.CaptureFailed(
+                            mode = "photo",
+                            reason = exc.imageCaptureError.toString(),
+                            surface = "gps_camera"
+                        )
+                    )
                     Toast.makeText(
                         this@GPSCameraActivity,
                         getString(R.string.message_camera_error, errorMessage),
@@ -391,6 +409,14 @@ class GPSCameraActivity : BaseActivity<ActivityGpsCameraBinding>(
                             FileOutputStream(photoFile).use { outStream ->
                                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream)
                             }
+                            Analytics.log(
+                                AnalyticsEvent.CaptureSucceeded(
+                                    mode = "photo",
+                                    template = "none",
+                                    fileSizeKb = photoFile.length() / 1024,
+                                    surface = "gps_camera"
+                                )
+                            )
                             launch(Dispatchers.Main) {
                                 Glide.with(applicationContext).load(lastModified?.absolutePath)
                                     .transition(DrawableTransitionOptions.withCrossFade()).apply(

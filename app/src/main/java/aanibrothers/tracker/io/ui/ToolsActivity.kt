@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityToolsBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.isLocationEnabled
@@ -45,46 +47,55 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
     override fun ActivityToolsBinding.initListeners() {
         mapBanner.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "map"))
                 go(MapActivity::class.java)
             }
         }
         actionMap.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "map"))
                 go(MapActivity::class.java)
             }
         }
         actionVoice.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "voice_navigation"))
                 go(MapActivity::class.java, listOf("is_voice_navigation" to true))
             }
         }
         actionRouteFinder.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "route_finder"))
                 go(RouteActivity::class.java)
             }
         }
         actionSpeedometer.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "speedometer"))
                 go(SpeedViewActivity::class.java)
             }
         }
         actionCompass.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "compass"))
                 go(CompassActivity::class.java)
             }
         }
         actionNear.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "nearby_places"))
                 go(NearActivity::class.java)
             }
         }
         actionArea.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "area_calculator"))
                 go(AreaCalcActivity::class.java)
             }
         }
         actionGpsCamera.setOnClickListener {
             checkLocationPermissionAndProceed {
+                Analytics.log(AnalyticsEvent.ToolOpened(tool = "gps_camera"))
                 go(GPSCameraActivity::class.java)
             }
         }

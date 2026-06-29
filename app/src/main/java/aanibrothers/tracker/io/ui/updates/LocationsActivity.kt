@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui.updates
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.caller.alert.AppDatabase
 import aanibrothers.tracker.io.databinding.ActivityLocationsBinding
 import aanibrothers.tracker.io.locations.LocationPreference
@@ -49,6 +51,8 @@ class LocationsActivity :
             LocationPreference.saveCustomLocation(
                 this@LocationsActivity, selected
             )
+            Analytics.log(AnalyticsEvent.LocationSaved(action = "select_custom"))
+            Analytics.log(AnalyticsEvent.CaptureLocationModeChanged(locationMode = "custom"))
             updateLocationSelection()
             setResult(RESULT_OK)
             finish()
@@ -83,6 +87,8 @@ class LocationsActivity :
     override fun ActivityLocationsBinding.initListeners() {
         layoutCurrentLocation.setOnClickListener {
             LocationPreference.markCurrentLocation(this@LocationsActivity)
+            Analytics.log(AnalyticsEvent.LocationSaved(action = "select_current"))
+            Analytics.log(AnalyticsEvent.CaptureLocationModeChanged(locationMode = "current"))
             updateLocationSelection()
             setResult(RESULT_OK)
             finish()
@@ -99,6 +105,7 @@ class LocationsActivity :
                 lifecycleScope.launch(Dispatchers.IO) {
                     repository.saveLocation(entity)
                     runOnUiThread {
+                        Analytics.log(AnalyticsEvent.LocationSaved(action = "add"))
                         adapter.addItemAtTop(entity)
                         recyclerView.scrollToPosition(0)
                     }

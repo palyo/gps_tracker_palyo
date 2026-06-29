@@ -2,6 +2,8 @@ package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.adapter.*
+import aanibrothers.tracker.io.analytics.Analytics
+import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
 import aanibrothers.tracker.io.module.*
@@ -120,6 +122,7 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
                 areaBounds.clear()
                 boundMarkers.clear()
                 textArea.beGone()
+                Analytics.log(AnalyticsEvent.AreaCleared)
                 return@setOnClickListener
             } else {
                 Toast.makeText(applicationContext, getString(R.string.message_please_add_mark_on_map), Toast.LENGTH_LONG).show()
@@ -278,6 +281,12 @@ class AreaCalcActivity : BaseActivity<ActivityAreaCalcBinding>(ActivityAreaCalcB
                         resultAvailable = true
                         val computeArea2: Double = SphericalUtil.computeArea(areaBounds)
                         val d2 = if (computeArea2 > 1000.0) computeArea2 / 1000.0 else 0.0
+                        Analytics.log(
+                            AnalyticsEvent.AreaCalculated(
+                                points = areaBounds.size,
+                                unit = if (d2 != 0.0) "km2" else "m2"
+                            )
+                        )
                         if (d2 != 0.0) {
                             binding?.textArea?.beVisible()
                             binding?.textArea?.text = TextUtils.concat(getString(R.string.measurement_area_in_km), String.format("%.4f", d2), " ", Html.fromHtml(" km<sup>2</sup>"))
