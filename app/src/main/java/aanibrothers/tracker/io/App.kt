@@ -27,11 +27,21 @@ import coder.apps.space.library.extension.THEME
 import coder.apps.space.library.extension.themeToggleMode
 import coder.apps.space.library.helper.TinyDB
 import com.google.android.gms.maps.MapsInitializer
+import java.util.concurrent.atomic.AtomicBoolean
 
 class App : Application(), Application.ActivityLifecycleCallbacks {
     companion object {
 
         var isOpenInter = false
+
+        // Process-global guard: the Next-Gen Mobile Ads SDK throws
+        // IllegalStateException if any ad is loaded before MobileAds.initialize()
+        // has completed. Initialization only runs after consent is granted
+        // (see LauncherActivity), so on offline / consent-declined / init-failure
+        // paths the SDK is never initialized. Every ad-load entry point checks
+        // this flag and no-ops until it's set true in the initialize callback.
+        val isMobileAdsInitialized = AtomicBoolean(false)
+
         private var instance: App? = null
         private var appContext: Context? = null
         fun getInstance(): App =

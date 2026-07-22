@@ -101,6 +101,9 @@ class LauncherActivity :
                     this@LauncherActivity,
                     InitializationConfig.Builder(ADMOB_APP_ID).build()
                 ) {
+                    // SDK ready — unblock every ad-load entry point. Must be set
+                    // before any load runs (including the splash interstitial below).
+                    App.isMobileAdsInitialized.set(true)
                     runOnUiThread {
                         preloadNative()
                         loadSplashInterstitial()

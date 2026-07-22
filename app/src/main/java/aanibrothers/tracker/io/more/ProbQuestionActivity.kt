@@ -12,7 +12,6 @@ import aanibrothers.tracker.io.ui.AppLanguageActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
 import aanibrothers.tracker.io.ui.updates.OnboardingActivity
 import aanibrothers.tracker.io.ui.updates.PermissionActivity
-import android.app.LocaleManager
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -24,7 +23,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import coder.apps.space.library.extension.go
 import coder.apps.space.library.helper.TinyDB
-import kotlin.jvm.java
 
 class ProbQuestionActivity : AppCompatActivity() {
     lateinit var binding: ActivityProbQuestionBinding
@@ -120,10 +118,13 @@ class ProbQuestionActivity : AppCompatActivity() {
         when {
             TinyDB(this).getBoolean(IS_LANGUAGE_ENABLED, true) ->
                 go(AppLanguageActivity::class.java, finish = true)
+
             isOnboardingEnabled() ->
                 go(OnboardingActivity::class.java, finish = true)
+
             !hasAllNewPermissions() || !isLocationEnabled() ->
                 go(PermissionActivity::class.java, finish = true)
+
             else ->
                 go(HomeActivity::class.java, finish = true)
         }

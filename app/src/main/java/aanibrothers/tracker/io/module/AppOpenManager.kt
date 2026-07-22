@@ -182,6 +182,18 @@ class AppOpenManager {
             return
         }
 
+        // MobileAds.initialize() must have completed before any AppOpenAd.load(),
+        // or the Next-Gen SDK throws IllegalStateException. On offline /
+        // consent-declined paths it never runs, so bail out cleanly.
+        if (!App.isMobileAdsInitialized.get()) {
+            isFailed = true
+            isLoading = false
+            listener?.invoke(true)
+            if (listeners != null) listeners?.invoke(true)
+            listeners = null
+            return
+        }
+
         loadCallback = object : AdLoadCallback<AppOpenAd> {
             override fun onAdLoaded(ad: AppOpenAd) {
                 isLoading = false

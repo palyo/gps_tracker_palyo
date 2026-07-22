@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io.module
 
+import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.analytics.AdPlacement
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
@@ -29,6 +30,12 @@ private fun isWithinFrequencyCap(): Boolean {
 }
 
 fun Context.loadInterAd(listener: ((result: Boolean) -> Unit)? = null) {
+    // Never load before MobileAds.initialize() has completed — the Next-Gen SDK
+    // throws IllegalStateException otherwise (offline / consent-declined paths).
+    if (!App.isMobileAdsInitialized.get()) {
+        listener?.invoke(true)
+        return
+    }
     if (isLoadingAd || admobInterstitialAd != null) return
     val adUnitId = getAdmobInterId()
     if (adUnitId.isBlank()) {

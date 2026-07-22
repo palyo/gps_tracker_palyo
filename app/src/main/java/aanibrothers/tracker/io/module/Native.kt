@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io.module
 
+import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.analytics.AdPlacement
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
@@ -26,6 +27,9 @@ import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
 var nativeAd: NativeAd? = null
 
 fun Activity.preloadNative() {
+    // Guard against loading before MobileAds.initialize() completes (crashes the
+    // Next-Gen SDK with IllegalStateException).
+    if (!App.isMobileAdsInitialized.get()) return
     try {
         val start = System.currentTimeMillis()
         val request = NativeAdRequest
