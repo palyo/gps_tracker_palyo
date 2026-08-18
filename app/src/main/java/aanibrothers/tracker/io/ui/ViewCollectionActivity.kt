@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.helper.EdgeToEdgeHandled
+import aanibrothers.tracker.io.helper.applySystemBarPadding
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
@@ -24,7 +26,7 @@ import kotlinx.coroutines.*
 import java.io.*
 import java.util.Locale
 
-class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(ActivityViewCollectionBinding::inflate) {
+class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(ActivityViewCollectionBinding::inflate), EdgeToEdgeHandled {
     private var fileAdapter: FilePagerAdapter? = null
     private var filesList: MutableList<File>? = mutableListOf()
     private var currentPos = 0
@@ -213,7 +215,7 @@ class ViewCollectionActivity : BaseActivity<ActivityViewCollectionBinding>(Activ
             statusBarColor = Color.TRANSPARENT
             navigationBarColor = Color.BLACK
         }
-        layoutToolbar.updatePadding(top = statusBarHeight)
+        layoutToolbar.applySystemBarPadding(applyBottom = false)
 
         toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()

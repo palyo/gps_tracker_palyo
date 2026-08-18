@@ -35,9 +35,9 @@ class PaintOverlayRenderer(
         color = Color.argb(0x3D, 0, 0, 0)
     }
     private val mapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
-    private val fontSemiBold by lazy { ResourcesCompat.getFont(context, coder.apps.space.library.R.font.semi_bold) }
-    private val fontMedium by lazy { ResourcesCompat.getFont(context, coder.apps.space.library.R.font.medium) }
-    private val fontRegular by lazy { ResourcesCompat.getFont(context, coder.apps.space.library.R.font.regular) }
+    private val fontSemiBold by lazy { ResourcesCompat.getFont(context, R.font.font_bold) }
+    private val fontMedium by lazy { ResourcesCompat.getFont(context, R.font.font_medium) }
+    private val fontRegular by lazy { ResourcesCompat.getFont(context, R.font.font_regular) }
     override fun onDraw(canvas: Canvas, presentationTimeUs: Long) {
         val w = canvas.width.toFloat()
         val h = canvas.height.toFloat()

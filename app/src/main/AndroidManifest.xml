@@ -54,6 +54,15 @@
             android:name=".ui.ViewCollectionActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.ReportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ReportPickerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.MyPdfFilesActivity"
+            android:exported="false" />
+        <activity
             android:name=".more.ProbActivity"
             android:launchMode="singleTask"
             android:exported="false" />

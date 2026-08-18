@@ -15,7 +15,7 @@
         android:text="Layer"
         android:textSize="@dimen/_12ssp"
         app:backgroundTint="@color/colorCardBackground"
-        app:fontFamily="@font/medium"
+        app:fontFamily="@font/font_medium"
         app:icon="@drawable/ic_menu_map_layers"
         app:iconPadding="@dimen/_8sdp"
         app:iconTint="@color/colorAccent"

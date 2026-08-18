@@ -6,6 +6,7 @@ import aanibrothers.tracker.io.analytics.CaptureCounter
 import aanibrothers.tracker.io.analytics.UserProp
 import aanibrothers.tracker.io.extension.HAS_SEEN_CALL_END_PERMISSION_DIALOG
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
+import aanibrothers.tracker.io.helper.applyEdgeToEdgeInsets
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.RemoteConfigManager
 import aanibrothers.tracker.io.module.appOpenCount
@@ -176,7 +177,12 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         }
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        // API 36 makes edge-to-edge mandatory, so every screen has to inset its
+        // own content. Doing it here covers all of them from one place;
+        // full-bleed screens opt out via EdgeToEdgeHandled.
+        activity.applyEdgeToEdgeInsets()
+    }
 
     override fun onActivityStarted(activity: Activity) {
         currentActivity = activity

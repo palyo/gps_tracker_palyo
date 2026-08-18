@@ -12,14 +12,14 @@ plugins {
 
 android {
     namespace = "aanibrothers.tracker.io"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "aani.gps.map.trackgps.gpsmapcamera.app"
         minSdk = 29
-        targetSdk = 35
-        versionCode = 15
-        versionName = "1.8"
+        targetSdk = 36
+        versionCode = 16
+        versionName = "1.9"
 
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true

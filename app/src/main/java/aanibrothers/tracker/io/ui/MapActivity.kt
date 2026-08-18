@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.helper.EdgeToEdgeHandled
+import aanibrothers.tracker.io.helper.applySystemBarPadding
 import aanibrothers.tracker.io.adapter.SuggestionLocationAdapter
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
@@ -73,7 +75,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
     ActivityMapBinding::inflate,
     isFullScreen = true,
     isFullScreenIncludeNav = false
-), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+), EdgeToEdgeHandled, OnMapReadyCallback, GoogleMap.OnPoiClickListener {
 
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
     private val TAG = "MapActivity"
@@ -338,10 +340,8 @@ class MapActivity : BaseActivity<ActivityMapBinding>(
     override fun ActivityMapBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
         updateNavigationBarColor(R.color.colorBlack)
-        layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
-            v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
-            insets
-        }
+        // Map draws under the bars; only the control bar is inset.
+        layoutController.applySystemBarPadding()
 
         onBackPressedDispatcher.addCallback {
             viewInterAd {

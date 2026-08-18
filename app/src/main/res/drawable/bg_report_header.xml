@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tinted header card holding the report's date, title and description. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:endColor="#EAF1FF"
+        android:startColor="#E3F2FD"
+        android:type="linear" />
+    <corners android:radius="@dimen/_14sdp" />
+</shape>

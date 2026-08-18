@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_4sdp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image_photo"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:background="@color/colorSecondaryBackground"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+
+    <ImageView
+        android:id="@+id/action_remove"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_margin="@dimen/_4sdp"
+        android:background="@drawable/bg_report_remove"
+        android:contentDescription="@string/action_remove_image"
+        android:padding="@dimen/_4sdp"
+        android:src="@drawable/ic_menu_close"
+        app:layout_constraintEnd_toEndOf="@+id/image_photo"
+        app:layout_constraintTop_toTopOf="@+id/image_photo"
+        app:tint="@color/colorWhite" />
+</androidx.constraintlayout.widget.ConstraintLayout>

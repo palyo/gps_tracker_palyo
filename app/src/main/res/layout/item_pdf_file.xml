@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorCardBackground"
+    android:paddingHorizontal="@dimen/_12sdp"
+    android:paddingVertical="@dimen/_10sdp">
+
+    <ImageView
+        android:id="@+id/image_pdf"
+        android:layout_width="@dimen/_28sdp"
+        android:layout_height="@dimen/_28sdp"
+        android:contentDescription="@string/action_my_pdf_files"
+        android:src="@drawable/ic_report_pdf"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_pdf_name"
+        style="@style/TextMedium"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_11ssp"
+        app:layout_constraintEnd_toStartOf="@+id/action_share_pdf"
+        app:layout_constraintStart_toEndOf="@+id/image_pdf"
+        app:layout_constraintTop_toTopOf="@+id/image_pdf"
+        tools:text="GPSReport_20260818_114600.pdf" />
+
+    <TextView
+        android:id="@+id/text_pdf_meta"
+        style="@style/TextRegular"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextOpacity"
+        android:textSize="@dimen/_9ssp"
+        app:layout_constraintEnd_toEndOf="@+id/text_pdf_name"
+        app:layout_constraintStart_toStartOf="@+id/text_pdf_name"
+        app:layout_constraintTop_toBottomOf="@+id/text_pdf_name"
+        tools:text="18 Aug 2026 · 1.2 MB" />
+
+    <ImageView
+        android:id="@+id/action_share_pdf"
+        android:layout_width="@dimen/_32sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:contentDescription="@string/action_share_report"
+        android:padding="@dimen/_6sdp"
+        android:src="@drawable/ic_menu_share"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/colorIcon" />
+</androidx.constraintlayout.widget.ConstraintLayout>

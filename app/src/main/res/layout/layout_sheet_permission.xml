@@ -71,7 +71,7 @@
         android:textSize="@dimen/_12ssp"
         app:cornerRadius="@dimen/_8sdp"
         app:backgroundTint="@color/colorAccent"
-        app:fontFamily="@font/bold"
+        app:fontFamily="@font/font_bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_description" />
@@ -84,7 +84,7 @@
         android:layout_marginStart="@dimen/_12sdp"
         android:layout_marginTop="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_12sdp"
-        app:fontFamily="@font/bold"
+        app:fontFamily="@font/font_bold"
         android:text="@string/action_cancel"
         app:cornerRadius="@dimen/_8sdp"
         android:textSize="@dimen/_12ssp"

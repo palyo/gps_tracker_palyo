@@ -4,6 +4,7 @@ import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.BuildConfig
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.helper.EdgeToEdgeHandled
 import aanibrothers.tracker.io.analytics.Analytics
 import aanibrothers.tracker.io.analytics.AnalyticsEvent
 import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
@@ -45,7 +46,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LauncherActivity :
-    BaseActivity<ActivityLauncherBinding>(ActivityLauncherBinding::inflate, isFullScreen = true) {
+    BaseActivity<ActivityLauncherBinding>(ActivityLauncherBinding::inflate, isFullScreen = true), EdgeToEdgeHandled {
 
     private var consentManager: ConsentManager? = null
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)

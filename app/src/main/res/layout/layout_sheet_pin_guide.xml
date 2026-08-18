@@ -60,7 +60,7 @@
         android:textColor="@color/colorWhite"
         android:textSize="@dimen/_12ssp"
         app:cornerRadius="@dimen/_8sdp"
-        app:fontFamily="@font/bold"
+        app:fontFamily="@font/font_bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_description" />

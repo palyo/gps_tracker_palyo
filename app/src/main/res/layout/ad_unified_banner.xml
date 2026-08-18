@@ -55,7 +55,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_toStartOf="@id/ad_call_to_action"
-                            android:fontFamily="@font/bold"
+                            android:fontFamily="@font/font_bold"
                             android:maxLines="1"
                             android:minLines="1"
                             android:textColor="@color/colorText"

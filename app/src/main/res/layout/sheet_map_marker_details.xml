@@ -92,7 +92,7 @@
         android:layout_marginTop="@dimen/_12sdp"
         android:text="@string/action_direction"
         android:textSize="@dimen/_11ssp"
-        app:fontFamily="@font/medium"
+        app:fontFamily="@font/font_medium"
         app:icon="@drawable/ic_menu_navigation"
         app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"

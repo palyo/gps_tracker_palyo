@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".ui.ReportActivity">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_back"
+        style="@style/MaterialButtonTransparent"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:insetTop="@dimen/_0sdp"
+        android:insetBottom="@dimen/_0sdp"
+        app:icon="@drawable/ic_navigation_back"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/_0sdp"
+        app:iconSize="@dimen/_24sdp"
+        app:iconTint="@color/colorIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_screen_title"
+        style="@style/TextSemiBold"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:text="@string/title_photo_report"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_15ssp"
+        app:layout_constraintBottom_toBottomOf="@+id/action_back"
+        app:layout_constraintEnd_toStartOf="@+id/action_share"
+        app:layout_constraintStart_toEndOf="@+id/action_back"
+        app:layout_constraintTop_toTopOf="@+id/action_back" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_share"
+        style="@style/MaterialButtonTransparent"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        android:insetTop="@dimen/_0sdp"
+        android:insetBottom="@dimen/_0sdp"
+        app:icon="@drawable/ic_menu_share"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/_0sdp"
+        app:iconSize="@dimen/_20sdp"
+        app:iconTint="@color/colorIcon"
+        app:layout_constraintBottom_toBottomOf="@+id/action_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/action_back" />
+
+    <!-- Report header: the date/time it was made, plus the title and
+         description the user can edit. -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_report_header"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@drawable/bg_report_header"
+        android:padding="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/action_back">
+
+        <TextView
+            android:id="@+id/text_report_date"
+            style="@style/TextMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/_6sdp"
+            android:gravity="center_vertical"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Tue, 8/18/2026" />
+
+        <TextView
+            android:id="@+id/text_report_time"
+            style="@style/TextMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/_6sdp"
+            android:gravity="center_vertical"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/text_report_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_report_date"
+            tools:text="11:46 AM" />
+
+        <View
+            android:id="@+id/divider_header"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@color/colorIconOpacity12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_report_date" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_report_logo"
+            android:layout_width="@dimen/_42sdp"
+            android:layout_height="@dimen/_42sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider_header"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+        <TextView
+            android:id="@+id/text_report_title"
+            style="@style/TextSemiBold"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/_12ssp"
+            android:gravity="start"
+            android:fontFamily="@font/font_medium"
+            app:layout_constraintEnd_toStartOf="@+id/action_edit_title"
+            app:layout_constraintStart_toEndOf="@+id/image_report_logo"
+            app:layout_constraintTop_toTopOf="@+id/image_report_logo"
+            tools:text="Gps Map Camera" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_edit_title"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_28sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:insetTop="@dimen/_0sdp"
+            android:insetBottom="@dimen/_0sdp"
+            app:icon="@drawable/ic_menu_edit"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:iconTint="@color/colorIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_report_title" />
+
+        <TextView
+            android:id="@+id/text_report_description"
+            style="@style/TextRegular"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_10ssp"
+            android:gravity="start"
+            android:fontFamily="@font/font_regular"
+            app:layout_constraintEnd_toStartOf="@+id/action_edit_description"
+            app:layout_constraintStart_toStartOf="@+id/text_report_title"
+            app:layout_constraintTop_toBottomOf="@+id/text_report_title"
+            tools:text="Capture photos with live GPS, map and timestamps" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_edit_description"
+            style="@style/MaterialButtonTransparent"
+            android:layout_width="@dimen/_28sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:insetTop="@dimen/_0sdp"
+            android:insetBottom="@dimen/_0sdp"
+            app:icon="@drawable/ic_menu_edit"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/_0sdp"
+            app:iconSize="@dimen/_14sdp"
+            app:iconTint="@color/colorIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_report_description" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_report_actions"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_report_header">
+
+        <TextView
+            android:id="@+id/action_save_photo"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_6sdp"
+            android:layout_weight="1"
+            android:paddingVertical="@dimen/_8sdp"
+            android:background="@drawable/bg_report_action_photo"
+            android:drawableStart="@drawable/ic_report_save_photo"
+            android:drawablePadding="@dimen/_6sdp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:text="@string/action_save_as_photo"
+            android:textColor="#2563EB"
+            android:textSize="@dimen/_10ssp" />
+
+        <TextView
+            android:id="@+id/action_save_pdf"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_6sdp"
+            android:layout_weight="1"
+            android:paddingVertical="@dimen/_8sdp"
+            android:background="@drawable/bg_report_action_pdf"
+            android:drawableStart="@drawable/ic_report_pdf"
+            android:drawablePadding="@dimen/_6sdp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:text="@string/action_save_as_pdf"
+            android:textColor="#DC2626"
+            android:textSize="@dimen/_10ssp" />
+
+        <TextView
+            android:id="@+id/action_my_pdf_files"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingVertical="@dimen/_8sdp"
+            android:background="@drawable/bg_report_action_files"
+            android:drawableStart="@drawable/ic_report_folder"
+            android:drawablePadding="@dimen/_6sdp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:text="@string/action_my_pdf_files"
+            android:textColor="#7C3AED"
+            android:textSize="@dimen/_10ssp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_report_images"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="@dimen/_0sdp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_72sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_report_actions"
+        tools:itemCount="6"
+        tools:listitem="@layout/item_report_photo"
+        tools:spanCount="3" />
+
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler_report_images"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/recycler_report_images">
+
+        <ImageView
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_120sdp"
+            android:contentDescription="@string/message_no_images_yet"
+            android:src="@drawable/ic_report_empty" />
+
+        <TextView
+            style="@style/TextMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="@string/message_no_images_yet"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_13ssp" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/action_add_images"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_16sdp"
+        android:contentDescription="@string/action_add_images"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_report_add_photo"
+        app:tint="@color/colorWhite" />
+
+    <ProgressBar
+        android:id="@+id/progress_report"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/colorAccent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

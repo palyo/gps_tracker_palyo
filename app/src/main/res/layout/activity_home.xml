@@ -865,6 +865,32 @@
          camera flip. The last-captured thumbnail leads the row and the lens
          flip closes it; Tools moved up to the top strip to keep this to five
          slots. -->
+    <!-- REPORT sits alongside the capture-mode tabs, as in the reference. It
+         is an action, not a capture mode, so it is a button rather than a
+         third tab — a third tab would shift the PHOTO/VIDEO positions the
+         tab listener switches on. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/action_report"
+        style="@style/MaterialButtonTransparent"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_32sdp"
+        android:insetTop="@dimen/_0sdp"
+        android:insetBottom="@dimen/_0sdp"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:text="@string/action_report"
+        android:textAllCaps="true"
+        android:textColor="@color/colorWhite80"
+        android:textSize="@dimen/_10ssp"
+        app:icon="@drawable/ic_action_report"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/_4sdp"
+        app:iconSize="@dimen/_14sdp"
+        app:iconTint="@color/colorWhite80"
+        app:layout_constraintBottom_toBottomOf="@+id/tabCaptureMode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tabCaptureMode"
+        app:layout_constraintTop_toTopOf="@+id/tabCaptureMode" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_controls"
         android:layout_width="@dimen/_0sdp"

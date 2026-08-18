@@ -1,6 +1,8 @@
 package aanibrothers.tracker.io.ui
 
 import aanibrothers.tracker.io.R
+import aanibrothers.tracker.io.helper.EdgeToEdgeHandled
+import aanibrothers.tracker.io.helper.applySystemBarPadding
 import aanibrothers.tracker.io.adapter.*
 import aanibrothers.tracker.io.databinding.*
 import aanibrothers.tracker.io.extension.*
@@ -31,7 +33,7 @@ import com.google.maps.android.ktx.utils.collection.*
 import kotlinx.coroutines.*
 import org.json.*
 
-class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), OnMapReadyCallback, GoogleMap.OnPoiClickListener {
+class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false), EdgeToEdgeHandled, OnMapReadyCallback, GoogleMap.OnPoiClickListener {
 
     private var isSource: Boolean = false
     private var suggestionLocationAdapter: SuggestionLocationAdapter? = null
@@ -255,10 +257,8 @@ class RouteActivity : BaseActivity<ActivityRoutesBinding>(ActivityRoutesBinding:
     override fun ActivityRoutesBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
         updateNavigationBarColor(R.color.colorBlack)
-        layoutController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
-            v.setPadding(0, statusBarHeight, 0, navigationBarHeight)
-            insets
-        }
+        // Map draws under the bars; only the control bar is inset.
+        layoutController.applySystemBarPadding()
         onBackPressedDispatcher.addCallback {
             viewInterAd {
                 finish()

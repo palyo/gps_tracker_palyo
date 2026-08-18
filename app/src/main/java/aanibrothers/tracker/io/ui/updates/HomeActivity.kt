@@ -6,6 +6,9 @@ import aanibrothers.tracker.io.databinding.ActivityHomeBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
 import aanibrothers.tracker.io.extension.lastRatePromptDay
 import aanibrothers.tracker.io.extension.viewPermission
+import aanibrothers.tracker.io.helper.CapturedPhotos
+import aanibrothers.tracker.io.helper.EdgeToEdgeHandled
+import aanibrothers.tracker.io.helper.applySystemBarPadding
 import aanibrothers.tracker.io.helper.InAppReviewListener
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
 import aanibrothers.tracker.io.helper.launchInAppReviewFlow
@@ -19,6 +22,7 @@ import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.viewNativeSmall
 import aanibrothers.tracker.io.ui.AppSettingsActivity
 import aanibrothers.tracker.io.ui.ToolsActivity
+import aanibrothers.tracker.io.ui.ReportActivity
 import aanibrothers.tracker.io.ui.ViewCollectionActivity
 import aanibrothers.tracker.io.widgets.FocusView
 import android.Manifest
@@ -166,7 +170,7 @@ import kotlin.math.roundToInt
 
 class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false
-) {
+), EdgeToEdgeHandled {
     private var exitSheetDialog: BottomSheetDialog? = null
     private val PERMISSION_REQUEST_CODE = 100
     private var cameraProvider: ProcessCameraProvider? = null
@@ -534,12 +538,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         restoreUIState()
         checkGooglePlayServices()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        binding?.apply {
-            getLatestCapturedFile()?.let { latestFile ->
-                lastCapturedFile = latestFile
-                Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
-            }
-        }
+        binding?.refreshLastCapturedThumbnail()
         binding?.updateCameraPermissionUi()
     }
 
@@ -1458,18 +1457,25 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         )
     }
 
-    private fun getLatestCapturedFile(): File? {
-        val directory = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-            getString(R.string.location_storage_directory)
-        )
-        if (!directory.exists() || !directory.isDirectory) return null
-
-        val files = directory.listFiles { file ->
-            file.isFile && file.name.endsWith(".jpg", ignoreCase = true)
-        } ?: return null
-
-        return files.maxByOrNull { it.lastModified() }
+    /**
+     * Refreshes the gallery thumbnail from the most recent capture.
+     *
+     * The previous version looked only at the top level of the app directory,
+     * while captures actually land in DCIM/Camera by default and in Site
+     * subfolders otherwise — so it found nothing in every configuration and
+     * the thumbnail sat empty until you took a photo in that session. The scan
+     * walks several roots, so it runs off the main thread.
+     */
+    private fun ActivityHomeBinding.refreshLastCapturedThumbnail() {
+        lifecycleScope.launch {
+            val latest = withContext(Dispatchers.IO) {
+                CapturedPhotos.latest(this@HomeActivity)
+            }
+            latest?.let { file ->
+                lastCapturedFile = file
+                Glide.with(this@HomeActivity).load(file).into(imageCaptured)
+            }
+        }
     }
 
     /**
@@ -2398,6 +2404,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 }
             }
         }
+        actionReport.setOnClickListener {
+            go(ReportActivity::class.java)
+        }
+
         actionTemplates.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
@@ -2531,10 +2541,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun ActivityHomeBinding.initView() {
         updateStatusBarColor(R.color.colorTransparent)
         updateNavigationBarColor(R.color.colorBlack)
-        layoutTopController.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets ->
-            v.setPadding(0, statusBarHeight, 0, 0)
-            insets
-        }
+        // The preview stays full-bleed under the bars; only the chrome is
+        // inset. The bottom row needs it too now that API 36 always draws
+        // behind the navigation bar.
+        layoutTopController.applySystemBarPadding(applyBottom = false)
+        bottomControls.applySystemBarPadding(applyTop = false)
         onBackPressedDispatcher.addCallback {
             if (exitSheetDialog?.isShowing == true) {
                 finishAffinity()
