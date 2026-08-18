@@ -54,9 +54,6 @@
             android:name=".ui.ViewCollectionActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.GPSCameraActivity"
-            android:exported="false" />
-        <activity
             android:name=".more.ProbActivity"
             android:launchMode="singleTask"
             android:exported="false" />

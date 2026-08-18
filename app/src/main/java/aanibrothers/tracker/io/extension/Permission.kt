@@ -61,11 +61,6 @@ fun Context.isGrantedOverlay(): Boolean {
  * Firebase Remote Config kill-switch ([IS_INTRO_REMOTE_ENABLED], cached) is on
  * AND the user has not already completed onboarding ([IS_INTRO_ENABLED]).
  */
-fun Context.isOnboardingEnabled(): Boolean {
-    val tinyDB = TinyDB(this)
-    return tinyDB.getBoolean(IS_INTRO_REMOTE_ENABLED, true) &&
-            tinyDB.getBoolean(IS_INTRO_ENABLED, true)
-}
 
 fun Context.isLocationEnabled(): Boolean {
     try {

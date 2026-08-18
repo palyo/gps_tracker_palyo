@@ -6,11 +6,9 @@ import aanibrothers.tracker.io.databinding.ActivityProbQuestionBinding
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
-import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.AppLanguageActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
-import aanibrothers.tracker.io.ui.updates.OnboardingActivity
 import aanibrothers.tracker.io.ui.updates.PermissionActivity
 import android.content.Intent
 import android.os.Bundle
@@ -118,9 +116,6 @@ class ProbQuestionActivity : AppCompatActivity() {
         when {
             TinyDB(this).getBoolean(IS_LANGUAGE_ENABLED, true) ->
                 go(AppLanguageActivity::class.java, finish = true)
-
-            isOnboardingEnabled() ->
-                go(OnboardingActivity::class.java, finish = true)
 
             !hasAllNewPermissions() || !isLocationEnabled() ->
                 go(PermissionActivity::class.java, finish = true)

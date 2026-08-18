@@ -1,11 +1,10 @@
 package aanibrothers.tracker.io.ui.updates
 
+import aanibrothers.tracker.io.App.Companion.appOpenManager
 import aanibrothers.tracker.io.R
-import aanibrothers.tracker.io.analytics.Analytics
-import aanibrothers.tracker.io.analytics.AnalyticsEvent
-import aanibrothers.tracker.io.analytics.CaptureCounter
 import aanibrothers.tracker.io.databinding.ActivityHomeBinding
 import aanibrothers.tracker.io.databinding.LayoutSheetExitBinding
+import aanibrothers.tracker.io.extension.lastRatePromptDay
 import aanibrothers.tracker.io.extension.viewPermission
 import aanibrothers.tracker.io.helper.InAppReviewListener
 import aanibrothers.tracker.io.helper.PaintOverlayRenderer
@@ -16,7 +15,7 @@ import aanibrothers.tracker.io.model.CaptureMode
 import aanibrothers.tracker.io.model.LocationMode
 import aanibrothers.tracker.io.model.OverlayState
 import aanibrothers.tracker.io.model.OverlayTemplate
-import aanibrothers.tracker.io.module.appOpenCount
+import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.viewNativeSmall
 import aanibrothers.tracker.io.ui.AppSettingsActivity
 import aanibrothers.tracker.io.ui.ToolsActivity
@@ -55,22 +54,34 @@ import android.provider.Settings
 import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
+import android.util.Size
+import android.view.Gravity
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.ViewConfiguration
 import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowInsets
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FallbackStrategy
 import androidx.camera.video.FileOutputOptions
@@ -80,6 +91,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
+import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -89,6 +101,7 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.core.view.marginTop
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -103,6 +116,7 @@ import androidx.media3.transformer.Transformer
 import coder.apps.space.library.base.BaseActivity
 import coder.apps.space.library.extension.applyDialogConfig
 import coder.apps.space.library.extension.beInvisible
+import coder.apps.space.library.extension.beGone
 import coder.apps.space.library.extension.beVisible
 import coder.apps.space.library.extension.color
 import coder.apps.space.library.extension.disable
@@ -127,6 +141,7 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -135,27 +150,36 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class HomeActivity : BaseActivity<ActivityHomeBinding>(
     ActivityHomeBinding::inflate, isFullScreen = true, isFullScreenIncludeNav = false
 ) {
     private var exitSheetDialog: BottomSheetDialog? = null
     private val PERMISSION_REQUEST_CODE = 100
-    private var hasLoggedHomeShown = false
     private var cameraProvider: ProcessCameraProvider? = null
-    // True once the camera use-cases are bound. CameraX is bound to this
-    // activity's lifecycle, so it auto-pauses/resumes — we must NOT rebind (or
-    // re-show the loader) on every onStart/onResume, only bind once.
+
+    // Bound camera handle — needed for tap-to-focus and torch. Refreshed on
+    // every bindToLifecycle() so the control always points at the live camera.
+    private var camera: Camera? = null
+
+    // True once the use-cases are bound. CameraX follows this activity's
+    // lifecycle and resumes the preview by itself, so onStart/onResume must
+    // NOT rebind (that unbinds the surface and flashes the loader again).
     private var isCameraBound = false
-    private var fusedLocationClient: FusedLocationProviderClient? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var captureMode = CaptureMode.PHOTO
     private lateinit var videoCapture: VideoCapture<Recorder>
@@ -163,6 +187,33 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private var isRecording = false
 
     private var isFocusManual = true
+    private var focusHideJob: Job? = null
+
+    // Vertical drag on the preview = exposure compensation, anchored to the
+    // value that was live when the finger went down.
+    private var exposureDragStartIndex = 0
+    private var isExposureDragging = false
+    private var touchDownX = 0f
+    private var touchDownY = 0f
+    private val touchSlop by lazy { ViewConfiguration.get(this).scaledTouchSlop }
+
+    // Zoom chips are built per lens, so they are held here rather than in the
+    // layout — the available ratios differ between the front and back camera.
+    private val zoomChips = mutableListOf<TextView>()
+
+    private val scaleGestureDetector by lazy {
+        ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val zoomState = camera?.cameraInfo?.zoomState?.value ?: return false
+                val target = (zoomState.zoomRatio * detector.scaleFactor)
+                    .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+                camera?.cameraControl?.setZoomRatio(target)
+                updateZoomChips(target)
+                return true
+            }
+        })
+    }
+
     private var isFirstClick = true
     private var isSoundOn = true
     private var isBackCameraSelected = true
@@ -189,7 +240,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             restoreLocationModeFromPref()
         }
 
-
     private var locationMode = LocationMode.CURRENT
     private var customLocation: Location? = null
 
@@ -200,65 +250,87 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     override fun ActivityHomeBinding.initExtra() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         isPortraitMode = true
-        // Lightweight UI wiring only — keep onCreate cheap so the first frame
-        // (camera chrome + loading spinner) draws immediately.
+
         initializeComponents()
         setupOrientationListener()
         setupFocusView()
         setupTab()
+        setupMapSnapshot()
+        displayCurrentLocation()
         setupTimeDisplay()
-
-        // Heavy SDK initialization (CameraX + Google Maps) is deferred until
-        // after the first frame paints. Running it synchronously here blocked
-        // the initial render, leaving a black window for 2-3s on the way in
-        // from PermissionActivity. Camera is started first so the Maps SDK
-        // install doesn't hold the main thread before the first camera frame.
-        val binding = this
-        root.post {
-            binding.updateCameraPermissionUi()
-            setupMapSnapshot()
-            displayCurrentLocation()
-            requestPermissions()
-        }
+        appOpenManager = AppOpenManager()
+        requestPermissions()
+        updateCameraPermissionUi()
+        handleRate()
     }
 
     private var googleMap: GoogleMap? = null
     private val lastMapSnapshot = java.util.concurrent.atomic.AtomicReference<Bitmap?>()
 
-    private fun getActiveMapFragment(): SupportMapFragment? {
-        // Map fragment containers are empty FrameLayouts in the XML.
-        // We install a SupportMapFragment into the active template's
-        // container lazily on first access — this keeps the heavy Google
-        // Maps SDK out of the activity's inflate critical path (otherwise
-        // each <fragment> tag blocked the main thread ~95ms in
-        // ENABLE_FEATURES during onCreateView).
-        val containerId = when (tinyDB?.getString("template", "default")) {
+    /** Container the active template draws its map tile into. */
+    private fun activeMapContainerId(): Int {
+        return when (tinyDB?.getString("template", "default")) {
             "classic" -> R.id.map_fragment_classic
             "squarise" -> R.id.map_fragment_squarise
             else -> R.id.map_fragment
         }
-        val tag = "map_fragment_$containerId"
+    }
 
-        supportFragmentManager.findFragmentByTag(tag)?.let {
-            return it as? SupportMapFragment
-        }
+    private fun getActiveMapFragment(): SupportMapFragment? {
+        return supportFragmentManager.findFragmentById(activeMapContainerId()) as? SupportMapFragment
+    }
 
-        val fragment = SupportMapFragment.newInstance()
-        try {
-            supportFragmentManager.beginTransaction()
-                .replace(containerId, fragment, tag)
+    /**
+     * Puts a map into the active template's container.
+     *
+     * The containers in the layout are plain FrameLayouts, and nothing ever
+     * added a fragment to them — so [getActiveMapFragment] returned null on
+     * every call and the map tile, the snapshot and the map type were all
+     * dead. MapActivity has always done this transaction; this screen never
+     * did. Same pattern as MapActivity, minus the gestures, since this map is
+     * only ever a thumbnail that gets snapshotted into the stamp.
+     */
+    private fun ensureMapFragment(): SupportMapFragment? {
+        getActiveMapFragment()?.let { return it }
+        if (isFinishing || isDestroyed) return null
+
+        val options = GoogleMapOptions()
+            .compassEnabled(false)
+            .zoomControlsEnabled(false)
+            .mapToolbarEnabled(false)
+            .scrollGesturesEnabled(false)
+            .zoomGesturesEnabled(false)
+            .rotateGesturesEnabled(false)
+            .tiltGesturesEnabled(false)
+
+        return try {
+            val containerId = activeMapContainerId()
+            val transaction = supportFragmentManager.beginTransaction()
+
+            // Drop a map left behind in another template's container, so
+            // switching templates doesn't accumulate live GoogleMap instances.
+            listOf(R.id.map_fragment, R.id.map_fragment_classic, R.id.map_fragment_squarise)
+                .filter { it != containerId }
+                .mapNotNull { supportFragmentManager.findFragmentById(it) }
+                .forEach { transaction.remove(it) }
+
+            val fragment = SupportMapFragment.newInstance(options)
+            transaction.replace(containerId, fragment)
+                // Committed synchronously so the very next findFragmentById
+                // (and the callers below) see it rather than racing the queue.
                 .commitNowAllowingStateLoss()
-        } catch (t: Throwable) {
-            Log.w(HomeActivity::class.java.simpleName, "Map fragment install failed", t)
-            return null
+            fragment
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Map fragment attach failed", exc)
+            null
         }
-        return fragment
     }
 
     private fun setupMapSnapshot() {
-        val fragment = getActiveMapFragment() ?: return
+        val fragment = ensureMapFragment() ?: return
         fragment.getMapAsync { map ->
             googleMap = map
+            map.mapType = getSelectedMapType()
             map.setOnMapLoadedCallback {
                 if (canSnapshotMap()) {
                     captureMapSnapshotSafe()
@@ -315,9 +387,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     captureMode = if (tab.position == 0) CaptureMode.PHOTO else CaptureMode.VIDEO
-                    Analytics.log(
-                        AnalyticsEvent.CaptureModeChanged(mode = captureMode.name.lowercase())
-                    )
                     updateCaptureUI()
                     if (captureMode == CaptureMode.VIDEO && !hasPermission(Manifest.permission.RECORD_AUDIO)) {
                         showAudioPermissionDialog()
@@ -447,12 +516,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     override fun onStart() {
         super.onStart()
-        Handler(mainLooper).postDelayed({
-            orientationEventListener?.enable()
-            binding?.updateCameraPermissionUi()
-            restoreLocationModeFromPref()
-        }, 1000)
-
+        orientationEventListener?.enable()
+        binding?.updateCameraPermissionUi()
+        restoreLocationModeFromPref()
     }
 
     override fun onStop() {
@@ -464,25 +530,18 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
     override fun onResume() {
         super.onResume()
-        if (!hasLoggedHomeShown) {
-            hasLoggedHomeShown = true
-            Analytics.log(AnalyticsEvent.HomeShown(isFirstSession = appOpenCount <= 1))
-        }
-        Handler(mainLooper).postDelayed({
-            allowMapSnapshot = true
-            restoreUIState()
-            checkGooglePlayServices()
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            binding?.apply {
-                getLatestCapturedFile()?.let { latestFile ->
-                    lastCapturedFile = latestFile
-                    Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
-                }
+        allowMapSnapshot = true
+        restoreUIState()
+        checkGooglePlayServices()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        binding?.apply {
+            getLatestCapturedFile()?.let { latestFile ->
+                lastCapturedFile = latestFile
+                Glide.with(this@HomeActivity).load(latestFile).into(imageCaptured)
             }
-            binding?.updateCameraPermissionUi()
-        }, 1000)
+        }
+        binding?.updateCameraPermissionUi()
     }
-
 
     override fun onPause() {
         super.onPause()
@@ -501,9 +560,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         super.onDestroy()
         orientationEventListener?.disable()
         stopLocationUpdates()
-        // timeRunnable is lateinit (set in setupTimeDisplay). On an early
-        // relaunch/config-change, onDestroy can run before it's assigned.
-        if (::timeRunnable.isInitialized) timeHandler.removeCallbacks(timeRunnable)
+        timeHandler.removeCallbacks(timeRunnable)
     }
 
     private fun setupOrientationListener() {
@@ -531,52 +588,83 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun restartCameraWithCorrectOrientation(cameraProvider: ProcessCameraProvider) {
-        binding?.let { binding ->
-            val targetRotation = currentScreenRotation
-            val targetAspectRatio = getTargetAspectRatio()
+        binding?.bindCameraUseCases(cameraProvider)
+    }
 
-            try {
-                cameraProvider.unbindAll()
+    /**
+     * The single place use-cases are bound. Cold start, camera flip, the
+     * photo/video switch and rotation changes all funnel through here, so
+     * resolution and rotation settings can never drift apart between the
+     * paths the way they used to.
+     */
+    private fun ActivityHomeBinding.bindCameraUseCases(provider: ProcessCameraProvider): Boolean {
+        val targetRotation = currentScreenRotation
+        val targetAspectRatio = getTargetAspectRatio()
 
-                val preview = Preview.Builder().setTargetAspectRatio(targetAspectRatio)
-                    .setTargetRotation(targetRotation).build().also {
-                        it.surfaceProvider = binding.previewView.surfaceProvider
-                    }
-
-                imageCapture = ImageCapture.Builder()
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                    .setTargetAspectRatio(targetAspectRatio).setTargetRotation(targetRotation)
+        val preview = Preview.Builder()
+            .setResolutionSelector(
+                ResolutionSelector.Builder()
+                    .setAspectRatioStrategy(aspectRatioStrategy(targetAspectRatio))
                     .build()
+            )
+            .setTargetRotation(targetRotation)
+            .build()
+            .also { it.surfaceProvider = previewView.surfaceProvider }
 
-                val cameraSelector = if (isBackCameraSelected) {
-                    CameraSelector.DEFAULT_BACK_CAMERA
-                } else {
-                    CameraSelector.DEFAULT_FRONT_CAMERA
-                }
-                val recorder = Recorder.Builder().setQualitySelector(
-                    QualitySelector.from(
-                        Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                    )
-                ).build()
+        imageCapture = buildImageCapture(targetAspectRatio, targetRotation)
 
-                videoCapture = VideoCapture.withOutput(recorder)
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture, videoCapture
-                )
-            } catch (exc: Exception) {
-                Log.e(HomeActivity::class.java.simpleName, "Camera restart failed", exc)
-            }
+        val recorder = Recorder.Builder().setQualitySelector(
+            QualitySelector.from(
+                Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
+            )
+        ).build()
+        videoCapture = VideoCapture.withOutput(recorder)
+
+        val cameraSelector = if (isBackCameraSelected) {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        } else {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+
+        return try {
+            provider.unbindAll()
+            camera = provider.bindToLifecycle(
+                this@HomeActivity, cameraSelector, preview, imageCapture, videoCapture
+            )
+            cameraProvider = provider
+            isCameraBound = true
+            resetExposure()
+            // Deferred a frame: CameraX fills in the zoom range as the camera
+            // finishes opening, so reading it inline can come back empty.
+            previewView.post { setupZoomControls() }
+            true
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Camera bind failed", exc)
+            isCameraBound = false
+            false
+        }
+    }
+
+    private fun aspectRatioStrategy(targetAspectRatio: Int): AspectRatioStrategy {
+        return if (targetAspectRatio == AspectRatio.RATIO_16_9) {
+            AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
+        } else {
+            AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun initializeComponents() {
-        // Preview frames bind asynchronously in startCamera(). Observe the
-        // stream state so the loading overlay disappears the moment the
-        // first frame draws — otherwise the SurfaceView shows a black hole
-        // through the activity background for 3–5s on cold start.
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this@HomeActivity)
+        cameraProviderFuture.addListener({
+            cameraProvider = cameraProviderFuture.get()
+        }, ContextCompat.getMainExecutor(this))
+
+        // Preview frames arrive asynchronously after startCamera() binds. Drop
+        // the loading overlay the moment the first frame is on screen —
+        // without this the spinner sits on top of a live preview forever.
         binding?.previewView?.previewStreamState?.observe(this) { state ->
-            if (state == androidx.camera.view.PreviewView.StreamState.STREAMING) {
+            if (state == PreviewView.StreamState.STREAMING) {
                 binding?.previewLoadingOverlay?.visibility = View.GONE
             }
         }
@@ -671,10 +759,21 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun ActivityHomeBinding.setupFocusView() {
         focusView.visibility = View.INVISIBLE
         previewView.setOnTouchListener { _, event ->
-            handleTouchEvent(event)
+            // Pinch owns the gesture while two fingers are down; the focus and
+            // brightness handling only ever sees single-finger events.
+            scaleGestureDetector.onTouchEvent(event)
+            if (!scaleGestureDetector.isInProgress && event.pointerCount == 1) {
+                handleTouchEvent(event)
+            }
             return@setOnTouchListener true
         }
-        startFocusTimer()
+        // The widget draws a fixed 150px ring by default, which clips on
+        // low-density screens. Scale it to whatever the view actually got.
+        focusView.post {
+            if (focusView.width > 0) {
+                focusView.setFocusSize((focusView.width * 0.72f).toInt())
+            }
+        }
     }
 
     private fun ActivityHomeBinding.setupTimeDisplay() {
@@ -750,6 +849,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 }
             )
             cameraProvider?.unbindAll()
+            camera = null
             isCameraBound = false
             stopLocationUpdates()
             return
@@ -767,121 +867,94 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun ActivityHomeBinding.startCamera() {
-        // Already bound — CameraX resumes the preview itself on lifecycle
-        // start/resume, so don't rebind or flash the loader again.
+        // Already bound — CameraX resumes the preview on its own, so a rebind
+        // here would only tear the surface down and re-show the loader.
         if (isCameraBound) return
 
-        // Show the loading overlay until the first preview frame arrives;
-        // the previewStreamState observer in initializeComponents() hides
-        // it once StreamState.STREAMING is reported.
+        // Covered until the first frame streams; the previewStreamState
+        // observer in initializeComponents() takes it away again.
         previewLoadingOverlay.visibility = View.VISIBLE
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this@HomeActivity)
 
         cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val targetRotation = currentScreenRotation
-            val targetAspectRatio = getTargetAspectRatio()
-            val preview = Preview.Builder().setTargetAspectRatio(targetAspectRatio)
-                .setTargetRotation(targetRotation).build().also {
-                    it.surfaceProvider = previewView.surfaceProvider
-                }
+            val provider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            imageCapture =
-                ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                    .setTargetAspectRatio(targetAspectRatio).setTargetRotation(targetRotation)
-                    .build()
-
-            val cameraSelector = if (isBackCameraSelected) {
-                CameraSelector.DEFAULT_BACK_CAMERA
+            if (bindCameraUseCases(provider)) {
+                setupCameraControls(provider)
             } else {
-                CameraSelector.DEFAULT_FRONT_CAMERA
-            }
-
-            try {
-                cameraProvider.unbindAll()
-                val recorder = Recorder.Builder().setQualitySelector(
-                    QualitySelector.from(
-                        Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                    )
-                ).build()
-
-                videoCapture = VideoCapture.withOutput(recorder)
-
-                cameraProvider.bindToLifecycle(
-                    this@HomeActivity, cameraSelector, preview, imageCapture, videoCapture
-                )
-                this@HomeActivity.cameraProvider = cameraProvider
-                isCameraBound = true
-                setupCameraControls(cameraProvider, cameraSelector)
-
-            } catch (exc: Exception) {
+                previewLoadingOverlay.visibility = View.GONE
                 Toast.makeText(
                     this@HomeActivity,
                     getString(R.string.toast_failed_start_camera),
                     Toast.LENGTH_SHORT
-                )
-                    .show()
+                ).show()
             }
         }, ContextCompat.getMainExecutor(this@HomeActivity))
     }
 
-    private fun ActivityHomeBinding.setupCameraControls(
-        cameraProvider: ProcessCameraProvider, cameraSelector: CameraSelector
-    ) {
+    /**
+     * Single place where photo quality is configured. MAXIMIZE_QUALITY runs the
+     * full 3A convergence before the shot; the resolution is deliberately
+     * capped — see [captureResolutionBound].
+     */
+    private fun buildImageCapture(targetAspectRatio: Int, targetRotation: Int): ImageCapture {
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(aspectRatioStrategy(targetAspectRatio))
+            .setResolutionStrategy(
+                ResolutionStrategy(
+                    captureResolutionBound(targetAspectRatio),
+                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
+                )
+            )
+            .build()
+
+        return ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+            .setJpegQuality(JPEG_QUALITY)
+            .setResolutionSelector(resolutionSelector)
+            .setTargetRotation(targetRotation)
+            .build()
+    }
+
+    /**
+     * Ceiling on the captured frame.
+     *
+     * The save path decodes the JPEG to an ARGB_8888 bitmap and then makes
+     * several more full-size copies of it (EXIF rotate, front-camera flip,
+     * portrait rotate, the composite), so peak memory is roughly three times
+     * `pixels * 4` bytes. On a 50MP sensor that is over half a gigabyte and
+     * the capture dies outright; asking for the sensor maximum here was what
+     * broke it. ~12MP keeps far more detail than the stamped output needs
+     * while staying inside a normal heap.
+     */
+    private fun captureResolutionBound(targetAspectRatio: Int): Size {
+        return if (targetAspectRatio == AspectRatio.RATIO_16_9) {
+            Size(3840, 2160)
+        } else {
+            Size(4000, 3000)
+        }
+    }
+
+    private fun ActivityHomeBinding.setupCameraControls(cameraProvider: ProcessCameraProvider) {
         actionFlashMode.setOnClickListener {
             if (isBackCameraSelected) {
-                Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "flash", value = "toggle"))
-                handleFlashToggle(cameraProvider, cameraSelector)
+                handleFlashToggle()
             }
         }
 
         actionChangeCamera.setOnClickListener {
-            Analytics.log(
-                AnalyticsEvent.CameraSettingChanged(
-                    setting = "camera_flip",
-                    value = if (isBackCameraSelected) "front" else "back"
-                )
-            )
             toggleCamera(cameraProvider)
         }
     }
 
     private fun ActivityHomeBinding.toggleCamera(cameraProvider: ProcessCameraProvider) {
-        val newCameraSelector = if (isBackCameraSelected) {
-            CameraSelector.DEFAULT_FRONT_CAMERA
-        } else {
-            CameraSelector.DEFAULT_BACK_CAMERA
-        }
+        isBackCameraSelected = !isBackCameraSelected
 
-        val targetRotation = currentScreenRotation
-        val targetAspectRatio = getTargetAspectRatio()
-
-        try {
-            cameraProvider.unbindAll()
-
-            val preview = Preview.Builder().setTargetAspectRatio(targetAspectRatio)
-                .setTargetRotation(targetRotation).build()
-                .also { it.surfaceProvider = previewView.surfaceProvider }
-
-            imageCapture =
-                ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                    .setTargetAspectRatio(targetAspectRatio).setTargetRotation(targetRotation)
-                    .build()
-            val recorder = Recorder.Builder().setQualitySelector(
-                QualitySelector.from(
-                    Quality.FHD, FallbackStrategy.higherQualityOrLowerThan(Quality.HD)
-                )
-            ).build()
-
-            videoCapture = VideoCapture.withOutput(recorder)
-            cameraProvider.bindToLifecycle(
-                this@HomeActivity, newCameraSelector, preview, imageCapture, videoCapture
-            )
-
+        if (bindCameraUseCases(cameraProvider)) {
             updateFlashIcon()
+        } else {
             isBackCameraSelected = !isBackCameraSelected
-        } catch (exc: Exception) {
             Toast.makeText(
                 this@HomeActivity,
                 getString(R.string.toast_failed_switch_camera),
@@ -890,11 +963,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
-    private fun handleFlashToggle(
-        cameraProvider: ProcessCameraProvider, cameraSelector: CameraSelector
-    ) {
+    private fun handleFlashToggle() {
         try {
-            val camera = cameraProvider.bindToLifecycle(this@HomeActivity, cameraSelector)
+            // Use the already-bound camera. Re-binding just to reach the
+            // control tore the preview down for a frame on every tap.
+            val camera = camera ?: return
 
             if (camera.cameraInfo.hasFlashUnit()) {
                 val cameraControl = camera.cameraControl
@@ -914,39 +987,273 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+    /**
+     * Tap to focus, then slide up or down without lifting to trim the
+     * brightness — the gesture stock camera apps use. The old handler only
+     * looked at ACTION_DOWN and hid the ring again on ACTION_UP, so neither
+     * half of this worked.
+     */
     private fun ActivityHomeBinding.handleTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                if (isFocusManual) {
-                    val adjustedX = event.x - focusView.width / 2f
-                    val adjustedY = event.y - focusView.height / 2f
-                    val maxX = (previewView.width - focusView.width).toFloat().coerceAtLeast(0f)
-                    val maxY = (previewView.height - focusView.height).toFloat().coerceAtLeast(0f)
-                    focusView.x = adjustedX.coerceIn(0f, maxX)
-                    focusView.y = adjustedY.coerceIn(0f, maxY)
-                    showFocusIconFor3Seconds()
+                touchDownX = event.x
+                touchDownY = event.y
+                isExposureDragging = false
+                exposureDragStartIndex =
+                    camera?.cameraInfo?.exposureState?.exposureCompensationIndex ?: 0
+
+                moveFocusRingTo(event.x, event.y)
+                showFocusRing()
+                focusAt(event.x, event.y)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                val dy = event.y - touchDownY
+                if (!isExposureDragging &&
+                    abs(dy) > touchSlop &&
+                    abs(dy) > abs(event.x - touchDownX)
+                ) {
+                    isExposureDragging = true
+                    showExposureSlider()
+                }
+                if (isExposureDragging) {
+                    // Hold the overlays open for as long as the finger is down.
+                    focusHideJob?.cancel()
+                    applyExposureDrag(dy)
                 }
             }
 
-            MotionEvent.ACTION_UP -> {
-                focusView.beInvisible()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (isExposureDragging) {
+                    isExposureDragging = false
+                    scheduleFocusOverlayHide()
+                }
             }
         }
         return true
     }
 
-    private fun ActivityHomeBinding.startFocusTimer() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            while (true) {
-                if (!isFocusManual) {
-                    focusView.beVisible()
-                    focusView.x = (previewView.width / 2f) - (focusView.width / 2f)
-                    focusView.y = (previewView.height / 2f) - (focusView.height / 2f)
-                    delay(3000)
-                    focusView.beInvisible()
+    /** Centres the focus ring on the tapped point, clamped to the preview. */
+    private fun ActivityHomeBinding.moveFocusRingTo(x: Float, y: Float) {
+        val maxX = (previewView.width - focusView.width).toFloat().coerceAtLeast(0f)
+        val maxY = (previewView.height - focusView.height).toFloat().coerceAtLeast(0f)
+        // Translation, not x/y: the ring is laid out at the preview's top-left
+        // corner, so a translation is already in preview coordinates and stays
+        // correct wherever the preview sits inside its container.
+        focusView.translationX = (x - focusView.width / 2f).coerceIn(0f, maxX)
+        focusView.translationY = (y - focusView.height / 2f).coerceIn(0f, maxY)
+    }
+
+    /**
+     * Maps the vertical drag onto the device's exposure compensation range —
+     * up is brighter. A drag across [EXPOSURE_DRAG_TRAVEL] of the preview
+     * height covers the whole range, so short sensors still get fine control.
+     */
+    private fun ActivityHomeBinding.applyExposureDrag(dy: Float) {
+        val cameraInfo = camera?.cameraInfo ?: return
+        val exposureState = cameraInfo.exposureState
+        if (!exposureState.isExposureCompensationSupported) return
+
+        val range = exposureState.exposureCompensationRange
+        val span = range.upper - range.lower
+        if (span <= 0) return
+
+        val travel = (previewView.height * EXPOSURE_DRAG_TRAVEL).coerceAtLeast(1f)
+        val steps = (-dy / travel) * span
+        val index = (exposureDragStartIndex + steps).roundToInt()
+            .coerceIn(range.lower, range.upper)
+
+        if (index != exposureState.exposureCompensationIndex) {
+            camera?.cameraControl?.setExposureCompensationIndex(index)
+        }
+        exposureSlider.setProgress((index - range.lower).toFloat() / span)
+    }
+
+    private fun ActivityHomeBinding.showExposureSlider() {
+        val exposureState = camera?.cameraInfo?.exposureState ?: return
+        if (!exposureState.isExposureCompensationSupported) return
+
+        val range = exposureState.exposureCompensationRange
+        val span = range.upper - range.lower
+        if (span > 0) {
+            exposureSlider.setProgress(
+                (exposureState.exposureCompensationIndex - range.lower).toFloat() / span
+            )
+        }
+
+        positionExposureSlider()
+        exposureSlider.animate().cancel()
+        exposureSlider.alpha = 1f
+        exposureSlider.beVisible()
+    }
+
+    /** Parks the slider beside the ring, flipping sides near the right edge. */
+    private fun ActivityHomeBinding.positionExposureSlider() {
+        val gap = EXPOSURE_SLIDER_GAP_DP * resources.displayMetrics.density
+        val rightOfRing = focusView.translationX + focusView.width + gap
+        val translationX = if (rightOfRing + exposureSlider.width <= previewView.width) {
+            rightOfRing
+        } else {
+            (focusView.translationX - gap - exposureSlider.width).coerceAtLeast(0f)
+        }
+        val maxY = (previewView.height - exposureSlider.height).toFloat().coerceAtLeast(0f)
+
+        exposureSlider.translationX = translationX
+        exposureSlider.translationY =
+            (focusView.translationY + focusView.height / 2f - exposureSlider.height / 2f)
+                .coerceIn(0f, maxY)
+    }
+
+    /**
+     * Rebuilds the zoom chips for whatever lens is now bound.
+     *
+     * The candidate ratios are filtered against the camera's real
+     * min/max — an ultra-wide 0.5x only appears on hardware that has one, and
+     * a 5x only where the range reaches it — so the row never offers a ratio
+     * the device would silently clamp.
+     */
+    private fun ActivityHomeBinding.setupZoomControls() {
+        val cameraInfo = camera?.cameraInfo
+        val zoomState = cameraInfo?.zoomState?.value
+
+        if (cameraInfo == null || zoomState == null || zoomState.maxZoomRatio <= 1f) {
+            layoutZoomLevels.beGone()
+            return
+        }
+
+        val ratios = zoomRatiosFor(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+        layoutZoomLevels.removeAllViews()
+        zoomChips.clear()
+
+        val chipWidth = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._40sdp)
+        val chipHeight = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._20sdp)
+        val chipGap = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._2sdp)
+
+        ratios.forEach { ratio ->
+            val chip = TextView(this@HomeActivity).apply {
+                text = formatZoomLabel(ratio)
+                tag = ratio
+                gravity = Gravity.CENTER
+                includeFontPadding = false
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, ZOOM_CHIP_TEXT_SP)
+                setBackgroundResource(R.drawable.bg_zoom_chip)
+                layoutParams = LinearLayout.LayoutParams(chipWidth, chipHeight).apply {
+                    marginStart = chipGap
+                    marginEnd = chipGap
                 }
-                delay(8000)
+                setOnClickListener { applyZoomRatio(ratio) }
             }
+            zoomChips.add(chip)
+            layoutZoomLevels.addView(chip)
+        }
+        layoutZoomLevels.beVisible()
+
+        // The camera object is replaced on every rebind, so drop the previous
+        // observer or each flip would stack another one on this activity.
+        cameraInfo.zoomState.removeObservers(this@HomeActivity)
+        cameraInfo.zoomState.observe(this@HomeActivity) { state ->
+            updateZoomChips(state.zoomRatio)
+        }
+        updateZoomChips(zoomState.zoomRatio)
+    }
+
+    private fun zoomRatiosFor(minRatio: Float, maxRatio: Float): List<Float> {
+        val ratios = mutableListOf<Float>()
+        // Lead with the lens's true wide end rather than a hardcoded 0.5x —
+        // ultra-wides report 0.5, 0.6 or 0.7 depending on the device, and a
+        // fixed chip would either miss it or ask for a ratio it can't reach.
+        if (minRatio < WIDE_ZOOM_THRESHOLD) ratios.add(minRatio)
+        ratios.addAll(ZOOM_CANDIDATES.filter { it in minRatio..maxRatio })
+
+        return ratios.distinct().ifEmpty { listOf(1f.coerceIn(minRatio, maxRatio)) }
+    }
+
+    /** "0.5x", "1x", "2x" — trailing zeroes dropped, like the stock camera. */
+    private fun formatZoomLabel(ratio: Float): String {
+        return if (ratio % 1f == 0f) {
+            "${ratio.toInt()}x"
+        } else {
+            "${(ratio * 10).roundToInt() / 10f}x"
+        }
+    }
+
+    private fun ActivityHomeBinding.applyZoomRatio(ratio: Float) {
+        val cameraControl = camera?.cameraControl ?: return
+        val zoomState = camera?.cameraInfo?.zoomState?.value ?: return
+        val target = ratio.coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+
+        try {
+            cameraControl.setZoomRatio(target)
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Zoom request failed", exc)
+            return
+        }
+        updateZoomChips(target)
+    }
+
+    /**
+     * Marks the chip the current ratio belongs to. A pinch lands between the
+     * presets, so the nearest chip at or below the ratio stays lit rather than
+     * the row going blank mid-gesture.
+     */
+    private fun updateZoomChips(currentRatio: Float) {
+        if (zoomChips.isEmpty()) return
+
+        val activeIndex = zoomChips.indices.lastOrNull { index ->
+            (zoomChips[index].tag as? Float ?: 1f) <= currentRatio + ZOOM_MATCH_TOLERANCE
+        } ?: 0
+
+        zoomChips.forEachIndexed { index, chip ->
+            val isActive = index == activeIndex
+            chip.isSelected = isActive
+            // White on the accent fill; plain white when unselected.
+            chip.setTextColor(color(R.color.colorWhite))
+            chip.text = if (isActive) {
+                formatZoomLabel(currentRatio)
+            } else {
+                formatZoomLabel(chip.tag as? Float ?: 1f)
+            }
+        }
+    }
+
+    /** Back to the metered exposure — called after every rebind. */
+    private fun resetExposure() {
+        val exposureState = camera?.cameraInfo?.exposureState ?: return
+        if (!exposureState.isExposureCompensationSupported) return
+
+        if (exposureState.exposureCompensationIndex != 0) {
+            camera?.cameraControl?.setExposureCompensationIndex(0)
+        }
+        val range = exposureState.exposureCompensationRange
+        val span = range.upper - range.lower
+        if (span > 0) {
+            binding?.exposureSlider?.setProgress((-range.lower).toFloat() / span)
+        }
+    }
+
+    /**
+     * Drives the real CameraX 3A engine. Until now the tap only moved a
+     * decorative ring, so the sensor never refocused and photos came out soft.
+     * Manual mode holds the lock until the next tap; auto mode releases it
+     * after [FOCUS_LOCK_SECONDS] and hands control back to continuous AF.
+     */
+    private fun ActivityHomeBinding.focusAt(x: Float, y: Float) {
+        val cameraControl = camera?.cameraControl ?: return
+        val point = previewView.meteringPointFactory.createPoint(x, y)
+        val action = FocusMeteringAction.Builder(
+            point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE
+        ).apply {
+            if (isFocusManual) {
+                disableAutoCancel()
+            } else {
+                setAutoCancelDuration(FOCUS_LOCK_SECONDS, TimeUnit.SECONDS)
+            }
+        }.build()
+
+        try {
+            cameraControl.startFocusAndMetering(action)
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Focus request failed", exc)
         }
     }
 
@@ -956,38 +1263,101 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             isFirstClick = true
             actionFocusMode.iconTint = ColorStateList.valueOf(color(R.color.colorWhite))
             focusView.setFocusShape(FocusView.FOCUS_SHAPE_SQUARE)
-            actionFocusMode.text = getString(R.string.action_manual_focus)
             focusView.setManualFocus(true)
-            showFocusIconFor3Seconds()
+            // Seed the manual lock at the centre so the mode takes effect
+            // immediately instead of waiting for the first tap.
+            centreFocusRing()
+            showFocusRing()
+            focusAt(previewView.width / 2f, previewView.height / 2f)
         } else {
-            focusView.visibility = View.VISIBLE
             isFirstClick = true
             actionFocusMode.iconTint = ColorStateList.valueOf(color(R.color.colorAccent))
             focusView.setFocusShape(FocusView.FOCUS_SHAPE_CIRCLE)
-            actionFocusMode.text = getString(R.string.action_auto_focus)
             focusView.setManualFocus(false)
+            // Release the lock — the sensor goes back to tracking the scene.
+            camera?.cameraControl?.cancelFocusAndMetering()
+            centreFocusRing()
+            showFocusRing()
         }
     }
 
-    private fun ActivityHomeBinding.showFocusIconFor3Seconds() {
+    private fun ActivityHomeBinding.centreFocusRing() {
+        moveFocusRingTo(previewView.width / 2f, previewView.height / 2f)
+    }
+
+    private fun ActivityHomeBinding.showFocusRing() {
+        // Cancel whatever the previous tap left running, otherwise rapid taps
+        // fight over alpha/visibility and the ring flickers or sticks.
+        focusHideJob?.cancel()
+        focusView.animate().cancel()
+        focusView.alpha = 1f
+        focusView.scaleX = 1f
+        focusView.scaleY = 1f
         focusView.beVisible()
-        focusView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction {
-            focusView.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+
+        focusView.animate().scaleX(1.15f).scaleY(1.15f).setDuration(120).withEndAction {
+            focusView.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
         }.start()
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            delay(3000)
-            focusView.animate().alpha(0f).setDuration(300).withEndAction {
-                focusView.beInvisible()
-                focusView.alpha = 1f
-            }.start()
+        scheduleFocusOverlayHide()
+    }
+
+    /**
+     * Fades out the ring and, if it is up, the brightness slider. The slider
+     * lingers a little longer so the value the user just dialled in stays
+     * readable after they lift their finger.
+     */
+    private fun ActivityHomeBinding.scheduleFocusOverlayHide() {
+        focusHideJob?.cancel()
+        focusHideJob = lifecycleScope.launch(Dispatchers.Main) {
+            val sliderShowing = exposureSlider.isVisible
+            delay(if (sliderShowing) EXPOSURE_VISIBLE_MS else FOCUS_RING_VISIBLE_MS)
+            fadeOutOverlay(focusView)
+            if (sliderShowing) fadeOutOverlay(exposureSlider)
         }
+    }
+
+    /** Shutter recoil — the tactile beat a camera app is expected to have. */
+    private fun ActivityHomeBinding.animateShutterPress() {
+        actionCapture.animate().cancel()
+        actionCapture.scaleX = 1f
+        actionCapture.scaleY = 1f
+        actionCapture.animate()
+            .scaleX(SHUTTER_PRESS_SCALE).scaleY(SHUTTER_PRESS_SCALE)
+            .setDuration(80)
+            .withEndAction {
+                actionCapture.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+            }
+            .start()
+    }
+
+    private fun fadeOutOverlay(view: View) {
+        view.animate().alpha(0f).setDuration(250).withEndAction {
+            view.beInvisible()
+            view.alpha = 1f
+        }.start()
+    }
+
+    /**
+     * The selected self-timer, read from the same preference
+     * [restoreTimerState] restores from.
+     *
+     * This used to be inferred from the timer button's own label, which meant
+     * the capture path broke the moment the button stopped carrying text.
+     */
+    private fun currentTimerStringRes(): Int {
+        return getSharedPreferences("timer_state", MODE_PRIVATE)
+            .getInt("timer_state_key", R.string.action_timer_off)
+    }
+
+    private fun hasActiveTimer(): Boolean {
+        return currentTimerStringRes() != R.string.action_timer_off
     }
 
     private fun ActivityHomeBinding.handleCaptureClick() {
-        when (actionTimer.text) {
-            getString(R.string.action_timer_3sec) -> handleTimer3SecondCapture()
-            getString(R.string.action_timer_5sec) -> handleTimer5SecondCapture()
+        when (currentTimerStringRes()) {
+            R.string.action_timer_3sec -> handleTimer3SecondCapture()
+            R.string.action_timer_5sec -> handleTimer5SecondCapture()
             else -> handleImmediateCapture()
         }
     }
@@ -1035,29 +1405,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         val photoFile = createPhotoFile()
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        if (actionTimer.text != getString(R.string.action_timer_3sec) && actionTimer.text != getString(
-                R.string.action_timer_5sec
-            )
-        ) {
+        if (!hasActiveTimer()) {
             progressBarAnimation.beVisible()
             progressBarAnimation.playAnimation()
         }
-
-        val template = tinyDB?.getString("template", "default") ?: "default"
-        val locModeStr = locationMode.name.lowercase()
-        val timerSeconds = when (actionTimer.text) {
-            getString(R.string.action_timer_3sec) -> 3
-            getString(R.string.action_timer_5sec) -> 5
-            else -> 0
-        }
-        Analytics.log(
-            AnalyticsEvent.CaptureAttempted(
-                mode = "photo",
-                template = template,
-                locationMode = locModeStr,
-                hasTimer = timerSeconds
-            )
-        )
 
         imageCapture.takePicture(
             outputOptions,
@@ -1067,24 +1418,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     val options = BitmapFactory.Options()
                     options.inJustDecodeBounds = true
                     BitmapFactory.decodeFile(photoFile.absolutePath, options)
-                    Analytics.log(
-                        AnalyticsEvent.CaptureSucceeded(
-                            mode = "photo",
-                            template = template,
-                            fileSizeKb = photoFile.length() / 1024
-                        )
-                    )
-                    CaptureCounter.bumpAndReport(this@HomeActivity)
                     processAndSaveImageWithOverlays(photoFile)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Analytics.log(
-                        AnalyticsEvent.CaptureFailed(
-                            mode = "photo",
-                            reason = exception.imageCaptureError.toString()
-                        )
-                    )
                     runOnUiThread {
                         hideProgressAnimations()
                         Toast.makeText(
@@ -1135,130 +1472,161 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         return files.maxByOrNull { it.lastModified() }
     }
 
+    /**
+     * Renders the stamp overlay and hands the heavy pixel work to a background
+     * thread.
+     *
+     * Only the parts that touch a View can stay here: the overlay is drawn
+     * from the live stamp views and the map snapshot is delivered on the main
+     * looper. Everything after that — decode, rotate, flip, composite, encode
+     * — used to run on the main thread too, which is why the system logged
+     * pause/stop timeouts for this activity on every shot.
+     */
     @SuppressLint("MissingPermission")
     private fun ActivityHomeBinding.processAndSaveImageWithOverlays(photoFile: File) {
+        val mapFragment = getActiveMapFragment()
+        if (mapFragment == null) {
+            composeAndSaveInBackground(photoFile, renderStampOverlay(null))
+            return
+        }
+        mapFragment.getMapAsync { googleMap ->
+            googleMap.snapshot { mapBitmap ->
+                composeAndSaveInBackground(photoFile, renderStampOverlay(mapBitmap))
+            }
+        }
+    }
+
+    /** Draws the stamp panel, with the map tile composited in. Main thread only. */
+    private fun ActivityHomeBinding.renderStampOverlay(mapBitmap: Bitmap?): Bitmap {
+        val overlay = createParentOverlayBitmap()
+        if (mapBitmap == null) return overlay
+
         try {
-            val capturedBitmapOptions = BitmapFactory.Options().apply {
-                inPreferredConfig = Bitmap.Config.ARGB_8888
+            val cardWidth = mapCardView.width
+            val cardHeight = mapCardView.height
+            val scaledMap = if (cardWidth > 0 && cardHeight > 0) {
+                mapBitmap.scale(cardWidth, cardHeight)
+            } else {
+                mapBitmap
             }
-            val capturedBitmap =
-                BitmapFactory.decodeFile(photoFile.absolutePath, capturedBitmapOptions)
 
-            if (capturedBitmap == null) {
-                handleCaptureError()
-                return
+            val radiusPx = resources.getDimension(com.intuit.sdp.R.dimen._8sdp)
+            val roundedMap = createRoundedMapBitmap(scaledMap, radiusPx)
+            if (scaledMap != mapBitmap) scaledMap.recycle()
+
+            Canvas(overlay).drawBitmap(
+                roundedMap,
+                mapCardView.left.toFloat(),
+                mapCardView.top.toFloat(),
+                Paint(Paint.ANTI_ALIAS_FLAG)
+            )
+            roundedMap.recycle()
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Map tile render failed", exc)
+        } finally {
+            mapBitmap.recycle()
+        }
+        return overlay
+    }
+
+    private fun ActivityHomeBinding.composeAndSaveInBackground(photoFile: File, overlay: Bitmap) {
+        // Snapshot the view-dependent inputs now; the worker must not touch
+        // the activity state while the user keeps using the camera.
+        val flipHorizontally = !isBackCameraSelected
+        val forcePortrait = isPortraitMode
+        val marginPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, OVERLAY_MARGIN_DP, resources.displayMetrics
+        )
+
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.Default) {
+                composePhoto(photoFile, overlay, flipHorizontally, forcePortrait, marginPx)
             }
-            var workingBitmap = capturedBitmap
-            workingBitmap =
-                replaceBitmap(workingBitmap, applyExifOrientation(photoFile, workingBitmap))
-            if (!isBackCameraSelected) {
-                workingBitmap = replaceBitmap(workingBitmap, flipBitmapHorizontal(workingBitmap))
+
+            hideProgressAnimations()
+            Toast.makeText(this@HomeActivity, getString(result.messageRes), Toast.LENGTH_SHORT)
+                .show()
+            if (result.saved) {
+                broadcastMediaScan(photoFile)
+                Glide.with(this@HomeActivity).load(photoFile).into(imageCaptured)
+                lastCapturedFile = photoFile
             }
-            if (isPortraitMode && workingBitmap.width > workingBitmap.height) {
-                workingBitmap = replaceBitmap(workingBitmap, rotateBitmap(workingBitmap))
-            }
-            val finalBitmap = workingBitmap
+        }
+    }
 
-            val mapFragment = getActiveMapFragment()
-            mapFragment?.getMapAsync { googleMap ->
-                googleMap.snapshot { mapBitmap ->
-                    try {
-                        val parentOverlayBitmap = createParentOverlayBitmap()
+    private data class CaptureResult(val saved: Boolean, @StringRes val messageRes: Int)
 
-                        if (mapBitmap != null) {
-                            val mapCardLeft = mapCardView.left.toFloat()
-                            val mapCardTop = mapCardView.top.toFloat()
-                            val mapCardWidth = mapCardView.width
-                            val mapCardHeight = mapCardView.height
+    /** Pure bitmap work — no views, no activity state. Safe off the main thread. */
+    private fun composePhoto(
+        photoFile: File,
+        overlay: Bitmap,
+        flipHorizontally: Boolean,
+        forcePortrait: Boolean,
+        marginPx: Float
+    ): CaptureResult {
+        val options = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        val captured = BitmapFactory.decodeFile(photoFile.absolutePath, options)
+        if (captured == null) {
+            overlay.recycle()
+            return CaptureResult(false, R.string.toast_failed_capture_image)
+        }
 
-                            val scaledMap = if (mapCardWidth > 0 && mapCardHeight > 0) {
-                                mapBitmap.scale(mapCardWidth, mapCardHeight)
-                            } else {
-                                mapBitmap
-                            }
+        var working = captured
+        working = replaceBitmap(working, applyExifOrientation(photoFile, working))
+        if (flipHorizontally) {
+            working = replaceBitmap(working, flipBitmapHorizontal(working))
+        }
+        if (forcePortrait && working.width > working.height) {
+            working = replaceBitmap(working, rotateBitmap(working))
+        }
 
-                            val radiusPx = resources.getDimension(com.intuit.sdp.R.dimen._8sdp)
+        return try {
+            val targetWidth = (working.width - marginPx * 2).toInt().coerceAtLeast(1)
+            val targetHeight = (working.height * OVERLAY_HEIGHT_RATIO).toInt().coerceAtLeast(120)
 
-                            val roundedMap = createRoundedMapBitmap(scaledMap, radiusPx)
-                            if (scaledMap != mapBitmap) scaledMap.recycle()
-
-                            val overlayCanvas = Canvas(parentOverlayBitmap)
-                            overlayCanvas.drawBitmap(
-                                roundedMap, mapCardLeft, mapCardTop, Paint(Paint.ANTI_ALIAS_FLAG)
-                            )
-                            roundedMap.recycle()
-                        }
-                        mapBitmap?.recycle()
-                        val marginDp = 20f
-                        val marginPx = TypedValue.applyDimension(
-                            TypedValue.COMPLEX_UNIT_DIP, marginDp, resources.displayMetrics
-                        )
-                        val targetWidth = (finalBitmap.width - (marginPx * 2)).toInt()
-                        val targetHeight = (finalBitmap.height * 0.20f).toInt().coerceAtLeast(120)
-
-                        val scaledOverlay =
-                            if (parentOverlayBitmap.width == targetWidth && parentOverlayBitmap.height == targetHeight) {
-                                parentOverlayBitmap
-                            } else {
-                                parentOverlayBitmap.scale(targetWidth, targetHeight)
-                            }
-
-                        if (scaledOverlay != parentOverlayBitmap) parentOverlayBitmap.recycle()
-
-                        val combinedBitmap = createBitmap(finalBitmap.width, finalBitmap.height)
-                        val combinedCanvas = Canvas(combinedBitmap)
-                        combinedCanvas.drawBitmap(finalBitmap, 0f, 0f, null)
-
-                        val overlayX = marginPx
-                        val overlayY = finalBitmap.height - targetHeight - marginPx
-
-                        combinedCanvas.drawBitmap(
-                            scaledOverlay, overlayX, overlayY, null
-                        )
-                        scaledOverlay.recycle()
-
-                        val saveSuccess = saveCombinedBitmap(combinedBitmap, photoFile)
-                        combinedBitmap.recycle()
-                        finalBitmap.recycle()
-
-                        runOnUiThread {
-                            hideProgressAnimations()
-                            val message = if (saveSuccess) {
-                                getString(R.string.message_portrait_saved_with_gps)
-                            } else {
-                                getString(R.string.message_image_saved_without_gps)
-                            }
-
-                            Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
-                            if (saveSuccess) {
-                                broadcastMediaScan(photoFile)
-                                Glide.with(this@HomeActivity).load(photoFile).into(imageCaptured)
-                                lastCapturedFile = photoFile
-                            }
-                        }
-                    } catch (e: Exception) {
-                        val fallbackSuccess = saveCombinedBitmap(finalBitmap, photoFile)
-                        finalBitmap.recycle()
-
-                        runOnUiThread {
-                            hideProgressAnimations()
-                            Toast.makeText(
-                                this@HomeActivity,
-                                if (fallbackSuccess) {
-                                    getString(R.string.message_image_saved_map_failed)
-                                } else {
-                                    getString(R.string.message_save_failed)
-                                },
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            if (fallbackSuccess) broadcastMediaScan(photoFile)
-                        }
-                    }
+            val scaledOverlay =
+                if (overlay.width == targetWidth && overlay.height == targetHeight) {
+                    overlay
+                } else {
+                    overlay.scale(targetWidth, targetHeight)
                 }
-            }
+            if (scaledOverlay != overlay) overlay.recycle()
 
-        } catch (e: Exception) {
-            handleCaptureError()
+            val combined = createBitmap(working.width, working.height)
+            val canvas = Canvas(combined)
+            canvas.drawBitmap(working, 0f, 0f, null)
+            canvas.drawBitmap(
+                scaledOverlay, marginPx, working.height - targetHeight - marginPx, null
+            )
+            scaledOverlay.recycle()
+
+            val saved = saveCombinedBitmap(combined, photoFile)
+            combined.recycle()
+            working.recycle()
+
+            CaptureResult(
+                saved,
+                if (saved) {
+                    R.string.message_portrait_saved_with_gps
+                } else {
+                    R.string.message_image_saved_without_gps
+                }
+            )
+        } catch (exc: Exception) {
+            Log.e(HomeActivity::class.java.simpleName, "Overlay composite failed", exc)
+            // Still give the user their photo, just without the stamp.
+            val fallbackSaved = saveCombinedBitmap(working, photoFile)
+            working.recycle()
+            CaptureResult(
+                fallbackSaved,
+                if (fallbackSaved) {
+                    R.string.message_image_saved_map_failed
+                } else {
+                    R.string.message_save_failed
+                }
+            )
         }
     }
 
@@ -1436,8 +1804,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                         ).show()
                                         lastCapturedFile = outputFile
                                         binding?.imageCaptured?.let { preview ->
-                                            Glide.with(this@HomeActivity).load(outputFile)
-                                                .into(preview)
+                                            Glide.with(this@HomeActivity).load(outputFile).into(preview)
                                         }
                                     }
                                 },
@@ -1456,8 +1823,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                         ).show()
                                         lastCapturedFile = inputFile
                                         binding?.imageCaptured?.let { preview ->
-                                            Glide.with(this@HomeActivity).load(inputFile)
-                                                .into(preview)
+                                            Glide.with(this@HomeActivity).load(inputFile).into(preview)
                                         }
                                     }
                                 })
@@ -1489,7 +1855,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun updateOverlayTextValues() {
         try {
             if (hasLocationPermission()) {
-                fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let { loc ->
                         getSelectedLocation(loc)?.let {
                             updateLocationUI(it)
@@ -1507,11 +1873,16 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 return false
             }
 
-            val fos = FileOutputStream(file)
-            val success = bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos)
-            fos.flush()
-            fos.close()
-            success
+            // The frame has already been through one JPEG round-trip by the
+            // time it gets here, so the final encode is kept high to avoid
+            // stacking artefacts around the stamp text and map tile.
+            FileOutputStream(file).use { fos ->
+                val success = bitmap.compress(
+                    Bitmap.CompressFormat.JPEG, SAVE_JPEG_QUALITY, fos
+                )
+                fos.flush()
+                success
+            }
         } catch (e: Exception) {
             false
         }
@@ -1552,7 +1923,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             return
         }
 
-        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 updateLocationUI(location)
             }
@@ -1568,7 +1939,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun updateMapMarker(googleMap: GoogleMap) {
         if (!hasLocationPermission()) return
 
-        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let { loc ->
                 val selectedLoc = getSelectedLocation(loc) ?: return@let
                 val latLng = LatLng(selectedLoc.latitude, selectedLoc.longitude)
@@ -1671,23 +2042,30 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
 
                     val fullAddress = parts.joinToString(", ")
 
-                    // getAddressLine(0) can be null (e.g. geocoder error / no
-                    // formatted line) — guard against it to avoid NPEs.
-                    val line0 = address.getAddressLine(0)
-                    val isShort = (line0?.length ?: 0) < 12
+                    val isShort =
+                        address.getAddressLine(0).length < 12
 
                     if (isShort) {
-                        Log.e("isShort", "updateLocationUI: $fullAddress")
+                        Log.e("isShort", "updateLocationUI: $fullAddress" )
                         displayCurrentLocation()
                         return@getAddress
                     }
-                    val displayAddress = line0?.takeIf { it.isNotBlank() }
-                        ?: fullAddress.takeIf { it.isNotBlank() }
-                        ?: unknownLocation
-                    textAddress.text = displayAddress
+                    textAddress.text = if (address.getAddressLine(0).isEmpty()) {
+                        fullAddress
+                    } else {
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
+                    }
                     updateOverlayState(location, fullAddress)
-                    textAddressClassic.text = displayAddress
-                    textAddressSquarise.text = displayAddress
+                    textAddressClassic.text = if (address.getAddressLine(0).isEmpty()) {
+                        fullAddress
+                    } else {
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
+                    }
+                    textAddressSquarise.text = if (address.getAddressLine(0).isEmpty()) {
+                        fullAddress
+                    } else {
+                        address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
+                    }
                 }
 
                 textLatitudeValue.text = String.format("%.6f", location.latitude)
@@ -1721,18 +2099,14 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         if (!hasLocationPermission()) return
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 15000)
             .setWaitForAccurateLocation(false).setMinUpdateIntervalMillis(10000).build()
-        fusedLocationClient?.requestLocationUpdates(
+        fusedLocationClient.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper()
-        )?.addOnCompleteListener { _ -> }
+        ).addOnCompleteListener { _ -> }
     }
 
     private fun stopLocationUpdates() {
         try {
-            // locationCallback is lateinit (set in initializeComponents); guard
-            // against teardown running before it's assigned.
-            if (::locationCallback.isInitialized) {
-                fusedLocationClient?.removeLocationUpdates(locationCallback)
-            }
+            fusedLocationClient.removeLocationUpdates(locationCallback)
         } catch (e: Exception) {
         }
     }
@@ -1746,19 +2120,16 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private fun ActivityHomeBinding.handleTimerClick(clickCount: Int) = when (clickCount % 3) {
         1 -> {
             actionTimer.iconTint = ColorStateList.valueOf(color(R.color.colorAccent))
-            actionTimer.text = getString(R.string.action_timer_3sec)
             saveTimerState(R.string.action_timer_3sec, R.color.colorAccent)
         }
 
         2 -> {
             actionTimer.iconTint = ColorStateList.valueOf(color(R.color.colorAccent))
-            actionTimer.text = getString(R.string.action_timer_5sec)
             saveTimerState(R.string.action_timer_5sec, R.color.colorAccent)
         }
 
         else -> {
             actionTimer.iconTint = ColorStateList.valueOf(color(R.color.colorWhite))
-            actionTimer.text = getString(R.string.action_timer_off)
             saveTimerState(R.string.action_timer_off, R.color.colorWhite)
         }
     }
@@ -1768,11 +2139,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         if (isSoundOn) {
             actionSound.iconTint = ColorStateList.valueOf(color(R.color.colorAccent))
             actionSound.icon = drawable(R.drawable.ic_action_sound_on)
-            actionSound.text = getString(R.string.action_sound_on)
         } else {
             actionSound.iconTint = ColorStateList.valueOf(color(R.color.colorWhite))
             actionSound.icon = drawable(R.drawable.ic_action_sound_off)
-            actionSound.text = getString(R.string.action_sound_off)
         }
         saveSoundState(isSoundOn)
     }
@@ -1797,7 +2166,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         val timerState = sharedPref.getInt("timer_state_key", R.string.action_timer_off)
         val iconResId = sharedPref.getInt("timer_icon_key", R.color.colorWhite)
         actionTimer.iconTint = ColorStateList.valueOf(color(iconResId))
-        actionTimer.text = getString(timerState)
     }
 
     private fun ActivityHomeBinding.restoreSoundState() {
@@ -1806,11 +2174,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         if (isSoundOn) {
             actionSound.iconTint = ColorStateList.valueOf(color(R.color.colorAccent))
             actionSound.icon = drawable(R.drawable.ic_action_sound_on)
-            actionSound.text = getString(R.string.action_sound_on)
         } else {
             actionSound.iconTint = ColorStateList.valueOf(color(R.color.colorWhite))
             actionSound.icon = drawable(R.drawable.ic_action_sound_off)
-            actionSound.text = getString(R.string.action_sound_off)
         }
     }
 
@@ -1825,6 +2191,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             restoreTimerState()
             restoreSoundState()
         }
+        // The user may have picked a different template while away, which moves
+        // the map to a different container — re-attach before touching it.
+        setupMapSnapshot()
         updateMapTypeFromTemplate(getSelectedMapType())
     }
 
@@ -1931,19 +2300,15 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                         adminArea = unknownValue
                         countryName = unknownValue
                     }
-                    // Geocoder callbacks fire on a background thread on
-                    // Tiramisu+. The callback below touches Views, so hop
-                    // back to the main thread first.
-                    runOnUiThread { callback(address) }
+                    callback(address)
                 }
 
                 override fun onError(errorMessage: String?) {
-                    val fallback = Address(Locale.getDefault()).apply {
+                    callback(Address(Locale.getDefault()).apply {
                         locality = unknownValue
                         adminArea = unknownValue
                         countryName = unknownValue
-                    }
-                    runOnUiThread { callback(fallback) }
+                    })
                 }
             })
         } else {
@@ -1982,21 +2347,17 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         var clickCount = 0
         restoreSoundState()
         actionFocusMode.setOnClickListener {
-            Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "focus", value = "toggle"))
             toggleFocusMode()
         }
         actionSound.setOnClickListener {
-            Analytics.log(AnalyticsEvent.CameraSettingChanged(setting = "sound", value = "toggle"))
             toggleSound()
         }
         actionTimer.setOnClickListener {
             clickCount++
-            Analytics.log(
-                AnalyticsEvent.CameraSettingChanged(setting = "timer", value = clickCount.toString())
-            )
             handleTimerClick(clickCount)
         }
         actionCapture.setOnClickListener {
+            animateShutterPress()
             when (captureMode) {
                 CaptureMode.PHOTO -> handleCaptureClick()
                 CaptureMode.VIDEO -> toggleVideoRecording()
@@ -2022,10 +2383,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                             )
                         )
                     } else {
-                        val intent =
-                            Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
-                                putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
-                            }
+                        val intent = Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
+                            putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
+                        }
                         startActivity(intent)
                     }
                 } else {
@@ -2090,6 +2450,35 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+    private fun handleRate() {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        if (lastRatePromptDay == today) {
+            return
+        }
+
+        if (!TinyDB(this@HomeActivity).getBoolean("isRated", false)) {
+            lastRatePromptDay = today
+//            viewRateDialog {
+//                if (it) {
+//                    launchInAppReviewFlow(object : InAppReviewListener {
+//                        override fun onComplete() {
+//                            TinyDB(this@HomeActivity).putBoolean("isRated", true)
+//                        }
+//
+//                        override fun onFailed() {
+//                            Log.e("TAG", "reviewFailed: ")
+//                        }
+//                    })
+//                } else {
+//                    Intent(this@HomeActivity, FeedbackActivity::class.java).apply {
+//                        startActivity(this)
+//                    }
+//                }
+//            }
+        }
+    }
+
+
     private fun toggleVideoRecording() {
         if (isRecording) {
             binding?.actionChangeCamera?.disable()
@@ -2098,53 +2487,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             binding?.actionChangeCamera?.enable()
             startVideoRecording()
         }
-    }
-
-    /**
-     * Back-press flow: show the rate dialog first, then chain into the exit
-     * sheet regardless of how the rate dialog ended.
-     *
-     *  - Positive rating  -> launch in-app review, then on complete/fail show exit sheet
-     *  - Negative rating  -> open FeedbackActivity (user navigates away — no exit sheet)
-     *  - Cancel / dismiss -> show exit sheet directly
-     *
-     * `proceedShown` guards against showing the exit sheet twice in case
-     * multiple callbacks fire.
-     */
-    private fun showRateThenExit() {
-        var proceedShown = false
-        val proceedToExit = {
-            if (!proceedShown && !isFinishing && !isDestroyed) {
-                proceedShown = true
-                showExitSheet()
-            }
-        }
-        viewRateDialog(
-            listener = { positive ->
-                if (positive) {
-                    launchInAppReviewFlow(object : InAppReviewListener {
-                        override fun onComplete() {
-                            TinyDB(this@HomeActivity).putBoolean("isRated", true)
-                            proceedToExit()
-                        }
-
-                        override fun onFailed() {
-                            proceedToExit()
-                        }
-                    })
-                } else {
-                    // User left ≤3 stars — send them to feedback. They navigate
-                    // away from Home, so don't queue an exit sheet behind them.
-                    Intent(this@HomeActivity, FeedbackActivity::class.java).apply {
-                        startActivity(this)
-                    }
-                }
-            },
-            onDismiss = {
-                // Cancel button / back press / outside-dismiss without rating.
-                proceedToExit()
-            }
-        )
     }
 
     private fun showExitSheet() {
@@ -2162,7 +2504,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
 
         sheetBinding.actionPositive.setOnClickListener {
-            Analytics.log(AnalyticsEvent.ExitSheetAction(action = "exit"))
             finishAffinity()
         }
 
@@ -2184,10 +2525,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
 
         exitSheetDialog = dialog
-        if (!isFinishing) {
-            Analytics.log(AnalyticsEvent.ExitSheetAction(action = "shown"))
-            dialog.show()
-        }
+        if (!isFinishing) dialog.show()
     }
 
     override fun ActivityHomeBinding.initView() {
@@ -2202,14 +2540,54 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 finishAffinity()
                 return@addCallback
             }
-            // Show rate dialog first if the user hasn't rated yet. Whatever
-            // outcome they pick — rate, skip, or dismiss — the exit sheet is
-            // shown afterwards.
-            if (!TinyDB(this@HomeActivity).getBoolean("isRated", false)) {
-                showRateThenExit()
-            } else {
-                showExitSheet()
-            }
+            showExitSheet()
         }
+    }
+
+    companion object {
+        /**
+         * Quality of the JPEG CameraX hands back. It is decoded and re-encoded
+         * with the overlay straight away, so pushing this to 100 only inflated
+         * the file the save path has to read back.
+         */
+        private const val JPEG_QUALITY = 95
+
+        /** Quality of the finished photo written to storage. */
+        private const val SAVE_JPEG_QUALITY = 95
+
+        /** How long a tap-to-focus lock is held before 3A returns to auto. */
+        private const val FOCUS_LOCK_SECONDS = 4L
+
+        /** How long the focus ring stays on screen after a tap. */
+        private const val FOCUS_RING_VISIBLE_MS = 1200L
+
+        /** How long the brightness slider lingers after the drag ends. */
+        private const val EXPOSURE_VISIBLE_MS = 2000L
+
+        /** Fraction of the preview height that spans the full exposure range. */
+        private const val EXPOSURE_DRAG_TRAVEL = 0.55f
+
+        /** Space between the focus ring and the brightness slider, in dp. */
+        private const val EXPOSURE_SLIDER_GAP_DP = 6f
+
+        /** How far the shutter button dips when pressed. */
+        private const val SHUTTER_PRESS_SCALE = 0.88f
+
+        /** Inset of the stamp overlay from the photo edges, in dp. */
+        private const val OVERLAY_MARGIN_DP = 20f
+
+        /** Stamp overlay height, as a fraction of the photo height. */
+        private const val OVERLAY_HEIGHT_RATIO = 0.20f
+
+        /** Ratios offered as chips, filtered against what the lens supports. */
+        private val ZOOM_CANDIDATES = listOf(1f, 2f, 5f, 10f)
+
+        /** Below this, the lens has a real ultra-wide worth its own chip. */
+        private const val WIDE_ZOOM_THRESHOLD = 0.99f
+
+        private const val ZOOM_CHIP_TEXT_SP = 12f
+
+        /** Slack when deciding which chip a pinched ratio belongs to. */
+        private const val ZOOM_MATCH_TOLERANCE = 0.05f
     }
 }

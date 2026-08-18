@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rounded translucent "glass" panel used for the GPS stamp overlay. This view
+     is drawn into the saved photo/video, so it doubles as the on-screen preview
+     of the stamp and the burned-in result. A subtle hairline stroke lifts it off
+     busy backgrounds. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#99000000" />
+    <corners android:radius="@dimen/_10sdp" />
+    <stroke
+        android:width="@dimen/_1sdp"
+        android:color="@color/colorWhite16" />
+</shape>

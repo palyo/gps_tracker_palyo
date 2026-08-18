@@ -9,11 +9,9 @@ import aanibrothers.tracker.io.extension.IS_SETTINGS
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
-import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
 import aanibrothers.tracker.io.ui.updates.HomeActivity
-import aanibrothers.tracker.io.ui.updates.OnboardingActivity
 import aanibrothers.tracker.io.ui.updates.PermissionActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.GridLayoutManager
@@ -33,7 +31,10 @@ class AppLanguageActivity :
         Analytics.log(AnalyticsEvent.LanguageView)
         language = currentLanguage ?: Locale.getDefault().language
         initAdapter()
-        viewNativeMedium(adNative, placement = aanibrothers.tracker.io.analytics.AdPlacement.LANGUAGE)
+        viewNativeMedium(
+            adNative,
+            placement = aanibrothers.tracker.io.analytics.AdPlacement.LANGUAGE
+        )
     }
 
     private fun ActivityAppLanguageBinding.initAdapter() {
@@ -51,19 +52,27 @@ class AppLanguageActivity :
             currentLanguage = language
             val fromSettings = intent?.getBooleanExtra(IS_SETTINGS, false)
             if (fromSettings == true) {
-                Analytics.log(AnalyticsEvent.LanguageSelected(langCode = language, source = "settings"))
+                Analytics.log(
+                    AnalyticsEvent.LanguageSelected(
+                        langCode = language,
+                        source = "settings"
+                    )
+                )
                 go(AppSettingsActivity::class.java, finish = true)
             } else {
-                Analytics.log(AnalyticsEvent.LanguageSelected(langCode = language, source = "first_launch"))
+                Analytics.log(
+                    AnalyticsEvent.LanguageSelected(
+                        langCode = language,
+                        source = "first_launch"
+                    )
+                )
                 tinyDB?.putBoolean(IS_LANGUAGE_ENABLED, false)
                 val continueFlow = {
-                    if (isOnboardingEnabled()) {
-                        go(OnboardingActivity::class.java, finish = true)
-                    } else if (!hasAllNewPermissions() || !isLocationEnabled()) {
-                        go(PermissionActivity::class.java, finish = true)
-                    } else {
+//                    if (!hasAllNewPermissions() || !isLocationEnabled()) {
+//                        go(PermissionActivity::class.java, finish = true)
+//                    } else {
                         go(HomeActivity::class.java, finish = true)
-                    }
+//                    }
                 }
 
                 if (tinyDB?.getBoolean(IS_SPLASH_AD_FAILED, false) == true) {

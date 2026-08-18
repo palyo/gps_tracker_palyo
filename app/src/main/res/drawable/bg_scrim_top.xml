@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark-to-transparent gradient placed behind the top camera controls so the
+     focus / sound / timer / flash / switch / settings icons stay legible over
+     bright scenes. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#99000000"
+        android:centerColor="#4D000000"
+        android:endColor="@android:color/transparent"
+        android:type="linear" />
+</shape>

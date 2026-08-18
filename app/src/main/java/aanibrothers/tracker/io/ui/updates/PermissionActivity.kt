@@ -15,7 +15,6 @@ import aanibrothers.tracker.io.extension.hasCameraPermissions
 import aanibrothers.tracker.io.extension.hasLocationPermissions
 import aanibrothers.tracker.io.extension.hasStoragePermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
-import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.module.getPolicyLink
 import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeMedium
@@ -139,13 +138,7 @@ class PermissionActivity :
                     return@setOnClickListener
                 }
                 Analytics.log(AnalyticsEvent.PermissionFlowCompleted(set = "base_3"))
-                if(isOnboardingEnabled()) {
-                    viewInterAd(placement = aanibrothers.tracker.io.analytics.AdPlacement.PERM_CONTINUE) {
-                        go(HomeActivity::class.java, finish = true)
-                    }
-                }else{
-                    go(HomeActivity::class.java, finish = true)
-                }
+                go(HomeActivity::class.java, finish = true)
             }
         }
 

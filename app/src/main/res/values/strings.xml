@@ -283,6 +283,7 @@
     <string name="please_add_reminder_title">Please add reminder title</string>
 
     <string name="action_templates">Templates</string>
+    <string name="action_gallery">Gallery</string>
     <string name="action_manual_focus">Manual</string>
     <string name="action_auto_focus">Auto</string>
     <string name="action_switch">Switch</string>
@@ -290,7 +291,7 @@
     <string name="action_flash_on">Flash ON</string>
     <string name="action_sound_off">Sound OFF</string>
     <string name="action_sound_on">Sound ON</string>
-    <string name="action_timer_off">Timer Off</string>
+    <string name="action_timer_off">Timer OFF</string>
     <string name="action_timer_3sec">Timer 3sec</string>
     <string name="action_timer_5sec">Timer 5sec</string>
     <string name="action_folder">Folder</string>

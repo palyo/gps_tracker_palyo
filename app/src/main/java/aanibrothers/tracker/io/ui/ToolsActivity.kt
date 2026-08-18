@@ -51,12 +51,6 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
                 go(MapActivity::class.java)
             }
         }
-        actionMap.setOnClickListener {
-            checkLocationPermissionAndProceed {
-                Analytics.log(AnalyticsEvent.ToolOpened(tool = "map"))
-                go(MapActivity::class.java)
-            }
-        }
         actionVoice.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "voice_navigation"))
@@ -91,12 +85,6 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "area_calculator"))
                 go(AreaCalcActivity::class.java)
-            }
-        }
-        actionGpsCamera.setOnClickListener {
-            checkLocationPermissionAndProceed {
-                Analytics.log(AnalyticsEvent.ToolOpened(tool = "gps_camera"))
-                go(GPSCameraActivity::class.java)
             }
         }
     }

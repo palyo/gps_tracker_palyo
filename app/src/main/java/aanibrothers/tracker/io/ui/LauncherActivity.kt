@@ -10,17 +10,15 @@ import aanibrothers.tracker.io.databinding.ActivityLauncherBinding
 import aanibrothers.tracker.io.extension.IS_LANGUAGE_ENABLED
 import aanibrothers.tracker.io.extension.IS_SPLASH_AD_FAILED
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
-import aanibrothers.tracker.io.extension.isOnboardingEnabled
 import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.AppOpenManager
 import aanibrothers.tracker.io.module.ConsentManager
-import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.RemoteConfigManager
+import aanibrothers.tracker.io.module.TAG
 import aanibrothers.tracker.io.module.loadInterAd
 import aanibrothers.tracker.io.module.preloadNative
 import aanibrothers.tracker.io.more.ProbActivity
 import aanibrothers.tracker.io.ui.updates.HomeActivity
-import aanibrothers.tracker.io.ui.updates.OnboardingActivity
 import aanibrothers.tracker.io.ui.updates.PermissionActivity
 import android.app.Activity
 import android.content.Intent
@@ -45,7 +43,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.jvm.java
 
 class LauncherActivity :
     BaseActivity<ActivityLauncherBinding>(ActivityLauncherBinding::inflate, isFullScreen = true) {
@@ -56,15 +53,18 @@ class LauncherActivity :
     private var mSplashInterstitialAd: InterstitialAd? = null
 
     // Hardcoded splash interstitial unit (preserved from your original code).
-    private val SPLASH_INTER_UNIT = if(BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-4852962457779682/2927637589"
+    private val SPLASH_INTER_UNIT =
+        if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-4852962457779682/2927637589"
 
     // AdMob app ID. The Next-Gen SDK requires it explicitly in InitializationConfig
     // (the legacy SDK read it from the AndroidManifest meta-data automatically).
     private val ADMOB_APP_ID = "ca-app-pub-4852962457779682~5605383182"
 
     // Hard ceiling on how long we'll keep the splash visible while waiting
-    // for the ad to load. After this, we proceed without the ad.
-    private val SPLASH_INTER_TIMEOUT_MS = 6000L
+    // for the ad to load. After this, we proceed without the ad. Kept short so
+    // a slow ad fill can't stall the user in front of a static splash — if the
+    // ad hasn't loaded by now we go straight to the camera instead of waiting.
+    private val SPLASH_INTER_TIMEOUT_MS = 3000L
 
     override fun ActivityLauncherBinding.initView() {
         // Order: gather consent -> init MobileAds -> load splash interstitial
@@ -197,7 +197,7 @@ class LauncherActivity :
     }
 
     private fun goNext(int: Int) {
-        Log.e(TAG, "goNext: $int" )
+        Log.e(TAG, "goNext: $int")
         loadInterAd()
         appOpenManager = AppOpenManager()
         if (hasNavigated.getAndSet(true)) return
@@ -209,12 +209,13 @@ class LauncherActivity :
             when {
                 stringExtra == "uninstall" ->
                     go(ProbActivity::class.java, finish = true)
+
                 tinyDB?.getBoolean(IS_LANGUAGE_ENABLED, true) == true ->
                     go(AppLanguageActivity::class.java, finish = true)
-                isOnboardingEnabled() ->
-                    go(OnboardingActivity::class.java, finish = true)
-                !hasAllNewPermissions() || !isLocationEnabled() ->
-                    go(PermissionActivity::class.java, finish = true)
+
+//                !hasAllNewPermissions() || !isLocationEnabled() ->
+//                    go(PermissionActivity::class.java, finish = true)
+
                 else ->
                     go(HomeActivity::class.java, finish = true)
             }
@@ -238,7 +239,9 @@ class LauncherActivity :
         val shortcutManager = getSystemService(ShortcutManager::class.java)
 
         val scanShortcut =
-            ShortcutInfo.Builder(this, "shortcut_theme").setShortLabel("Camera").setLongLabel("Camera").setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_camera)).setIntent(
+            ShortcutInfo.Builder(this, "shortcut_theme").setShortLabel("Camera")
+                .setLongLabel("Camera")
+                .setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_camera)).setIntent(
                 Intent(this, LauncherActivity::class.java).apply {
                     putExtra("fromShortCut", "camera")
                     action = Intent.ACTION_VIEW
@@ -246,7 +249,9 @@ class LauncherActivity :
                 }).build()
 
         val searchUninstall =
-            ShortcutInfo.Builder(this, "shortcut_uninstall").setShortLabel("Uninstall").setLongLabel("Uninstall").setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_delete)).setIntent(
+            ShortcutInfo.Builder(this, "shortcut_uninstall").setShortLabel("Uninstall")
+                .setLongLabel("Uninstall")
+                .setIcon(Icon.createWithResource(this, R.mipmap.ic_shortcut_delete)).setIntent(
                 Intent(this, LauncherActivity::class.java).apply {
                     putExtra("fromShortCut", "uninstall")
                     action = Intent.ACTION_VIEW
