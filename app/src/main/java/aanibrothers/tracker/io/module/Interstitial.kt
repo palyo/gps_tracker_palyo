@@ -21,7 +21,7 @@ private var isLoadingAd = false
 // Frequency cap: AdMob's quality threshold expects a reasonable gap between
 // full-screen ads. Showing an interstitial on every back-press (the old
 // behaviour) is one of the most-flagged abusive patterns.
-private const val MIN_INTERSTITIAL_INTERVAL_MS = 45_000L  // 45 seconds
+private const val MIN_INTERSTITIAL_INTERVAL_MS = 30_000L  // 45 seconds
 private var lastInterstitialShownAt = 0L
 
 private fun isWithinFrequencyCap(): Boolean {

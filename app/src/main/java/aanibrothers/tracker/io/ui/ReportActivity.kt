@@ -5,6 +5,8 @@ import aanibrothers.tracker.io.adapter.ReportImageAdapter
 import aanibrothers.tracker.io.databinding.ActivityReportBinding
 import aanibrothers.tracker.io.helper.PdfReportBuilder
 import aanibrothers.tracker.io.helper.PhotoReportRenderer
+import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewInterAd
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -13,6 +15,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -58,6 +61,7 @@ class ReportActivity : BaseActivity<ActivityReportBinding>(ActivityReportBinding
 
     override fun ActivityReportBinding.initView() {
         updateNavigationBarColor(R.color.colorBackground)
+        viewBanner(adNative)
     }
 
     override fun ActivityReportBinding.initExtra() {
@@ -83,6 +87,11 @@ class ReportActivity : BaseActivity<ActivityReportBinding>(ActivityReportBinding
     }
 
     override fun ActivityReportBinding.initListeners() {
+        onBackPressedDispatcher.addCallback {
+            viewInterAd {
+                finish()
+            }
+        }
         actionBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         actionAddImages.setOnClickListener {
             pickImagesLauncher.launch(Intent(this@ReportActivity, ReportPickerActivity::class.java))
@@ -120,7 +129,7 @@ class ReportActivity : BaseActivity<ActivityReportBinding>(ActivityReportBinding
 
     private fun reportTitle(): String {
         return preferences?.getString(KEY_TITLE, "").orEmpty()
-            .ifBlank { getString(R.string.app_name_splash) }
+            .ifBlank { getString(R.string.app_name) }
     }
 
     private fun reportDescription(): String {

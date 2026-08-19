@@ -244,6 +244,19 @@
                     app:layout_constraintTop_toBottomOf="@+id/text_gmt_time" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <include
+                android:id="@+id/shimmer_map_data"
+                layout="@layout/layout_map_data_shimmer"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:background="@drawable/bg_stamp_panel"
+                android:clipToOutline="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -435,6 +448,20 @@
                     app:layout_constraintTop_toBottomOf="@+id/text_gmt_time_classic" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <include
+                android:id="@+id/shimmer_map_data_classic"
+                layout="@layout/layout_map_data_shimmer"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:background="@drawable/ic_bg_rounded_8sdp"
+                android:backgroundTint="@color/colorBlack34"
+                android:clipToOutline="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -625,6 +652,19 @@
                     app:layout_constraintStart_toStartOf="@id/text_address_squarise"
                     app:layout_constraintTop_toBottomOf="@+id/text_gmt_time_squarise" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <include
+                android:id="@+id/shimmer_map_data_squarise"
+                layout="@layout/layout_map_data_shimmer"
+                android:layout_width="@dimen/_0sdp"
+                android:layout_height="@dimen/_0sdp"
+                android:background="@color/colorBlack34"
+                android:clipToOutline="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

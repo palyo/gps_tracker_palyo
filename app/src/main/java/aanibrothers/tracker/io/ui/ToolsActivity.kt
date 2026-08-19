@@ -7,6 +7,7 @@ import aanibrothers.tracker.io.databinding.ActivityToolsBinding
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
 import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.viewBanner
+import aanibrothers.tracker.io.module.viewInterAd
 import android.content.IntentSender
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -32,7 +33,11 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
             val allGranted = permissions.values.all { it }
             if (!allGranted) {
                 pendingAction = null
-                Toast.makeText(this, getString(R.string.toast_location_permissions_required), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.toast_location_permissions_required),
+                    Toast.LENGTH_SHORT
+                ).show()
                 incrementPermissionsDeniedCount("PERMISSION_LOCATION")
             } else {
                 pendingAction?.invoke()
@@ -48,43 +53,58 @@ class ToolsActivity : BaseActivity<ActivityToolsBinding>(ActivityToolsBinding::i
         mapBanner.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "map"))
-                go(MapActivity::class.java)
+                viewInterAd {
+                    go(MapActivity::class.java)
+                }
             }
         }
         actionVoice.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "voice_navigation"))
-                go(MapActivity::class.java, listOf("is_voice_navigation" to true))
+                viewInterAd {
+                    go(MapActivity::class.java, listOf("is_voice_navigation" to true))
+                }
             }
         }
         actionRouteFinder.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "route_finder"))
-                go(RouteActivity::class.java)
+                viewInterAd {
+                    go(RouteActivity::class.java)
+                }
             }
         }
         actionSpeedometer.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "speedometer"))
-                go(SpeedViewActivity::class.java)
+                viewInterAd {
+                    go(SpeedViewActivity::class.java)
+                }
             }
         }
         actionCompass.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "compass"))
-                go(CompassActivity::class.java)
+                viewInterAd {
+                    go(CompassActivity::class.java)
+                }
             }
         }
         actionNear.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "nearby_places"))
-                go(NearActivity::class.java)
+                viewInterAd {
+                    go(NearActivity::class.java)
+                }
             }
         }
         actionArea.setOnClickListener {
             checkLocationPermissionAndProceed {
                 Analytics.log(AnalyticsEvent.ToolOpened(tool = "area_calculator"))
-                go(AreaCalcActivity::class.java)
+                viewInterAd {
+                    go(AreaCalcActivity::class.java)
+                }
+
             }
         }
     }

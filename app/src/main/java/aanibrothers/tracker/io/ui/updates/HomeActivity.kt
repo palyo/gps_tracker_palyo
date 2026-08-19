@@ -19,6 +19,7 @@ import aanibrothers.tracker.io.model.LocationMode
 import aanibrothers.tracker.io.model.OverlayState
 import aanibrothers.tracker.io.model.OverlayTemplate
 import aanibrothers.tracker.io.module.AppOpenManager
+import aanibrothers.tracker.io.module.viewInterAd
 import aanibrothers.tracker.io.module.viewNativeSmall
 import aanibrothers.tracker.io.ui.AppSettingsActivity
 import aanibrothers.tracker.io.ui.ToolsActivity
@@ -151,6 +152,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
@@ -271,6 +273,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     private var googleMap: GoogleMap? = null
     private val lastMapSnapshot = java.util.concurrent.atomic.AtomicReference<Bitmap?>()
 
+    // While the map tile and the reverse-geocoded address are still loading, a
+    // shimmer skeleton covers the stamp panel. Flipped true the first time a
+    // real address lands so lifecycle re-entries don't flash the skeleton again.
+    private var isMapDataLoaded = false
+
     /** Container the active template draws its map tile into. */
     private fun activeMapContainerId(): Int {
         return when (tinyDB?.getString("template", "default")) {
@@ -382,6 +389,55 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         }
     }
 
+
+    private fun ActivityHomeBinding.allShimmerViews(): List<ShimmerFrameLayout> = listOf(
+        shimmerMapData.root as ShimmerFrameLayout,
+        shimmerMapDataClassic.root as ShimmerFrameLayout,
+        shimmerMapDataSquarise.root as ShimmerFrameLayout
+    )
+
+    /** The skeleton that belongs to whichever template is currently active. */
+    private fun ActivityHomeBinding.activeShimmerView(): ShimmerFrameLayout {
+        return when (tinyDB?.getString("template", "default")) {
+            "classic" -> shimmerMapDataClassic.root as ShimmerFrameLayout
+            "squarise" -> shimmerMapDataSquarise.root as ShimmerFrameLayout
+            else -> shimmerMapData.root as ShimmerFrameLayout
+        }
+    }
+
+    /** The real detail text blocks the skeleton stands in for, per template. */
+    private fun ActivityHomeBinding.allDetailViews(): List<View> = listOf(
+        layoutLocationDetails, layoutLocationDetailsClassic, layoutLocationDetailsSquarise
+    )
+
+    /**
+     * Cover the active stamp panel with its animating loading skeleton and hide
+     * the real detail text underneath so the two don't show through each other.
+     * The map card stays in the tree — the opaque skeleton tile hides it, while
+     * the map keeps rendering so its snapshot is ready for the stamp.
+     */
+    private fun ActivityHomeBinding.showMapDataShimmer() {
+        val active = activeShimmerView()
+        allShimmerViews().forEach { shimmer ->
+            if (shimmer === active) {
+                shimmer.beVisible()
+                shimmer.startShimmer()
+            } else {
+                shimmer.stopShimmer()
+                shimmer.beGone()
+            }
+        }
+        allDetailViews().forEach { it.beInvisible() }
+    }
+
+    /** Reveal the loaded stamp panel by dropping every skeleton overlay. */
+    private fun ActivityHomeBinding.hideMapDataShimmer() {
+        allShimmerViews().forEach { shimmer ->
+            shimmer.stopShimmer()
+            shimmer.beGone()
+        }
+        allDetailViews().forEach { it.beVisible() }
+    }
 
     fun ActivityHomeBinding.setupTab() {
         tabCaptureMode.apply {
@@ -836,6 +892,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         layoutMapData.isVisible = hasAllPermissions && template == "default"
         layoutMapDataClassic.isVisible = hasAllPermissions && template == "classic"
         layoutMapDataSquarise.isVisible = hasAllPermissions && template == "squarise"
+
+        // Keep the loading skeleton up until the first address/map tile lands.
+        if (hasAllPermissions && !isMapDataLoaded) showMapDataShimmer()
 
         if (!hasAllPermissions) {
             permissionTitle.setText(R.string.title_camera_location)
@@ -2070,6 +2129,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                     } else {
                         address.getAddressLine(0)?.takeIf { it.isNotBlank() } ?: unknownLocation
                     }
+
+                    // Real address is on screen — retire the loading skeleton.
+                    isMapDataLoaded = true
+                    hideMapDataShimmer()
                 }
 
                 textLatitudeValue.text = String.format("%.6f", location.latitude)
@@ -2380,10 +2443,12 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                             )
                         )
                     } else {
-                        val intent = Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
-                            putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
+                        viewInterAd {
+                            val intent = Intent(this@HomeActivity, ViewCollectionActivity::class.java).apply {
+                                putExtra(ViewCollectionActivity.EXTRA_FILE_PATH, file.absolutePath)
+                            }
+                            startActivity(intent)
                         }
-                        startActivity(intent)
                     }
                 } else {
                     Toast.makeText(
@@ -2399,7 +2464,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
             allowMapSnapshot = false
-            go(TemplatesActivity::class.java)
+            viewInterAd {
+                go(TemplatesActivity::class.java)
+            }
         }
         actionTools.setOnClickListener {
             stopLocationUpdates()
@@ -2417,7 +2484,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
             allowMapSnapshot = false
-            go(AppSettingsActivity::class.java)
         }
         buttonAllowAccess.setOnClickListener {
             requestCameraLocationPermissions()

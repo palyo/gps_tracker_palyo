@@ -249,7 +249,7 @@
         android:paddingHorizontal="@dimen/_8sdp"
         android:paddingTop="@dimen/_10sdp"
         android:paddingBottom="@dimen/_72sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ad_native"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_report_actions"
@@ -291,7 +291,7 @@
         android:layout_margin="@dimen/_16sdp"
         android:contentDescription="@string/action_add_images"
         app:backgroundTint="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ad_native"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_report_add_photo"
         app:tint="@color/colorWhite" />
@@ -302,8 +302,18 @@
         android:layout_height="wrap_content"
         android:indeterminateTint="@color/colorAccent"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ad_native"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <aanibrothers.tracker.io.module.AdsView
+        android:id="@+id/ad_native"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/native_56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shimmer_preview_layout="@layout/ad_unified_banner_loading" />
 </androidx.constraintlayout.widget.ConstraintLayout>
