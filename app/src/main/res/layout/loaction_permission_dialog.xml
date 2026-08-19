@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_location_services"
         android:lineSpacingExtra="6dp"
-        android:fontFamily="@font/font_regular"/>
+        android:fontFamily="@font/regular"/>
     <TextView
         android:textSize="15sp"
         android:textColor="@color/colorTextOpacity"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_location_services_content"
         android:lineSpacingExtra="6dp"
-        android:fontFamily="@font/font_regular"/>
+        android:fontFamily="@font/regular"/>
     <Button
         android:textStyle="bold"
         android:textColor="#ffffff"
@@ -40,6 +40,6 @@
         android:layout_marginTop="@dimen/_8sdp"
         android:text="@string/open_location_settings"
         android:textAllCaps="true"
-        android:fontFamily="@font/font_regular"
+        android:fontFamily="@font/regular"
         android:backgroundTint="@color/colorAccent"/>
 </LinearLayout>

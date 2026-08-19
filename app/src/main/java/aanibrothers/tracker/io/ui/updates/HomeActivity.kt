@@ -387,10 +387,23 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         tabCaptureMode.apply {
             addTab(newTab().setText(getString(R.string.tab_photo)))
             addTab(newTab().setText(getString(R.string.tab_video)))
+            addTab(newTab().setText(getString(R.string.action_report).uppercase()))
 
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    captureMode = if (tab.position == 0) CaptureMode.PHOTO else CaptureMode.VIDEO
+                    if (tab.position == 2) {
+                        // REPORT is an action, not a capture mode: open the
+                        // screen and snap the selection back to the active
+                        // mode's tab so the camera state is untouched.
+                        post { getTabAt(if (captureMode == CaptureMode.VIDEO) 1 else 0)?.select() }
+                        go(ReportActivity::class.java)
+                        return
+                    }
+                    val newMode = if (tab.position == 0) CaptureMode.PHOTO else CaptureMode.VIDEO
+                    // The snap-back from REPORT re-selects the current mode's
+                    // tab; skip the camera restart in that case.
+                    if (newMode == captureMode) return
+                    captureMode = newMode
                     updateCaptureUI()
                     if (captureMode == CaptureMode.VIDEO && !hasPermission(Manifest.permission.RECORD_AUDIO)) {
                         showAudioPermissionDialog()
@@ -790,26 +803,18 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun requiredCameraPermissions(): Array<String> {
-        val permissions = mutableListOf(
+        return arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        return permissions.toTypedArray()
     }
 
-    private fun needsStoragePermission(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-    }
-
-    private fun hasCameraLocationStoragePermissions(): Boolean {
+    private fun hasCameraLocationPermissions(): Boolean {
         return requiredCameraPermissions().all { hasPermission(it) }
     }
 
-    private fun requestCameraLocationStoragePermissions() {
+    private fun requestCameraLocationPermissions() {
         val deniedCount = fetchPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
         if (deniedCount >= 2) {
             openAppSettings()
@@ -823,7 +828,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
     }
 
     private fun ActivityHomeBinding.updateCameraPermissionUi() {
-        val hasAllPermissions = hasCameraLocationStoragePermissions()
+        val hasAllPermissions = hasCameraLocationPermissions()
         permissionLayout.isVisible = !hasAllPermissions
         previewView.isVisible = hasAllPermissions
 
@@ -833,20 +838,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         layoutMapDataSquarise.isVisible = hasAllPermissions && template == "squarise"
 
         if (!hasAllPermissions) {
-            permissionTitle.setText(
-                if (needsStoragePermission()) {
-                    R.string.title_camera_location_storage
-                } else {
-                    R.string.title_camera_location
-                }
-            )
-            permissionBody.setText(
-                if (needsStoragePermission()) {
-                    R.string.body_camera_location_storage
-                } else {
-                    R.string.body_camera_location
-                }
-            )
+            permissionTitle.setText(R.string.title_camera_location)
+            permissionBody.setText(R.string.body_camera_location)
             cameraProvider?.unbindAll()
             camera = null
             isCameraBound = false
@@ -1802,7 +1795,11 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                 inputFile = inputFile,
                                 outputFile = outputFile,
                                 onSuccess = {
+                                    // The Transformer export outlives the activity: if the user
+                                    // left before it finished, the file is saved but no UI work
+                                    // is possible (Glide throws on a destroyed activity).
                                     runOnUiThread {
+                                        if (isFinishing || isDestroyed) return@runOnUiThread
                                         Toast.makeText(
                                             this,
                                             getString(R.string.message_overlay_video_saved),
@@ -1819,6 +1816,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                                         "startVideoRecording:", "Overlay failed: ${e.message}"
                                     )
                                     runOnUiThread {
+                                        if (isFinishing || isDestroyed) return@runOnUiThread
                                         Toast.makeText(
                                             this,
                                             getString(
@@ -2230,9 +2228,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
         var cameraGranted = hasPermission(Manifest.permission.CAMERA)
         var fineGranted = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         var coarseGranted = hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-        var storageGranted =
-            !needsStoragePermission() || hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
         permissionList.forEachIndexed { index, permission ->
             if (grantResults.getOrNull(index) != PackageManager.PERMISSION_GRANTED) return@forEachIndexed
 
@@ -2240,26 +2235,22 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 Manifest.permission.CAMERA -> cameraGranted = true
                 Manifest.permission.ACCESS_FINE_LOCATION -> fineGranted = true
                 Manifest.permission.ACCESS_COARSE_LOCATION -> coarseGranted = true
-                Manifest.permission.WRITE_EXTERNAL_STORAGE -> storageGranted = true
             }
         }
 
         val locationGranted = fineGranted && coarseGranted
 
-        if (cameraGranted && locationGranted && storageGranted) {
+        if (cameraGranted && locationGranted) {
             binding?.updateCameraPermissionUi()
             Toast.makeText(this, getString(R.string.toast_camera_gps_ready), Toast.LENGTH_SHORT)
                 .show()
         } else {
             incrementPermissionsDeniedCount("PERMISSION_CAMERA_LOCATION")
             binding?.updateCameraPermissionUi()
-            val message = if (needsStoragePermission()) {
-                getString(R.string.message_camera_location_storage_permissions_required)
-            } else {
-                getString(R.string.message_camera_gps_permissions_required)
-            }
             Toast.makeText(
-                this, message, Toast.LENGTH_LONG
+                this,
+                getString(R.string.message_camera_gps_permissions_required),
+                Toast.LENGTH_LONG
             ).show()
         }
     }
@@ -2404,10 +2395,6 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
                 }
             }
         }
-        actionReport.setOnClickListener {
-            go(ReportActivity::class.java)
-        }
-
         actionTemplates.setOnClickListener {
             stopLocationUpdates()
             timeHandler.removeCallbacks(timeRunnable)
@@ -2433,7 +2420,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>(
             go(AppSettingsActivity::class.java)
         }
         buttonAllowAccess.setOnClickListener {
-            requestCameraLocationStoragePermissions()
+            requestCameraLocationPermissions()
         }
 
         when (intent?.getIntExtra("action", 0)) {

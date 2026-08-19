@@ -16,7 +16,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.CanvasOverlay
 import coder.apps.space.library.extension.dimen
-import androidx.core.graphics.toColorInt
 import androidx.core.graphics.withClip
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,7 +36,7 @@ class PaintOverlayRenderer(
     private val mapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
     private val fontSemiBold by lazy { ResourcesCompat.getFont(context, R.font.font_bold) }
     private val fontMedium by lazy { ResourcesCompat.getFont(context, R.font.font_medium) }
-    private val fontRegular by lazy { ResourcesCompat.getFont(context, R.font.font_regular) }
+    private val fontRegular by lazy { ResourcesCompat.getFont(context, R.font.regular) }
     override fun onDraw(canvas: Canvas, presentationTimeUs: Long) {
         val w = canvas.width.toFloat()
         val h = canvas.height.toFloat()

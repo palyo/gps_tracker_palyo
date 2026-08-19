@@ -1,5 +1,6 @@
 package aanibrothers.tracker.io.module
 
+import aanibrothers.tracker.io.App
 import aanibrothers.tracker.io.R
 import aanibrothers.tracker.io.databinding.AdUnifiedBannerLoadingBinding
 import android.app.Activity
@@ -32,6 +33,9 @@ fun Activity.viewBanner(container: ViewGroup) {
 }
 
 private fun Activity.viewBannerInternal(container: ViewGroup, attempt: Int) {
+    // Never load before MobileAds.initialize() has completed — the Next-Gen SDK
+    // throws IllegalStateException otherwise (offline / consent-declined paths).
+    if (!App.isMobileAdsInitialized.get()) return
     if (container.isNotEmpty()) container.removeAllViews()
     val adSize = getAdSize()
     val height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (adSize.height + 2).toFloat(), resources.displayMetrics).toInt()
@@ -81,6 +85,7 @@ private fun Activity.getAdSize(): AdSize {
 
 
 fun Context.viewMRECBanner(viewGroup: AdsView) {
+    if (!App.isMobileAdsInitialized.get()) return
     val adView = AdView(this)
     val adRequest = BannerAdRequest.Builder(getAdmobBannerMRECId(), AdSize.MEDIUM_RECTANGLE).build()
     adView.loadAd(adRequest, object : AdLoadCallback<BannerAd> {

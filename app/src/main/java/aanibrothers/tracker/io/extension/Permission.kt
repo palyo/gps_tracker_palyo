@@ -3,7 +3,6 @@ package aanibrothers.tracker.io.extension
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import coder.apps.space.library.helper.TinyDB
@@ -15,25 +14,6 @@ val LOCATION_PERMISSION =
 val CAMERA_PERMISSION = arrayOf(Manifest.permission.CAMERA)
 
 
-
-val STORAGE_PERMISSION = if (Build.VERSION.SDK_INT >= 33) {
-    arrayOf(
-        Manifest.permission.READ_MEDIA_IMAGES,
-        Manifest.permission.READ_MEDIA_VIDEO
-    )
-} else {
-    arrayOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
-}
-
-
-fun Context.hasStoragePermissions(): Boolean {
-    return STORAGE_PERMISSION.all {
-        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-    }
-}
 
 fun Context.hasLocationPermissions(): Boolean {
     return LOCATION_PERMISSION.all {
@@ -48,8 +28,12 @@ fun Context.hasCameraPermissions(): Boolean {
 }
 
 
+/**
+ * The app writes only its own files into shared storage, which needs no
+ * permission on the supported API range, so this is camera plus location.
+ */
 fun Context.hasAllNewPermissions(): Boolean {
-    return hasStoragePermissions() && hasLocationPermissions() && hasCameraPermissions()
+    return hasLocationPermissions() && hasCameraPermissions()
 }
 
 fun Context.isGrantedOverlay(): Boolean {

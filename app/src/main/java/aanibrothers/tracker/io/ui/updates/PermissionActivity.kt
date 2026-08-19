@@ -9,11 +9,9 @@ import aanibrothers.tracker.io.databinding.LayoutDialogPermissionSettingsBinding
 import aanibrothers.tracker.io.databinding.LoactionPermissionDialogBinding
 import aanibrothers.tracker.io.extension.CAMERA_PERMISSION
 import aanibrothers.tracker.io.extension.LOCATION_PERMISSION
-import aanibrothers.tracker.io.extension.STORAGE_PERMISSION
 import aanibrothers.tracker.io.extension.hasAllNewPermissions
 import aanibrothers.tracker.io.extension.hasCameraPermissions
 import aanibrothers.tracker.io.extension.hasLocationPermissions
-import aanibrothers.tracker.io.extension.hasStoragePermissions
 import aanibrothers.tracker.io.extension.isLocationEnabled
 import aanibrothers.tracker.io.module.getPolicyLink
 import aanibrothers.tracker.io.module.viewInterAd
@@ -41,7 +39,6 @@ class PermissionActivity :
     private var handlerSettingOverLay: HandleSettingPreview? = null
 
     private val permissionKeyMap = mapOf(
-        "storage" to STORAGE_PERMISSION,
         "location" to LOCATION_PERMISSION,
         "camera" to CAMERA_PERMISSION
     )
@@ -93,13 +90,6 @@ class PermissionActivity :
         }
 
     override fun ActivityPermissionBinding.initListeners() {
-        clPermissionStorage.setOnClickListener {
-            if (hasStoragePermissions()) {
-                imgPermission3.isSelected = true
-                return@setOnClickListener
-            }
-            requestWithLimit("storage", STORAGE_PERMISSION)
-        }
 
         clPermissionLocation.setOnClickListener {
             if (hasLocationPermissions()) {
@@ -161,21 +151,18 @@ class PermissionActivity :
 
     private fun refreshUi() {
         binding?.apply {
-            val storageGranted = hasStoragePermissions()
             val locationGranted = hasLocationPermissions()
             val cameraGranted = hasCameraPermissions()
-
-            imgPermission3.isActivated = storageGranted
             imgPermission4.isActivated = locationGranted
             imgPermission2.isActivated = cameraGranted
 
-            if (storageGranted || locationGranted || cameraGranted) {
+            if (locationGranted || cameraGranted) {
                 lottieView.beGone()
             } else {
                 lottieView.beVisible()
             }
 
-            if (storageGranted && locationGranted && cameraGranted) {
+            if (locationGranted && cameraGranted) {
                 btnAllowPermission.beVisible()
             } else {
                 btnAllowPermission.beGone()
@@ -208,7 +195,6 @@ class PermissionActivity :
 
     private fun requestNextMissing() {
         val (key, perms) = when {
-            !hasStoragePermissions() -> "storage" to STORAGE_PERMISSION
             !hasLocationPermissions() -> "location" to LOCATION_PERMISSION
             !hasCameraPermissions() -> "camera" to CAMERA_PERMISSION
             else -> return

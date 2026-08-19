@@ -157,7 +157,7 @@
             android:textColor="@color/colorText"
             android:textSize="@dimen/_10ssp"
             android:gravity="start"
-            android:fontFamily="@font/font_regular"
+            android:fontFamily="@font/regular"
             app:layout_constraintEnd_toStartOf="@+id/action_edit_description"
             app:layout_constraintStart_toStartOf="@+id/text_report_title"
             app:layout_constraintTop_toBottomOf="@+id/text_report_title"

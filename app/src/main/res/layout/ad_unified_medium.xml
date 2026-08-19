@@ -17,7 +17,7 @@
             android:id="@+id/cta"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:fontFamily="@font/font_regular"
+            android:fontFamily="@font/regular"
             android:backgroundTint="@color/colorAccent"
             android:layout_marginHorizontal="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -88,7 +88,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="AD"
-                                    android:fontFamily="@font/font_regular"
+                                    android:fontFamily="@font/regular"
                                     android:paddingHorizontal="4dp"
                                     android:paddingVertical="1dp"/>
                                 <TextView
@@ -101,7 +101,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/app_name"
                                     android:lines="1"
-                                    android:fontFamily="@font/font_regular"
+                                    android:fontFamily="@font/regular"
                                     android:layout_marginStart="8dp"/>
                             </LinearLayout>
                             <TextView
@@ -114,7 +114,7 @@
                                 android:text="jhfoiejigoghg jgoirfjgiofj jgoifrjg jknjkgikf knghkhfrgikgf njoidgjioj"
                                 android:lines="2"
                                 android:alpha="0.8"
-                                android:fontFamily="@font/font_regular"/>
+                                android:fontFamily="@font/regular"/>
                         </LinearLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -153,7 +153,7 @@
                             android:layout_marginTop="@dimen/gnt_no_margin"
                             android:layout_marginBottom="@dimen/gnt_no_margin"
                             android:lines="1"
-                            android:fontFamily="@font/font_regular"
+                            android:fontFamily="@font/regular"
                             android:layout_marginStart="@dimen/gnt_no_margin"
                             android:layout_marginEnd="@dimen/gnt_no_margin"/>
                     </LinearLayout>

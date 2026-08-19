@@ -157,7 +157,7 @@
                         android:id="@+id/ad_call_to_action"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:fontFamily="@font/font_regular"
+                        android:fontFamily="@font/regular"
                         android:backgroundTint="@color/colorAccent8"
                         android:layout_marginHorizontal="14dp"
                         app:layout_constraintBottom_toBottomOf="parent"

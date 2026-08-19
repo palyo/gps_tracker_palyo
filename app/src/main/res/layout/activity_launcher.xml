@@ -73,7 +73,7 @@
         android:layout_marginBottom="@dimen/_10sdp"
         android:text="This action can contain ad"
         android:textSize="@dimen/_9ssp"
-        app:fontFamily="@font/font_regular"
+        app:fontFamily="@font/regular"
         app:layout_constraintBottom_toTopOf="@+id/progress_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

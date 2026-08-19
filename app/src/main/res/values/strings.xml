@@ -84,8 +84,6 @@
     <string name="notification_permission_body">Enable notifications to receive important updates and reminders related to your budget and financial tracking.</string>
     <string name="title_camera_location">Camera &amp; Location Permission Required</string>
     <string name="body_camera_location">To capture photos with embedded GPS data, allow camera and location permissions.</string>
-    <string name="title_camera_location_storage">Camera, Location &amp; Storage Access Required</string>
-    <string name="body_camera_location_storage">To capture photos and save files with GPS data, allow camera, location, and storage permissions.</string>
     <string name="button_allow_access">Allow Access</string>
     <string name="button_allow">Allow</string>
     <string name="button_open_settings">Open Settings</string>
@@ -99,7 +97,6 @@
     <string name="title_phone_notification_permission_denied">Phone and Notification Permission Denied</string>
     <string name="body_permission_denied_open_settings">The app cannot function properly without that permission. Please enable the permission in the app settings.</string>
     <string name="message_camera_gps_permissions_required">Camera and GPS permissions required</string>
-    <string name="message_camera_location_storage_permissions_required">Camera, location, and storage permissions required</string>
     <string name="message_capture_failed">Capture failed: %1$s</string>
     <string name="message_portrait_saved_with_gps">Portrait image saved with GPS data</string>
     <string name="message_image_saved_without_gps">Image saved without GPS data</string>
